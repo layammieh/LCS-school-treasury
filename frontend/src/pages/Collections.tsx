@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import { useSchoolYearStore } from '../store/schoolYearStore';
 import {
   Plus, ChevronDown, Activity, Calendar, Layers, Coins, X,
-  Pencil, Trash2, AlertCircle, Search, CreditCard
+  Pencil, Trash2, AlertCircle, Search, CreditCard, Loader2
 } from 'lucide-react';
 import { transactionsApi, consigneesApi, expensesApi } from '../lib/api';
 import type {
@@ -705,7 +705,7 @@ export default function Collections() {
                     </colgroup>
                     <tbody className="divide-y divide-slate-200 text-xs">
                         {loading ? (
-                          <tr><td colSpan={6} className="px-4 py-10 text-center text-gray-400">Loading...</td></tr>
+                          <tr><td colSpan={6} className="px-4 py-10 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" /></td></tr>
                         ) : transactions.length === 0 ? (
                           <tr>
                             <td colSpan={6} className="px-4 py-12 text-center h-28">
@@ -917,7 +917,7 @@ export default function Collections() {
                     </colgroup>
                     <tbody className="divide-y divide-slate-200 text-xs">
                         {loadingExpenses ? (
-                          <tr><td colSpan={6} className="px-4 py-10 text-center text-gray-400">Loading...</td></tr>
+                          <tr><td colSpan={6} className="px-4 py-10 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" /></td></tr>
                         ) : expenses.length === 0 ? (
                           <tr>
                             <td colSpan={6} className="px-4 py-12 text-center h-28">

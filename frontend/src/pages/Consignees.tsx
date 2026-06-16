@@ -11,7 +11,8 @@ import {
   Edit2,
   Trash2,
   ChevronDown,
-  Search
+  Search,
+  Loader2
 } from 'lucide-react';
 import { consigneesApi } from '../lib/api';
 import type { Consignee } from '../lib/api';
@@ -266,7 +267,7 @@ export default function Consignees() {
                 </thead>
                 <tbody className="divide-y divide-slate-200 text-xs bg-white">
                   {loading ? (
-                    <tr><td colSpan={4} className="px-10 py-10 text-center text-gray-400">Loading...</td></tr>
+                    <tr><td colSpan={4} className="px-10 py-10 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" /></td></tr>
                   ) : filteredConsignees.length === 0 ? (
                     <tr><td colSpan={4} className="px-10 py-10 text-center text-gray-400">No consignees found. Click "Add New Consignee" to add one.</td></tr>
                   ) : filteredConsignees.map(c => (

@@ -9,7 +9,8 @@ import {
   CreditCard,
   Wallet,
   Calendar,
-  ChevronDown
+  ChevronDown,
+  Loader2
 } from 'lucide-react';
 import { dashboardApi } from '../lib/api';
 import type { DashboardStats, Transaction } from '../lib/api';
@@ -295,7 +296,7 @@ export default function Dashboard() {
                 </thead>
                 <tbody className="divide-y divide-slate-200 text-xs">
                   {loading ? (
-                    <tr><td colSpan={6} className="px-6 py-8 text-center text-gray-400">Loading transactions...</td></tr>
+                    <tr><td colSpan={6} className="px-6 py-8 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" /></td></tr>
                   ) : (stats?.recent_transactions ?? []).map((txn: Transaction) => (
                     <tr key={txn.id} className="hover:bg-gray-50/50">
                       <td className="px-6 py-3.5 font-bold text-gray-800">{txn.student_name}</td>
