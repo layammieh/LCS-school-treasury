@@ -18,7 +18,7 @@ export default function Header({
   const user = useAuthStore(state => state.user);
   const logout = useAuthStore(state => state.logout);
   const isViewMode = useAuthStore(state => state.isViewMode);
-  const openSidebar = useSidebarStore(state => state.open);
+  const toggleSidebar = useSidebarStore(state => state.toggle);
   const navigate = useNavigate();
   const schoolYear = useSchoolYearStore(state => state.schoolYear);
   const setSchoolYear = useSchoolYearStore(state => state.setSchoolYear);
@@ -60,9 +60,9 @@ export default function Header({
     <header className="bg-white border-b border-gray-200 px-4 md:px-8 py-3.5 flex justify-between items-center shrink-0">
       <div className="flex items-center flex-1 mr-4">
         <button 
-          onClick={openSidebar}
-          className="md:hidden mr-3 p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors"
-          aria-label="Open menu"
+          onClick={toggleSidebar}
+          className="mr-3 p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors"
+          aria-label="Toggle menu"
         >
           <Menu className="h-5 w-5" />
         </button>

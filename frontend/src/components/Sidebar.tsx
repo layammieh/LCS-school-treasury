@@ -38,8 +38,7 @@ export default function Sidebar({ activePage }: SidebarProps) {
         />
       )}
 
-      <aside className={`fixed inset-y-0 left-0 bg-[#003D29] text-white flex flex-col justify-between p-4 shrink-0 shadow-lg min-h-screen z-50 transition-transform duration-300 md:translate-x-0 md:static md:w-64 ${isOpen ? 'translate-x-0 w-64' : '-translate-x-full w-0 md:w-64'
-        }`}>
+      <aside className={`fixed md:relative inset-y-0 left-0 bg-[#003D29] text-white flex flex-col justify-between shrink-0 shadow-lg min-h-screen z-50 transition-all duration-300 overflow-hidden ${isOpen ? 'translate-x-0 w-64 p-4' : '-translate-x-full w-0 p-0'}`}>
         <div>
           {/* Logo Brand */}
           <div className="flex items-center justify-between px-2 py-4 mb-4 border-b border-white/10">
@@ -52,8 +51,8 @@ export default function Sidebar({ activePage }: SidebarProps) {
                 <span className="text-[9px] text-gray-400 uppercase tracking-widest font-semibold block mt-0.5">School Administration</span>
               </div>
             </div>
-            {/* Close button on mobile */}
-            <button onClick={close} className="md:hidden text-gray-400 hover:text-white p-1">
+            {/* Close button */}
+            <button onClick={close} className="text-gray-400 hover:text-white p-1">
               <X className="h-5 w-5" />
             </button>
           </div>
