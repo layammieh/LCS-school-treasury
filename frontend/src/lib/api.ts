@@ -3,7 +3,7 @@
  * All requests automatically include the auth token from localStorage.
  */
 
-const BASE_URL = '/api';
+const BASE_URL = (import.meta.env.VITE_API_URL as string) || '/api';
 
 function getToken(): string | null {
   return localStorage.getItem('auth_token');
