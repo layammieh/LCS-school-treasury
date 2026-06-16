@@ -33,7 +33,7 @@ export default function Calendar() {
       <Sidebar activePage="calendar" />
 
       <div className="flex-1 flex flex-col overflow-y-auto max-h-screen">
-        <Header searchPlaceholder="Search transactions, students or dates..." />
+        <Header />
 
         <main className="p-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
           

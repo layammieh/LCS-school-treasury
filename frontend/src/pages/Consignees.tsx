@@ -157,7 +157,7 @@ export default function Consignees() {
       <Sidebar activePage="consignees" />
 
       <div className="flex-1 flex flex-col overflow-y-auto max-h-screen">
-        <Header searchPlaceholder="Search consignees, stalls, or phone numbers..." />
+        <Header />
 
         <main className="p-8 space-y-6">
           {/* Page Title & Button */}

@@ -88,7 +88,7 @@ export default function Dashboard() {
       <Sidebar activePage="dashboard" />
 
       <div className="flex-1 flex flex-col overflow-y-auto max-h-screen">
-        <Header searchPlaceholder="Search student, invoice, or vendor..." />
+        <Header />
 
         <main className="flex-1 p-8 space-y-6">
           

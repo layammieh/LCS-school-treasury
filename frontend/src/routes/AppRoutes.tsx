@@ -41,8 +41,6 @@ const AppRoute = ({ children }: { children: React.ReactNode }) => {
 
 export default function AppRoutes() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-  const isViewMode = useAuthStore(state => state.isViewMode);
-  const hasAccess = isAuthenticated || isViewMode;
 
   return (
     <Routes>

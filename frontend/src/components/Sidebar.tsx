@@ -1,5 +1,5 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
+import { Link, useLocation } from 'react-router-dom';
+
 import { useSidebarStore } from '../store/sidebarStore';
 import {
   LayoutDashboard,
@@ -16,17 +16,10 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ activePage }: SidebarProps) {
-  const logout = useAuthStore(state => state.logout);
-  const navigate = useNavigate();
   const location = useLocation();
 
   const isOpen = useSidebarStore(state => state.isOpen);
   const close = useSidebarStore(state => state.close);
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },

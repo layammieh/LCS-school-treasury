@@ -22,7 +22,7 @@ export default function Settings() {
 
   // Profile Form State
   const [fullName, setFullName] = useState(user?.full_name || '');
-  const [emailAddress, setEmailAddress] = useState(user?.email || '');
+  const emailAddress = user?.email || '';
   const [bio, setBio] = useState(user?.bio || '');
   const [avatar, setAvatar] = useState<File | null>(null);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -99,7 +99,6 @@ export default function Settings() {
 
       <div className="flex-1 flex flex-col overflow-y-auto max-h-screen">
         <Header 
-          searchPlaceholder="Search settings or tools..." 
           userName={user?.full_name}
         />
 

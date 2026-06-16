@@ -414,7 +414,7 @@ export default function Collections() {
       <Sidebar activePage="collections" />
 
       <div className="flex-1 flex flex-col overflow-y-auto max-h-screen">
-        <Header searchPlaceholder="Search by name or invoice..." />
+        <Header />
 
         <main className="p-6 space-y-6">
 

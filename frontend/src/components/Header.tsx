@@ -1,4 +1,4 @@
-import { Search, LogOut, LogIn, Calendar, Menu, Eye } from 'lucide-react';
+import { LogOut, LogIn, Calendar, Menu, Eye } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
@@ -7,14 +7,12 @@ import { useSidebarStore } from '../store/sidebarStore';
 import { ConfirmModal } from './ConfirmModal';
 
 interface HeaderProps {
-  searchPlaceholder?: string;
   userName?: string;
   userRole?: string;
   userAvatar?: string;
 }
 
 export default function Header({ 
-  searchPlaceholder = "Search...",
   userRole = "LCS Office",
 }: HeaderProps) {
   const user = useAuthStore(state => state.user);
@@ -25,24 +23,8 @@ export default function Header({
   const schoolYear = useSchoolYearStore(state => state.schoolYear);
   const setSchoolYear = useSchoolYearStore(state => state.setSchoolYear);
   const [showYearMenu, setShowYearMenu] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      // Navigate to search or filter current content
-      // For now, we'll just log it - this can be expanded to actual search functionality
-      console.log('Searching for:', searchQuery);
-      // You could implement navigation to a search page or filter current page
-    }
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    // You could implement live search filtering here
-  };
 
   // Generate school years dynamically (from 2006-2007 to 2046-2047)
   const generateSchoolYears = () => {
