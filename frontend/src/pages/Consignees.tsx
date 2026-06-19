@@ -256,7 +256,7 @@ export default function Consignees() {
             </div>
 
             <div className="overflow-x-auto overflow-y-auto max-h-[350px]">
-              <table className="w-full table-fixed text-left border-collapse">
+              <table className="w-full min-w-[800px] table-fixed text-left border-collapse">
                 <thead className="sticky top-0 bg-gray-50 z-10 shadow-sm border-b border-slate-200/60">
                   <tr className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                     <th className="pl-24 pr-10 py-3.5 w-[40%] text-left">Vendor Name</th>

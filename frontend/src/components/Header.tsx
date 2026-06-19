@@ -69,7 +69,7 @@ export default function Header({
       </div>
 
       {/* User actions */}
-      <div className="flex items-center space-x-5">
+      <div className="flex items-center space-x-2 md:space-x-5">
         {/* School Year Button */}
         <button 
           onClick={() => setShowYearMenu(true)}
@@ -139,8 +139,8 @@ export default function Header({
         )}
 
         {/* Profile */}
-        <div className="flex items-center space-x-3 border-l border-gray-200 pl-5">
-          <div className="text-right">
+        <div className="flex items-center space-x-3 border-l border-gray-200 pl-3 md:pl-5">
+          <div className="text-right hidden sm:block">
             <p className="text-xs font-bold text-gray-900 leading-none">{displayName}</p>
             <span className="text-[9px] text-gray-500 font-semibold block mt-0.5">{displayRole}</span>
           </div>

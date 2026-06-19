@@ -237,8 +237,8 @@ export default function Revenue() {
                           recipient.icon === 'Wrench' ? Wrench : GraduationCap;
 
                       return (
-                        <div key={recipient.id} className="flex justify-between items-center p-3.5 bg-gray-50/50 border border-gray-200 rounded-xl">
-                          <div className="flex items-center space-x-3 flex-1">
+                        <div key={recipient.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-gray-50/50 border border-gray-200 rounded-xl">
+                          <div className="flex items-center space-x-3 w-full sm:w-auto flex-1">
                             <div className={`bg-${recipient.color}/15 p-2 rounded-lg text-${recipient.color}`}>
                               <IconComponent className="h-5 w-5" />
                             </div>
@@ -275,7 +275,7 @@ export default function Revenue() {
                             </div>
                           </div>
                           
-                          <div className="flex items-center space-x-3">
+                          <div className="flex items-center justify-between sm:justify-end space-x-3 w-full sm:w-auto">
                             <div className="flex items-center space-x-2">
                               <span className="text-[10px] font-bold text-gray-400 uppercase">Percentage</span>
                               <div className="relative w-20">
@@ -381,8 +381,8 @@ export default function Revenue() {
                 </div>
 
                 {/* Expanded Table Workspace with larger height limit and rows */}
-                <div className="overflow-hidden border border-gray-200 rounded-xl bg-white flex-1 overflow-y-auto max-h-[420px] shadow-inner">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto border border-gray-200 rounded-xl bg-white flex-1 overflow-y-auto max-h-[420px] shadow-inner">
+                  <table className="w-full min-w-[400px] text-left border-collapse text-xs">
                     <thead>
                       <tr className="bg-gray-50 border-b border-gray-200 font-bold text-gray-400 uppercase text-[10px] tracking-wider sticky top-0 z-10">
                         <th className="px-5 py-3.5">Target Fund</th>

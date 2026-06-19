@@ -657,8 +657,10 @@ export default function Collections() {
                   </div>
                 </div>
 
-                {/* Fixed header */}
-                <div className="bg-gray-50 border-b border-gray-200 rounded-t-xl overflow-hidden">
+                <div className="overflow-x-auto w-full">
+                  <div className="min-w-[800px]">
+                    {/* Fixed header */}
+                    <div className="bg-gray-50 border-b border-gray-200 rounded-t-xl overflow-hidden">
                   <table className="w-full table-fixed text-left border-collapse">
                     <colgroup>
                       <col style={{width:'80px'}} />
@@ -755,6 +757,8 @@ export default function Collections() {
                         )}
                       </tbody>
                   </table>
+                </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -880,8 +884,10 @@ export default function Collections() {
                   </div>
                 </div>
 
-                {/* Fixed header */}
-                <div className="bg-gray-50 border-b border-gray-200 rounded-t-xl overflow-hidden">
+                <div className="overflow-x-auto w-full">
+                  <div className="min-w-[800px]">
+                    {/* Fixed header */}
+                    <div className="bg-gray-50 border-b border-gray-200 rounded-t-xl overflow-hidden">
                   <table className="w-full table-fixed text-left border-collapse">
                     <colgroup>
                       <col style={{width:'25%'}} />
@@ -960,6 +966,8 @@ export default function Collections() {
                         )}
                       </tbody>
                   </table>
+                </div>
+                  </div>
                 </div>
               </div>
             </div>
