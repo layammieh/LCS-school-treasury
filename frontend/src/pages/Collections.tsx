@@ -106,6 +106,8 @@ export default function Collections() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedConsignee, setSelectedConsignee] = useState<Consignee | null>(null);
   const suggestRef = useRef<HTMLDivElement>(null);
+  const [showExternalSuggestions, setShowExternalSuggestions] = useState(false);
+  const externalSuggestRef = useRef<HTMLDivElement>(null);
   const searchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 
@@ -201,6 +203,7 @@ export default function Collections() {
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (suggestRef.current && !suggestRef.current.contains(e.target as Node)) setShowSuggestions(false);
+      if (externalSuggestRef.current && !externalSuggestRef.current.contains(e.target as Node)) setShowExternalSuggestions(false);
       if (datePickerRef.current && !datePickerRef.current.contains(e.target as Node)) setShowDatePicker(false);
       if (monthPickerRef.current && !monthPickerRef.current.contains(e.target as Node)) setShowMonthPicker(false);
       if (statusMenuRef.current && !statusMenuRef.current.contains(e.target as Node)) setShowStatusMenu(false);
@@ -507,7 +510,7 @@ export default function Collections() {
                     <span className="text-[9px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Coconut</span>
                   </div>
                   <div className="mt-4">
-                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Coconut Payments</span>
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total collected - COCONUT</span>
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
                       {loading ? '...' : formatCurrency(summary?.total_coconut ?? 0)}
                     </p>
@@ -1045,17 +1048,33 @@ export default function Collections() {
                   ) : (
                     <div>
                       <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Source Name</label>
-                      <input
-                        type="text"
-                        list="external-sources"
-                        value={form.consignee_name}
-                        onChange={e => setForm(prev => ({ ...prev, consignee_name: e.target.value }))}
-                        placeholder="Enter external source name (e.g. Coconut)..."
-                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
-                      />
-                      <datalist id="external-sources">
-                        <option value="Coconut" />
-                      </datalist>
+                      <div className="relative" ref={externalSuggestRef}>
+                        <input
+                          type="text"
+                          value={form.consignee_name}
+                          onChange={e => {
+                            setForm(prev => ({ ...prev, consignee_name: e.target.value }));
+                            setShowExternalSuggestions(true);
+                          }}
+                          onFocus={() => setShowExternalSuggestions(true)}
+                          placeholder="Enter external source name..."
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
+                        />
+                        {showExternalSuggestions && 'Coconut'.toLowerCase().includes(form.consignee_name.toLowerCase()) && (
+                          <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-30 max-h-48 overflow-y-auto">
+                            <button 
+                               onClick={() => {
+                                 setForm(prev => ({ ...prev, consignee_name: 'Coconut' }));
+                                 setShowExternalSuggestions(false);
+                               }}
+                               className="w-full text-left px-4 py-2 text-xs font-semibold hover:bg-gray-50 transition-colors flex items-center justify-between"
+                            >
+                              <span>Coconut</span>
+                              <span className="text-[10px] text-gray-400">External Category</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 
