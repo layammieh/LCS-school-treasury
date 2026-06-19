@@ -178,8 +178,8 @@ export default function Login() {
               <span className="text-gray-500">Don't have an account? </span>
               <button
                 type="button"
-                onClick={() => navigate('/register')}
-                className="text-[#006B4D] font-bold hover:underline block mx-auto mt-1 cursor-pointer focus:outline-none"
+                disabled
+                className="text-[#006B4D] opacity-50 font-bold block mx-auto mt-1 cursor-not-allowed focus:outline-none"
               >
                 Register a new account
               </button>
