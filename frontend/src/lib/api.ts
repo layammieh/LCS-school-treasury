@@ -328,6 +328,8 @@ export interface Expense {
 
 export interface ExpenseSummary {
   total_expenses: number;
+  total_canteen: number;
+  total_coconut: number;
   expense_count: number;
   highest_expense: number;
   highest_expense_name: string;

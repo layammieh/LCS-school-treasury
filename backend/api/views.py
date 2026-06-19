@@ -608,6 +608,8 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 qs = qs.filter(date__year=parts[0], date__month=parts[1])
 
         total_expenses = qs.aggregate(total=Sum('amount'))['total'] or Decimal('0')
+        total_canteen = qs.exclude(name__icontains='coconut').aggregate(total=Sum('amount'))['total'] or Decimal('0')
+        total_coconut = qs.filter(name__icontains='coconut').aggregate(total=Sum('amount'))['total'] or Decimal('0')
         expense_count = qs.count()
 
         highest = qs.order_by('-amount').first()
@@ -619,6 +621,8 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
         return Response({
             'total_expenses': float(total_expenses),
+            'total_canteen': float(total_canteen),
+            'total_coconut': float(total_coconut),
             'expense_count': expense_count,
             'highest_expense': highest_amount,
             'highest_expense_name': highest_name,

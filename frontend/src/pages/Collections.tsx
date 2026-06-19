@@ -118,6 +118,7 @@ export default function Collections() {
   const [expensePage, setExpensePage] = useState(1);
 
   const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [expenseModalTab, setExpenseModalTab] = useState<'canteen' | 'coconut'>('canteen');
   const [expenseForm, setExpenseForm] = useState(EMPTY_EXPENSE_FORM);
   const [editingExpenseId, setEditingExpenseId] = useState<number | null>(null);
 
@@ -334,18 +335,24 @@ export default function Collections() {
   /* ─────────────────── EXPENSES actions ─────────────────── */
   function openCreateExpenseModal() {
     setExpenseForm({ ...EMPTY_EXPENSE_FORM, date: expenseFilterDate || TODAY });
-    setModalError(''); setEditingExpenseId(null); setShowExpenseModal(true);
+    setModalError(''); setEditingExpenseId(null); setExpenseModalTab('canteen'); setShowExpenseModal(true);
   }
 
   function openEditExpenseModal(exp: Expense) {
     setEditingExpenseId(exp.id);
+    const isCoconut = exp.name.toLowerCase().includes('coconut');
+    let displayName = exp.name;
+    if (isCoconut && displayName.endsWith(' (Coconut)')) {
+      displayName = displayName.replace(' (Coconut)', '');
+    }
     setExpenseForm({
-      name: exp.name,
+      name: displayName,
       requested_by: exp.requested_by || '',
       amount: String(exp.amount),
       date: exp.date,
       reason: exp.reason || '',
     });
+    setExpenseModalTab(isCoconut ? 'coconut' : 'canteen');
     setModalError(''); setShowExpenseModal(true);
   }
 
@@ -353,8 +360,12 @@ export default function Collections() {
     setSaving(true);
     setModalError('');
     try {
+      let finalName = expenseForm.name.trim();
+      if (expenseModalTab === 'coconut' && !finalName.toLowerCase().includes('coconut')) {
+        finalName = finalName + ' (Coconut)';
+      }
       const payload = {
-        name: expenseForm.name.trim(),
+        name: finalName,
         requested_by: expenseForm.requested_by.trim(),
         amount: parseFloat(expenseForm.amount) || 0,
         date: expenseForm.date,
@@ -773,16 +784,29 @@ export default function Collections() {
           {activeTab === 'expenses' && (
             <div className="space-y-5">
               {/* Summary Cards */}
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
                     <div className="bg-red-50 p-2 rounded-lg text-red-600"><CreditCard className="h-5 w-5" /></div>
-                    <span className="text-[9px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Total</span>
+                    <span className="text-[9px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Canteen</span>
                   </div>
                   <div className="mt-4">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Expenses - CANTEEN</span>
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
-                      {loadingExpenses ? '...' : formatCurrency(expenseSummary?.total_expenses ?? 0)}
+                      {loadingExpenses ? '...' : formatCurrency(expenseSummary?.total_canteen ?? 0)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
+                  <div className="flex justify-between items-start">
+                    <div className="bg-orange-50 p-2 rounded-lg text-orange-600"><CreditCard className="h-5 w-5" /></div>
+                    <span className="text-[9px] font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Coconut</span>
+                  </div>
+                  <div className="mt-4">
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Expenses - COCONUT</span>
+                    <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
+                      {loadingExpenses ? '...' : formatCurrency(expenseSummary?.total_coconut ?? 0)}
                     </p>
                   </div>
                 </div>
@@ -1117,6 +1141,26 @@ export default function Collections() {
                   <h2 className="text-sm font-bold text-gray-900">{editingExpenseId !== null ? 'Edit Expense' : 'Record New Expense'}</h2>
                   <button onClick={() => setShowExpenseModal(false)} className="text-gray-400 hover:text-gray-600"><X className="h-4 w-4" /></button>
                 </div>
+
+                {/* Modal Tabs */}
+                {!editingExpenseId && (
+                  <div className="flex border-b border-gray-200 mb-4">
+                    <button
+                      onClick={() => setExpenseModalTab('canteen')}
+                      className={`flex-1 pb-2 text-xs font-bold tracking-tight transition-colors border-b-2 ${expenseModalTab === 'canteen' ? 'border-red-600 text-red-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                        }`}
+                    >
+                      Canteen Expenses
+                    </button>
+                    <button
+                      onClick={() => setExpenseModalTab('coconut')}
+                      className={`flex-1 pb-2 text-xs font-bold tracking-tight transition-colors border-b-2 ${expenseModalTab === 'coconut' ? 'border-orange-600 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                        }`}
+                    >
+                      Coconut Expenses
+                    </button>
+                  </div>
+                )}
 
                 {modalError && (
                   <div className="bg-red-50 border border-red-200 text-red-700 text-xs font-semibold px-4 py-3 rounded-lg flex items-center space-x-2">
