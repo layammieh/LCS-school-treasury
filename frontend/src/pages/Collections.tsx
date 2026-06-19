@@ -88,7 +88,7 @@ export default function Collections() {
   const [saving, setSaving] = useState(false);
   const [modalError, setModalError] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
-  
+
   const [filterDate, setFilterDate] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [filterMonth, setFilterMonth] = useState('');
@@ -98,7 +98,7 @@ export default function Collections() {
   const datePickerRef = useRef<HTMLDivElement>(null);
   const monthPickerRef = useRef<HTMLDivElement>(null);
   const statusMenuRef = useRef<HTMLDivElement>(null);
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [searchDebounceText, setSearchDebounceText] = useState('');
   const [consigneeQuery, setConsigneeQuery] = useState('');
@@ -157,7 +157,7 @@ export default function Collections() {
     if (date) params.date = date;
     if (month) params.month = month;
     if (search) params.search = search;
-    
+
     Promise.all([
       expensesApi.list(params),
       expensesApi.summary({ date, month, schoolYear })
@@ -169,14 +169,14 @@ export default function Collections() {
   }
 
   /* ─────────────────── Effects ─────────────────── */
-  useEffect(() => { 
+  useEffect(() => {
     if (activeTab === 'income') {
-      loadData(page, filterDate, filterStatus, filterMonth, searchDebounceText); 
+      loadData(page, filterDate, filterStatus, filterMonth, searchDebounceText);
     } else {
       loadExpensesData(expensePage, expenseFilterDate, expenseFilterMonth, expenseSearchDebounceText);
     }
   }, [
-    activeTab, schoolYear, 
+    activeTab, schoolYear,
     page, filterDate, filterStatus, filterMonth, searchDebounceText,
     expensePage, expenseFilterDate, expenseFilterMonth, expenseSearchDebounceText
   ]);
@@ -204,7 +204,7 @@ export default function Collections() {
       if (datePickerRef.current && !datePickerRef.current.contains(e.target as Node)) setShowDatePicker(false);
       if (monthPickerRef.current && !monthPickerRef.current.contains(e.target as Node)) setShowMonthPicker(false);
       if (statusMenuRef.current && !statusMenuRef.current.contains(e.target as Node)) setShowStatusMenu(false);
-      
+
       if (expenseDatePickerRef.current && !expenseDatePickerRef.current.contains(e.target as Node)) setShowExpenseDatePicker(false);
       if (expenseMonthPickerRef.current && !expenseMonthPickerRef.current.contains(e.target as Node)) setShowExpenseMonthPicker(false);
     }
@@ -334,10 +334,10 @@ export default function Collections() {
   function openEditExpenseModal(exp: Expense) {
     setEditingExpenseId(exp.id);
     setExpenseForm({
-      name: exp.name, 
+      name: exp.name,
       requested_by: exp.requested_by || '',
       amount: String(exp.amount),
-      date: exp.date, 
+      date: exp.date,
       reason: exp.reason || '',
     });
     setModalError(''); setShowExpenseModal(true);
@@ -379,8 +379,8 @@ export default function Collections() {
 
   /* ─────────────────── COMMON actions ─────────────────── */
   function openDeleteModal(id: number, name: string, type: 'income' | 'expense') {
-    setDeleteItemId(id); 
-    setDeleteItemName(name); 
+    setDeleteItemId(id);
+    setDeleteItemName(name);
     setDeleteItemType(type);
     setDeleteModalOpen(true);
   }
@@ -391,20 +391,20 @@ export default function Collections() {
     try {
       if (deleteItemType === 'income') {
         await transactionsApi.delete(deleteItemId);
-        setPage(1); 
+        setPage(1);
         loadData(1, filterDate, filterStatus, filterMonth, searchDebounceText);
       } else {
         await expensesApi.delete(deleteItemId);
         setExpensePage(1);
         loadExpensesData(1, expenseFilterDate, expenseFilterMonth, expenseSearchDebounceText);
       }
-      setDeleteModalOpen(false); 
-      setDeleteItemId(null); 
+      setDeleteModalOpen(false);
+      setDeleteItemId(null);
       setDeleteItemName('');
-    } catch (e: any) { 
-      setError(e.message || 'Failed to delete.'); 
-    } finally { 
-      setIsDeleting(false); 
+    } catch (e: any) {
+      setError(e.message || 'Failed to delete.');
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -451,17 +451,15 @@ export default function Collections() {
           <div className="flex border-b border-gray-200 space-x-6">
             <button
               onClick={() => setActiveTab('income')}
-              className={`pb-3 text-sm font-bold tracking-tight transition-colors border-b-2 ${
-                activeTab === 'income' ? 'border-[#006B4D] text-[#006B4D]' : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+              className={`pb-3 text-sm font-bold tracking-tight transition-colors border-b-2 ${activeTab === 'income' ? 'border-[#006B4D] text-[#006B4D]' : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
             >
               Income
             </button>
             <button
               onClick={() => setActiveTab('expenses')}
-              className={`pb-3 text-sm font-bold tracking-tight transition-colors border-b-2 ${
-                activeTab === 'expenses' ? 'border-red-600 text-red-600' : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+              className={`pb-3 text-sm font-bold tracking-tight transition-colors border-b-2 ${activeTab === 'expenses' ? 'border-red-600 text-red-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
             >
               Expenses
             </button>
@@ -484,9 +482,6 @@ export default function Collections() {
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
                       {loading ? '...' : formatCurrency(summary?.total_collected ?? 0)}
                     </p>
-                    <p className="text-[10px] text-gray-500 font-medium mt-1">
-                      Canteen Payments: <span className="text-gray-700 font-bold">{loading ? '...' : formatCurrency(summary?.total_canteen ?? 0)}</span>
-                    </p>
                   </div>
                 </div>
 
@@ -505,13 +500,13 @@ export default function Collections() {
 
                 <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="bg-green-50 p-2 rounded-lg text-green-600"><Coins className="h-5 w-5" /></div>
-                    <span className="text-[9px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Coconut</span>
+                    <div className="bg-red-50 p-2 rounded-lg text-red-600"><Activity className="h-5 w-5" /></div>
+                    <span className="text-[9px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Critical</span>
                   </div>
                   <div className="mt-4">
-                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Coconut Payments</span>
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Overdue Items</span>
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
-                      {loading ? '...' : formatCurrency(summary?.total_coconut ?? 0)}
+                      {loading ? '...' : `${summary?.overdue_count ?? 0} Accounts`}
                     </p>
                   </div>
                 </div>
@@ -542,11 +537,10 @@ export default function Collections() {
                     <div className="relative" ref={statusMenuRef}>
                       <button
                         onClick={() => { setShowStatusMenu(v => !v); setShowDatePicker(false); setShowMonthPicker(false); }}
-                        className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
-                          filterStatus !== 'All Statuses'
+                        className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${filterStatus !== 'All Statuses'
                             ? 'bg-[#006B4D] text-white border-[#006B4D]'
                             : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-150'
-                        }`}
+                          }`}
                       >
                         <span className="capitalize">{filterStatus}</span>
                         <ChevronDown className="h-3 w-3" />
@@ -571,9 +565,8 @@ export default function Collections() {
                     <div className="relative" ref={datePickerRef}>
                       <button
                         onClick={() => { setShowDatePicker(v => !v); setShowStatusMenu(false); setShowMonthPicker(false); }}
-                        className={`flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
-                          filterDate ? 'bg-[#006B4D] text-white border-[#006B4D]' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-150'
-                        }`}
+                        className={`flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${filterDate ? 'bg-[#006B4D] text-white border-[#006B4D]' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-150'
+                          }`}
                       >
                         <Calendar className="h-3.5 w-3.5" />
                         <span>{filterDate
@@ -610,9 +603,8 @@ export default function Collections() {
                     <div className="relative" ref={monthPickerRef}>
                       <button
                         onClick={() => { setShowMonthPicker(v => !v); setShowStatusMenu(false); setShowDatePicker(false); }}
-                        className={`flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
-                          filterMonth ? 'bg-[#006B4D] text-white border-[#006B4D]' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-150'
-                        }`}
+                        className={`flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${filterMonth ? 'bg-[#006B4D] text-white border-[#006B4D]' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-150'
+                          }`}
                       >
                         <Calendar className="h-3.5 w-3.5" />
                         <span>{filterMonth
@@ -635,11 +627,11 @@ export default function Collections() {
                           <input
                             type="month"
                             value={filterMonth}
-                            onChange={e => { 
-                              setFilterMonth(e.target.value); 
-                              setFilterDate(''); 
-                              setShowMonthPicker(false); 
-                              applyFilters('', filterStatus, e.target.value); 
+                            onChange={e => {
+                              setFilterMonth(e.target.value);
+                              setFilterDate('');
+                              setShowMonthPicker(false);
+                              applyFilters('', filterStatus, e.target.value);
                             }}
                             className="w-full px-3 py-2 border border-gray-200 rounded-lg text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
                           />
@@ -664,103 +656,103 @@ export default function Collections() {
                   <div className="min-w-[800px]">
                     {/* Fixed header */}
                     <div className="bg-gray-50 border-b border-gray-200 rounded-t-xl overflow-hidden">
-                  <table className="w-full table-fixed text-left border-collapse">
-                    <colgroup>
-                      <col style={{width:'80px'}} />
-                      <col style={{width:'25%'}} />
-                      <col style={{width:'20%'}} />
-                      <col style={{width:'25%'}} />
-                      <col style={{width:'15%'}} />
-                      <col style={{width:'15%'}} />
-                    </colgroup>
-                    <thead>
-                      <tr className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                        <th className="pl-[56px] pr-2 py-3 text-center">
-                          <input
-                            type="checkbox"
-                            className="rounded text-[#006B4D] focus:ring-[#006B4D]"
-                            checked={transactions.length > 0 && transactions.every(t => selectedIds.has(t.id))}
-                            onChange={e => setSelectedIds(prev => {
-                              const next = new Set(prev);
-                              transactions.forEach(t => e.target.checked ? next.add(t.id) : next.delete(t.id));
-                              return next;
-                            })}
-                          />
-                        </th>
-                        <th className="pl-[56px] pr-4 py-3 text-left">Consignee</th>
-                        <th className="px-4 py-3 text-right">Amount</th>
-                        <th className="px-4 py-3 text-center">Date</th>
-                        <th className="px-4 py-3 text-center">Status</th>
-                        <th className="px-4 py-3 text-center">Actions</th>
-                      </tr>
-                    </thead>
-                  </table>
-                </div>
-
-                {/* Scrollable body */}
-                <div className="overflow-y-auto max-h-[400px]">
-                  <table className="w-full table-fixed text-left border-collapse">
-                    <colgroup>
-                      <col style={{width:'80px'}} />
-                      <col style={{width:'25%'}} />
-                      <col style={{width:'20%'}} />
-                      <col style={{width:'25%'}} />
-                      <col style={{width:'15%'}} />
-                      <col style={{width:'15%'}} />
-                    </colgroup>
-                    <tbody className={`divide-y divide-slate-200 text-xs ${loading && transactions.length > 0 ? 'opacity-50 pointer-events-none transition-opacity' : ''}`}>
-                        {loading && transactions.length === 0 ? (
-                          <tr><td colSpan={6} className="px-4 py-10 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" /></td></tr>
-                        ) : transactions.length === 0 ? (
-                          <tr>
-                            <td colSpan={6} className="px-4 py-12 text-center h-28">
-                              <div className="min-h-28 flex flex-col items-center justify-center space-y-2 text-gray-400">
-                                <Coins className="h-7 w-7 opacity-30" />
-                                <p className="text-xs font-semibold">No payments recorded</p>
-                              </div>
-                            </td>
+                      <table className="w-full table-fixed text-left border-collapse">
+                        <colgroup>
+                          <col style={{ width: '80px' }} />
+                          <col style={{ width: '25%' }} />
+                          <col style={{ width: '20%' }} />
+                          <col style={{ width: '25%' }} />
+                          <col style={{ width: '15%' }} />
+                          <col style={{ width: '15%' }} />
+                        </colgroup>
+                        <thead>
+                          <tr className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                            <th className="pl-[56px] pr-2 py-3 text-center">
+                              <input
+                                type="checkbox"
+                                className="rounded text-[#006B4D] focus:ring-[#006B4D]"
+                                checked={transactions.length > 0 && transactions.every(t => selectedIds.has(t.id))}
+                                onChange={e => setSelectedIds(prev => {
+                                  const next = new Set(prev);
+                                  transactions.forEach(t => e.target.checked ? next.add(t.id) : next.delete(t.id));
+                                  return next;
+                                })}
+                              />
+                            </th>
+                            <th className="pl-[56px] pr-4 py-3 text-left">Consignee</th>
+                            <th className="px-4 py-3 text-right">Amount</th>
+                            <th className="px-4 py-3 text-center">Date</th>
+                            <th className="px-4 py-3 text-center">Status</th>
+                            <th className="px-4 py-3 text-center">Actions</th>
                           </tr>
-                        ) : (
-                          transactions.map(txn => (
-                            <tr key={txn.id} className={`${selectedIds.has(txn.id) ? 'bg-green-50/40' : 'hover:bg-gray-50/50'} transition-colors`}>
-                              <td className="pl-[56px] pr-2 py-3">
-                                <input type="checkbox" checked={selectedIds.has(txn.id)} onChange={() => toggleSelect(txn.id)} className="rounded text-[#006B4D] focus:ring-[#006B4D]" />
-                              </td>
-                              <td className="px-4 py-3 w-[25%]">
-                                <div className="flex items-center space-x-2">
-                                  <div className="w-8 h-8 rounded-full bg-emerald-50 text-[#006B4D] flex items-center justify-center font-bold text-[11px] shrink-0">
-                                    {txn.student_initials || txn.student_name?.slice(0, 2).toUpperCase()}
-                                  </div>
-                                  <span className="font-bold text-gray-800 truncate">{txn.student_name}</span>
+                        </thead>
+                      </table>
+                    </div>
+
+                    {/* Scrollable body */}
+                    <div className="overflow-y-auto max-h-[400px]">
+                      <table className="w-full table-fixed text-left border-collapse">
+                        <colgroup>
+                          <col style={{ width: '80px' }} />
+                          <col style={{ width: '25%' }} />
+                          <col style={{ width: '20%' }} />
+                          <col style={{ width: '25%' }} />
+                          <col style={{ width: '15%' }} />
+                          <col style={{ width: '15%' }} />
+                        </colgroup>
+                        <tbody className={`divide-y divide-slate-200 text-xs ${loading && transactions.length > 0 ? 'opacity-50 pointer-events-none transition-opacity' : ''}`}>
+                          {loading && transactions.length === 0 ? (
+                            <tr><td colSpan={6} className="px-4 py-10 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" /></td></tr>
+                          ) : transactions.length === 0 ? (
+                            <tr>
+                              <td colSpan={6} className="px-4 py-12 text-center h-28">
+                                <div className="min-h-28 flex flex-col items-center justify-center space-y-2 text-gray-400">
+                                  <Coins className="h-7 w-7 opacity-30" />
+                                  <p className="text-xs font-semibold">No payments recorded</p>
                                 </div>
                               </td>
-                              <td className="px-4 py-3 w-[20%] text-right font-bold text-gray-800 whitespace-nowrap">{formatCurrency(txn.amount)}</td>
-                              <td className="px-4 py-3 w-[25%] text-center text-gray-500 font-medium text-[11px]">
-                                {new Date(txn.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                              </td>
-                              <td className="px-4 py-3 w-[15%] text-center">
-                                <span className={`inline-flex px-2 py-0.5 text-[9px] font-extrabold rounded-full uppercase tracking-wide ${statusBadge(txn.status)}`}>
-                                  {txn.status}
-                                </span>
-                              </td>
-                              <td className="px-4 py-3 w-[15%] text-center">
-                                {!isViewMode && (
-                                  <div className="flex items-center justify-center space-x-1">
-                                    <button onClick={() => openEditModal(txn)} title="Edit" className="p-1 rounded-md text-gray-400 hover:text-[#006B4D] hover:bg-[#006B4D]/5 transition-colors">
-                                      <Pencil className="h-3.5 w-3.5" />
-                                    </button>
-                                    <button onClick={() => openDeleteModal(txn.id, txn.student_name || 'payment', 'income')} title="Delete" className="p-1 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
-                                      <Trash2 className="h-3.5 w-3.5" />
-                                    </button>
-                                  </div>
-                                )}
-                              </td>
                             </tr>
-                          ))
-                        )}
-                      </tbody>
-                  </table>
-                </div>
+                          ) : (
+                            transactions.map(txn => (
+                              <tr key={txn.id} className={`${selectedIds.has(txn.id) ? 'bg-green-50/40' : 'hover:bg-gray-50/50'} transition-colors`}>
+                                <td className="pl-[56px] pr-2 py-3">
+                                  <input type="checkbox" checked={selectedIds.has(txn.id)} onChange={() => toggleSelect(txn.id)} className="rounded text-[#006B4D] focus:ring-[#006B4D]" />
+                                </td>
+                                <td className="px-4 py-3 w-[25%]">
+                                  <div className="flex items-center space-x-2">
+                                    <div className="w-8 h-8 rounded-full bg-emerald-50 text-[#006B4D] flex items-center justify-center font-bold text-[11px] shrink-0">
+                                      {txn.student_initials || txn.student_name?.slice(0, 2).toUpperCase()}
+                                    </div>
+                                    <span className="font-bold text-gray-800 truncate">{txn.student_name}</span>
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 w-[20%] text-right font-bold text-gray-800 whitespace-nowrap">{formatCurrency(txn.amount)}</td>
+                                <td className="px-4 py-3 w-[25%] text-center text-gray-500 font-medium text-[11px]">
+                                  {new Date(txn.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                </td>
+                                <td className="px-4 py-3 w-[15%] text-center">
+                                  <span className={`inline-flex px-2 py-0.5 text-[9px] font-extrabold rounded-full uppercase tracking-wide ${statusBadge(txn.status)}`}>
+                                    {txn.status}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-3 w-[15%] text-center">
+                                  {!isViewMode && (
+                                    <div className="flex items-center justify-center space-x-1">
+                                      <button onClick={() => openEditModal(txn)} title="Edit" className="p-1 rounded-md text-gray-400 hover:text-[#006B4D] hover:bg-[#006B4D]/5 transition-colors">
+                                        <Pencil className="h-3.5 w-3.5" />
+                                      </button>
+                                      <button onClick={() => openDeleteModal(txn.id, txn.student_name || 'payment', 'income')} title="Delete" className="p-1 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -812,9 +804,8 @@ export default function Collections() {
                     <div className="relative" ref={expenseDatePickerRef}>
                       <button
                         onClick={() => { setShowExpenseDatePicker(v => !v); setShowExpenseMonthPicker(false); }}
-                        className={`flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
-                          expenseFilterDate ? 'bg-red-600 text-white border-red-600' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-150'
-                        }`}
+                        className={`flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${expenseFilterDate ? 'bg-red-600 text-white border-red-600' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-150'
+                          }`}
                       >
                         <Calendar className="h-3.5 w-3.5" />
                         <span>{expenseFilterDate
@@ -848,9 +839,8 @@ export default function Collections() {
                     <div className="relative" ref={expenseMonthPickerRef}>
                       <button
                         onClick={() => { setShowExpenseMonthPicker(v => !v); setShowExpenseDatePicker(false); }}
-                        className={`flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
-                          expenseFilterMonth ? 'bg-red-600 text-white border-red-600' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-150'
-                        }`}
+                        className={`flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${expenseFilterMonth ? 'bg-red-600 text-white border-red-600' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-150'
+                          }`}
                       >
                         <Calendar className="h-3.5 w-3.5" />
                         <span>{expenseFilterMonth
@@ -873,11 +863,11 @@ export default function Collections() {
                           <input
                             type="month"
                             value={expenseFilterMonth}
-                            onChange={e => { 
-                              setExpenseFilterMonth(e.target.value); 
-                              setExpenseFilterDate(''); 
-                              setShowExpenseMonthPicker(false); 
-                              applyExpenseFilters('', e.target.value); 
+                            onChange={e => {
+                              setExpenseFilterMonth(e.target.value);
+                              setExpenseFilterDate('');
+                              setShowExpenseMonthPicker(false);
+                              applyExpenseFilters('', e.target.value);
                             }}
                             className="w-full px-3 py-2 border border-gray-200 rounded-lg text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
                           />
@@ -891,85 +881,85 @@ export default function Collections() {
                   <div className="min-w-[800px]">
                     {/* Fixed header */}
                     <div className="bg-gray-50 border-b border-gray-200 rounded-t-xl overflow-hidden">
-                  <table className="w-full table-fixed text-left border-collapse">
-                    <colgroup>
-                      <col style={{width:'25%'}} />
-                      <col style={{width:'20%'}} />
-                      <col style={{width:'20%'}} />
-                      <col style={{width:'15%'}} />
-                      <col style={{width:'10%'}} />
-                      <col style={{width:'10%'}} />
-                    </colgroup>
-                    <thead>
-                      <tr className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                        <th className="pl-8 pr-4 py-3 text-left">Expense Name</th>
-                        <th className="px-4 py-3 text-left">Requested By</th>
-                        <th className="px-4 py-3 text-left">Reason</th>
-                        <th className="px-4 py-3 text-center">Date</th>
-                        <th className="px-4 py-3 text-right">Amount</th>
-                        <th className="px-4 py-3 text-center">Actions</th>
-                      </tr>
-                    </thead>
-                  </table>
-                </div>
-
-                {/* Scrollable body */}
-                <div className="overflow-y-auto max-h-[400px]">
-                  <table className="w-full table-fixed text-left border-collapse">
-                    <colgroup>
-                      <col style={{width:'25%'}} />
-                      <col style={{width:'20%'}} />
-                      <col style={{width:'20%'}} />
-                      <col style={{width:'15%'}} />
-                      <col style={{width:'10%'}} />
-                      <col style={{width:'10%'}} />
-                    </colgroup>
-                    <tbody className={`divide-y divide-slate-200 text-xs ${loadingExpenses && expenses.length > 0 ? 'opacity-50 pointer-events-none transition-opacity' : ''}`}>
-                        {loadingExpenses && expenses.length === 0 ? (
-                          <tr><td colSpan={6} className="px-4 py-10 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" /></td></tr>
-                        ) : expenses.length === 0 ? (
-                          <tr>
-                            <td colSpan={6} className="px-4 py-12 text-center h-28">
-                              <div className="min-h-28 flex flex-col items-center justify-center space-y-2 text-gray-400">
-                                <CreditCard className="h-7 w-7 opacity-30" />
-                                <p className="text-xs font-semibold">No expenses recorded</p>
-                              </div>
-                            </td>
+                      <table className="w-full table-fixed text-left border-collapse">
+                        <colgroup>
+                          <col style={{ width: '25%' }} />
+                          <col style={{ width: '20%' }} />
+                          <col style={{ width: '20%' }} />
+                          <col style={{ width: '15%' }} />
+                          <col style={{ width: '10%' }} />
+                          <col style={{ width: '10%' }} />
+                        </colgroup>
+                        <thead>
+                          <tr className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                            <th className="pl-8 pr-4 py-3 text-left">Expense Name</th>
+                            <th className="px-4 py-3 text-left">Requested By</th>
+                            <th className="px-4 py-3 text-left">Reason</th>
+                            <th className="px-4 py-3 text-center">Date</th>
+                            <th className="px-4 py-3 text-right">Amount</th>
+                            <th className="px-4 py-3 text-center">Actions</th>
                           </tr>
-                        ) : (
-                          expenses.map(exp => (
-                            <tr key={exp.id} className="hover:bg-gray-50/50 transition-colors">
-                              <td className="pl-8 pr-4 py-3 w-[25%]">
-                                <span className="font-bold text-gray-800 truncate">{exp.name}</span>
-                              </td>
-                              <td className="px-4 py-3 w-[20%]">
-                                <span className="text-gray-700 truncate block">{exp.requested_by || '-'}</span>
-                              </td>
-                              <td className="px-4 py-3 w-[20%]">
-                                <span className="text-gray-600 truncate block" title={exp.reason || ''}>{exp.reason || '-'}</span>
-                              </td>
-                              <td className="px-4 py-3 w-[15%] text-center text-gray-500 font-medium text-[11px]">
-                                {new Date(exp.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                              </td>
-                              <td className="px-4 py-3 w-[10%] text-right font-bold text-red-600 whitespace-nowrap">{formatCurrency(exp.amount)}</td>
-                              <td className="px-4 py-3 w-[10%] text-center">
-                                {!isViewMode && (
-                                  <div className="flex items-center justify-center space-x-1">
-                                    <button onClick={() => openEditExpenseModal(exp)} title="Edit" className="p-1 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
-                                      <Pencil className="h-3.5 w-3.5" />
-                                    </button>
-                                    <button onClick={() => openDeleteModal(exp.id, exp.name, 'expense')} title="Delete" className="p-1 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
-                                      <Trash2 className="h-3.5 w-3.5" />
-                                    </button>
-                                  </div>
-                                )}
+                        </thead>
+                      </table>
+                    </div>
+
+                    {/* Scrollable body */}
+                    <div className="overflow-y-auto max-h-[400px]">
+                      <table className="w-full table-fixed text-left border-collapse">
+                        <colgroup>
+                          <col style={{ width: '25%' }} />
+                          <col style={{ width: '20%' }} />
+                          <col style={{ width: '20%' }} />
+                          <col style={{ width: '15%' }} />
+                          <col style={{ width: '10%' }} />
+                          <col style={{ width: '10%' }} />
+                        </colgroup>
+                        <tbody className={`divide-y divide-slate-200 text-xs ${loadingExpenses && expenses.length > 0 ? 'opacity-50 pointer-events-none transition-opacity' : ''}`}>
+                          {loadingExpenses && expenses.length === 0 ? (
+                            <tr><td colSpan={6} className="px-4 py-10 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" /></td></tr>
+                          ) : expenses.length === 0 ? (
+                            <tr>
+                              <td colSpan={6} className="px-4 py-12 text-center h-28">
+                                <div className="min-h-28 flex flex-col items-center justify-center space-y-2 text-gray-400">
+                                  <CreditCard className="h-7 w-7 opacity-30" />
+                                  <p className="text-xs font-semibold">No expenses recorded</p>
+                                </div>
                               </td>
                             </tr>
-                          ))
-                        )}
-                      </tbody>
-                  </table>
-                </div>
+                          ) : (
+                            expenses.map(exp => (
+                              <tr key={exp.id} className="hover:bg-gray-50/50 transition-colors">
+                                <td className="pl-8 pr-4 py-3 w-[25%]">
+                                  <span className="font-bold text-gray-800 truncate">{exp.name}</span>
+                                </td>
+                                <td className="px-4 py-3 w-[20%]">
+                                  <span className="text-gray-700 truncate block">{exp.requested_by || '-'}</span>
+                                </td>
+                                <td className="px-4 py-3 w-[20%]">
+                                  <span className="text-gray-600 truncate block" title={exp.reason || ''}>{exp.reason || '-'}</span>
+                                </td>
+                                <td className="px-4 py-3 w-[15%] text-center text-gray-500 font-medium text-[11px]">
+                                  {new Date(exp.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                </td>
+                                <td className="px-4 py-3 w-[10%] text-right font-bold text-red-600 whitespace-nowrap">{formatCurrency(exp.amount)}</td>
+                                <td className="px-4 py-3 w-[10%] text-center">
+                                  {!isViewMode && (
+                                    <div className="flex items-center justify-center space-x-1">
+                                      <button onClick={() => openEditExpenseModal(exp)} title="Edit" className="p-1 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                                        <Pencil className="h-3.5 w-3.5" />
+                                      </button>
+                                      <button onClick={() => openDeleteModal(exp.id, exp.name, 'expense')} title="Delete" className="p-1 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1002,9 +992,8 @@ export default function Collections() {
                         setForm(EMPTY_INCOME_FORM);
                         setConsigneeQuery('');
                       }}
-                      className={`flex-1 pb-2 text-xs font-bold tracking-tight transition-colors border-b-2 ${
-                        incomeModalTab === 'consignee' ? 'border-[#006B4D] text-[#006B4D]' : 'border-transparent text-gray-500 hover:text-gray-700'
-                      }`}
+                      className={`flex-1 pb-2 text-xs font-bold tracking-tight transition-colors border-b-2 ${incomeModalTab === 'consignee' ? 'border-[#006B4D] text-[#006B4D]' : 'border-transparent text-gray-500 hover:text-gray-700'
+                        }`}
                     >
                       Consignee Payment
                     </button>
@@ -1014,9 +1003,8 @@ export default function Collections() {
                         setForm(EMPTY_INCOME_FORM);
                         setConsigneeQuery('');
                       }}
-                      className={`flex-1 pb-2 text-xs font-bold tracking-tight transition-colors border-b-2 ${
-                        incomeModalTab === 'external' ? 'border-[#006B4D] text-[#006B4D]' : 'border-transparent text-gray-500 hover:text-gray-700'
-                      }`}
+                      className={`flex-1 pb-2 text-xs font-bold tracking-tight transition-colors border-b-2 ${incomeModalTab === 'external' ? 'border-[#006B4D] text-[#006B4D]' : 'border-transparent text-gray-500 hover:text-gray-700'
+                        }`}
                     >
                       External Source
                     </button>

@@ -75,10 +75,10 @@ export const authApi = {
 // ---------------------------------------------------------------------------
 export const profileApi = {
   getProfile: () => request<{ username: string; full_name: string; email: string; bio?: string; avatar?: string }>('/auth/profile/'),
-  
-  updateProfile: (data: FormData) => 
+
+  updateProfile: (data: FormData) =>
     request<{ username: string; full_name: string; email: string; bio?: string; avatar?: string }>(
-      '/auth/profile/', 
+      '/auth/profile/',
       { method: 'PUT', body: data }
     ),
 
@@ -181,8 +181,6 @@ export interface CollectionSummary {
   outstanding: number;
   overdue_count: number;
   efficiency: number;
-  total_coconut: number;
-  total_canteen: number;
 }
 
 export interface LedgerSummary {
