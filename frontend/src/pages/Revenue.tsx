@@ -36,6 +36,7 @@ export default function Revenue() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newRecipientName, setNewRecipientName] = useState('');
   const [newRecipientPercentage, setNewRecipientPercentage] = useState('');
+  const [modalError, setModalError] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
   const [deleteItemName, setDeleteItemName] = useState('');
@@ -91,6 +92,7 @@ export default function Revenue() {
 
   const addRecipient = async () => {
     if (!newRecipientName.trim()) return;
+    setModalError('');
 
     const newRecipient = {
       name: newRecipientName,
@@ -109,6 +111,7 @@ export default function Revenue() {
       loadRecipients();
     } catch (e: any) {
       console.error('Failed to add recipient:', e);
+      setModalError(e.message || 'Failed to add recipient. Please try again.');
     }
   };
 
@@ -441,6 +444,11 @@ export default function Revenue() {
             </div>
 
             <div className="space-y-4 text-xs">
+              {modalError && (
+                <div className="p-3 bg-red-50 text-red-700 text-xs rounded-lg border border-red-100 font-medium">
+                  {modalError}
+                </div>
+              )}
               <div>
                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Recipient Name</label>
                 <input
