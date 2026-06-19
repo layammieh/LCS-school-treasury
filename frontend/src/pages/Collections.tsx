@@ -784,30 +784,52 @@ export default function Collections() {
           {activeTab === 'expenses' && (
             <div className="space-y-5">
               {/* Summary Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
-                  <div className="flex justify-between items-start">
-                    <div className="bg-red-50 p-2 rounded-lg text-red-600"><CreditCard className="h-5 w-5" /></div>
-                    <span className="text-[9px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Canteen</span>
+              {/* ── Canteen Section ── */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-rose-500 rounded-xl shadow-sm">
+                    <span className="text-base">🍱</span>
+                    <span className="text-xs font-bold text-white uppercase tracking-widest">Canteen</span>
                   </div>
-                  <div className="mt-4">
-                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Expenses - CANTEEN</span>
-                    <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
-                      {loadingExpenses ? '...' : formatCurrency(expenseSummary?.total_canteen ?? 0)}
-                    </p>
+                  <div className="flex-1 h-px bg-gradient-to-r from-red-200 to-transparent"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white p-5 rounded-xl border border-red-100 shadow-sm flex flex-col justify-between">
+                    <div className="flex justify-between items-start">
+                      <div className="bg-red-50 p-2 rounded-lg text-red-600"><CreditCard className="h-5 w-5" /></div>
+                      <span className="text-[9px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Canteen</span>
+                    </div>
+                    <div className="mt-4">
+                      <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Expenses - CANTEEN</span>
+                      <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
+                        {loadingExpenses ? '...' : formatCurrency(expenseSummary?.total_canteen ?? 0)}
+                      </p>
+                    </div>
                   </div>
                 </div>
+              </div>
 
-                <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
-                  <div className="flex justify-between items-start">
-                    <div className="bg-orange-50 p-2 rounded-lg text-orange-600"><CreditCard className="h-5 w-5" /></div>
-                    <span className="text-[9px] font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Coconut</span>
+              {/* ── Coconut Section ── */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-400 rounded-xl shadow-sm">
+                    <span className="text-base">🥥</span>
+                    <span className="text-xs font-bold text-white uppercase tracking-widest">Coconut</span>
                   </div>
-                  <div className="mt-4">
-                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Expenses - COCONUT</span>
-                    <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
-                      {loadingExpenses ? '...' : formatCurrency(expenseSummary?.total_coconut ?? 0)}
-                    </p>
+                  <div className="flex-1 h-px bg-gradient-to-r from-orange-200 to-transparent"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white p-5 rounded-xl border border-orange-100 shadow-sm flex flex-col justify-between">
+                    <div className="flex justify-between items-start">
+                      <div className="bg-orange-50 p-2 rounded-lg text-orange-600"><CreditCard className="h-5 w-5" /></div>
+                      <span className="text-[9px] font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Coconut</span>
+                    </div>
+                    <div className="mt-4">
+                      <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Expenses - COCONUT</span>
+                      <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
+                        {loadingExpenses ? '...' : formatCurrency(expenseSummary?.total_coconut ?? 0)}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
