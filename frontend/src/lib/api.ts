@@ -100,6 +100,9 @@ export interface DashboardStats {
   outstanding_fees: number;
   total_expenses: number;
   available_balance: number;
+  total_coconut_collections: number;
+  total_coconut_expenses: number;
+  coconut_balance: number;
   monthly_chart: MonthlyData[];
   recent_transactions: Transaction[];
 }

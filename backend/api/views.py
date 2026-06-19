@@ -307,11 +307,31 @@ def dashboard_stats(request):
     recent_txns = recent_txns_qs.order_by('-date', '-created_at')[:5]
     recent_data = TransactionSerializer(recent_txns, many=True).data
 
+    coconut_collections = Transaction.objects.filter(transaction_type='collection', user=request.user, school_year=school_year, category__icontains='coconut')
+    if month_filter:
+        parts = month_filter.split('-')
+        if len(parts) == 2:
+            coconut_collections = coconut_collections.filter(date__year=parts[0], date__month=parts[1])
+            
+    total_coconut_collections = coconut_collections.filter(status='paid').aggregate(total=Sum('amount'))['total'] or Decimal('0')
+
+    coconut_expenses_qs = Expense.objects.filter(user=request.user, school_year=school_year, name__icontains='coconut')
+    if month_filter:
+        parts = month_filter.split('-')
+        if len(parts) == 2:
+            coconut_expenses_qs = coconut_expenses_qs.filter(date__year=parts[0], date__month=parts[1])
+    total_coconut_expenses = coconut_expenses_qs.aggregate(total=Sum('amount'))['total'] or Decimal('0')
+    
+    coconut_balance = total_coconut_collections - total_coconut_expenses
+
     return Response({
         'total_collections': float(total_collected),
         'outstanding_fees': float(outstanding),
         'total_expenses': float(total_expenses),
         'available_balance': float(available_balance),
+        'total_coconut_collections': float(total_coconut_collections),
+        'total_coconut_expenses': float(total_coconut_expenses),
+        'coconut_balance': float(coconut_balance),
         'monthly_chart': months_data,
         'recent_transactions': recent_data,
     })

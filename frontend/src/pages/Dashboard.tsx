@@ -10,7 +10,9 @@ import {
   Wallet,
   Calendar,
   ChevronDown,
-  Loader2
+  Loader2,
+  TrendingUp,
+  Activity
 } from 'lucide-react';
 import { dashboardApi } from '../lib/api';
 import type { DashboardStats, Transaction } from '../lib/api';
@@ -155,7 +157,7 @@ export default function Dashboard() {
               </div>
               <div className="mt-4">
                 <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
-                  Total Income{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                  Total Income - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                 </span>
                 <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
                   {loading ? '...' : formatCurrency(stats?.total_collections ?? 0)}
@@ -172,7 +174,7 @@ export default function Dashboard() {
               </div>
               <div className="mt-4">
                 <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
-                  Total Expenses{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                  Total Expenses - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                 </span>
                 <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
                   {loading ? '...' : formatCurrency(stats?.total_expenses ?? 0)}
@@ -189,10 +191,64 @@ export default function Dashboard() {
               </div>
               <div className="mt-4">
                 <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
-                  Total Balance{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                  Total Balance - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                 </span>
                 <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
                   {loading ? '...' : formatCurrency((stats?.total_collections ?? 0) - (stats?.total_expenses ?? 0))}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Coconut Financial Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {/* Total Collected - COCONUT */}
+            <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between">
+              <div className="flex justify-between items-start">
+                <div className="bg-[#4ade80]/15 p-2 rounded-lg text-[#006B4D]">
+                  <TrendingUp className="h-5 w-5" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+                  Total Collected - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                </span>
+                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
+                  {loading ? '...' : formatCurrency(stats?.total_coconut_collections ?? 0)}
+                </p>
+              </div>
+            </div>
+
+            {/* Total Expenses - COCONUT */}
+            <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between">
+              <div className="flex justify-between items-start">
+                <div className="bg-red-50 p-2 rounded-lg text-red-600">
+                  <Activity className="h-5 w-5" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+                  Total Expenses - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                </span>
+                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
+                  {loading ? '...' : formatCurrency(stats?.total_coconut_expenses ?? 0)}
+                </p>
+              </div>
+            </div>
+
+            {/* Total Balance - COCONUT */}
+            <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between">
+              <div className="flex justify-between items-start">
+                <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600">
+                  <Wallet className="h-5 w-5" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+                  Total Balance - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                </span>
+                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
+                  {loading ? '...' : formatCurrency(stats?.coconut_balance ?? 0)}
                 </p>
               </div>
             </div>

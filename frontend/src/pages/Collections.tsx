@@ -276,15 +276,18 @@ export default function Collections() {
         return;
       }
       if (editingId) {
+        const cat = name.toLowerCase() === 'coconut' ? 'Coconut' : 'General';
         await transactionsApi.update(editingId, {
           student_name: name, student_initials: initials,
           amount: parseFloat(form.amount), status: form.status, date: form.date, canteen,
+          category: cat,
         });
       } else {
+        const cat = name.toLowerCase() === 'coconut' ? 'Coconut' : 'General';
         await transactionsApi.create({
           transaction_type: 'collection', student_name: name, student_initials: initials,
           grade_section: '', id_number: '', amount: parseFloat(form.amount),
-          category: 'General', canteen, status: form.status, date: form.date,
+          category: cat, canteen, status: form.status, date: form.date,
         });
       }
       setShowModal(false);
@@ -478,7 +481,7 @@ export default function Collections() {
                     <span className="text-[9px] font-bold text-[#006B4D] bg-[#4ade80]/15 px-2 py-0.5 rounded-full">Live</span>
                   </div>
                   <div className="mt-4">
-                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Collected</span>
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Collected - CANTEEN</span>
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
                       {loading ? '...' : formatCurrency(summary?.total_collected ?? 0)}
                     </p>
@@ -500,13 +503,13 @@ export default function Collections() {
 
                 <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="bg-red-50 p-2 rounded-lg text-red-600"><Activity className="h-5 w-5" /></div>
-                    <span className="text-[9px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Critical</span>
+                    <div className="bg-green-50 p-2 rounded-lg text-green-600"><Coins className="h-5 w-5" /></div>
+                    <span className="text-[9px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Coconut</span>
                   </div>
                   <div className="mt-4">
-                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Overdue Items</span>
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Coconut Payments</span>
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
-                      {loading ? '...' : `${summary?.overdue_count ?? 0} Accounts`}
+                      {loading ? '...' : formatCurrency(summary?.total_coconut ?? 0)}
                     </p>
                   </div>
                 </div>
@@ -538,8 +541,8 @@ export default function Collections() {
                       <button
                         onClick={() => { setShowStatusMenu(v => !v); setShowDatePicker(false); setShowMonthPicker(false); }}
                         className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${filterStatus !== 'All Statuses'
-                            ? 'bg-[#006B4D] text-white border-[#006B4D]'
-                            : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-150'
+                          ? 'bg-[#006B4D] text-white border-[#006B4D]'
+                          : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-150'
                           }`}
                       >
                         <span className="capitalize">{filterStatus}</span>
@@ -774,7 +777,7 @@ export default function Collections() {
                     <span className="text-[9px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Total</span>
                   </div>
                   <div className="mt-4">
-                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Expenses</span>
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Expenses - CANTEEN</span>
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
                       {loadingExpenses ? '...' : formatCurrency(expenseSummary?.total_expenses ?? 0)}
                     </p>
@@ -1044,11 +1047,15 @@ export default function Collections() {
                       <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Source Name</label>
                       <input
                         type="text"
+                        list="external-sources"
                         value={form.consignee_name}
                         onChange={e => setForm(prev => ({ ...prev, consignee_name: e.target.value }))}
-                        placeholder="Enter external source name..."
+                        placeholder="Enter external source name (e.g. Coconut)..."
                         className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
                       />
+                      <datalist id="external-sources">
+                        <option value="Coconut" />
+                      </datalist>
                     </div>
                   )}
 
