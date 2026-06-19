@@ -165,7 +165,7 @@ export default function Consignees() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-gray-955 tracking-tight leading-none">Canteen Vendor Directory</h1>
-              <p className="text-xs text-gray-500 mt-1">Manage institutional consignees and stall assignments for the Academic Year 2024-2025.</p>
+              <p className="text-xs text-gray-500 mt-1">Manage institutional consignees and coconut income for this academic year.</p>
             </div>
             {!isViewMode && (
               <button onClick={() => setShowModal(true)}

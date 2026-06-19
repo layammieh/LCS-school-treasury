@@ -484,6 +484,9 @@ export default function Collections() {
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
                       {loading ? '...' : formatCurrency(summary?.total_collected ?? 0)}
                     </p>
+                    <p className="text-[10px] text-gray-500 font-medium mt-1">
+                      Canteen Payments: <span className="text-gray-700 font-bold">{loading ? '...' : formatCurrency(summary?.total_canteen ?? 0)}</span>
+                    </p>
                   </div>
                 </div>
 
@@ -502,13 +505,13 @@ export default function Collections() {
 
                 <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="bg-red-50 p-2 rounded-lg text-red-600"><Activity className="h-5 w-5" /></div>
-                    <span className="text-[9px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Critical</span>
+                    <div className="bg-green-50 p-2 rounded-lg text-green-600"><Coins className="h-5 w-5" /></div>
+                    <span className="text-[9px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Coconut</span>
                   </div>
                   <div className="mt-4">
-                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Overdue Items</span>
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Coconut Payments</span>
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
-                      {loading ? '...' : `${summary?.overdue_count ?? 0} Accounts`}
+                      {loading ? '...' : formatCurrency(summary?.total_coconut ?? 0)}
                     </p>
                   </div>
                 </div>

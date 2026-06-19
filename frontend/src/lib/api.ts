@@ -181,6 +181,8 @@ export interface CollectionSummary {
   outstanding: number;
   overdue_count: number;
   efficiency: number;
+  total_coconut: number;
+  total_canteen: number;
 }
 
 export interface LedgerSummary {

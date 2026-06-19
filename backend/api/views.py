@@ -491,11 +491,19 @@ class TransactionViewSet(viewsets.ModelViewSet):
         paid_count = qs.filter(status='paid').count()
         efficiency = round(paid_count / total_count * 100, 1) if total_count else 0
 
+        total_coconut = qs.filter(status='paid', category__icontains='coconut').aggregate(
+            total=Sum('amount'))['total'] or Decimal('0')
+            
+        total_canteen = qs.filter(status='paid', category__icontains='canteen').aggregate(
+            total=Sum('amount'))['total'] or Decimal('0')
+
         return Response({
             'total_collected': float(total_collected),
             'outstanding': float(outstanding),
             'overdue_count': overdue_count,
             'efficiency': efficiency,
+            'total_coconut': float(total_coconut),
+            'total_canteen': float(total_canteen),
         })
 
     @action(detail=False, methods=['get'], url_path='ledger-summary')

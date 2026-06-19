@@ -97,7 +97,7 @@ export default function Dashboard() {
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-955 tracking-tight leading-none">Financial Dashboard</h1>
-              <p className="text-xs text-gray-500 mt-1">Overview of Liberty Collegiate School fiscal status.</p>
+              <p className="text-xs text-gray-500 mt-1">Overview of Lumbia Central School fiscal status.</p>
             </div>
             <div className="relative" ref={monthPickerRef}>
               <button
