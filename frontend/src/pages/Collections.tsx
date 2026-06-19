@@ -3,7 +3,7 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import { useSchoolYearStore } from '../store/schoolYearStore';
 import {
-  Plus, ChevronDown, Activity, Calendar, Layers, Coins, X,
+  Plus, ChevronDown, Calendar, Layers, Coins, X,
   Pencil, Trash2, AlertCircle, Search, CreditCard, Loader2
 } from 'lucide-react';
 import { transactionsApi, consigneesApi, expensesApi } from '../lib/api';
