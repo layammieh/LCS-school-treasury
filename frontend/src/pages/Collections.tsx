@@ -481,12 +481,12 @@ export default function Collections() {
                 <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
                     <div className="bg-[#4ade80]/10 p-2 rounded-lg text-[#006B4D]"><Coins className="h-5 w-5" /></div>
-                    <span className="text-[9px] font-bold text-[#006B4D] bg-[#4ade80]/15 px-2 py-0.5 rounded-full">Live</span>
+                    <span className="text-[9px] font-bold text-[#006B4D] bg-[#4ade80]/15 px-2 py-0.5 rounded-full">CANTEEN</span>
                   </div>
                   <div className="mt-4">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Collected - CANTEEN</span>
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
-                      {loading ? '...' : formatCurrency(summary?.total_collected ?? 0)}
+                      {loading ? '...' : formatCurrency(summary?.total_canteen ?? 0)}
                     </p>
                   </div>
                 </div>

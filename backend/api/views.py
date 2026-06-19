@@ -220,7 +220,7 @@ def dashboard_stats(request):
 
     one_week_ago = timezone.now().date() - timedelta(days=7)
 
-    total_collected = collections.filter(status='paid').aggregate(
+    total_collected = collections.filter(status='paid').exclude(category__icontains='coconut').aggregate(
         total=Sum('amount')
     )['total'] or Decimal('0')
 
@@ -236,7 +236,7 @@ def dashboard_stats(request):
         parts = month_filter.split('-')
         if len(parts) == 2:
             expenses_qs = expenses_qs.filter(date__year=parts[0], date__month=parts[1])
-    total_expenses = expenses_qs.aggregate(total=Sum('amount'))['total'] or Decimal('0')
+    total_expenses = expenses_qs.exclude(name__icontains='coconut').aggregate(total=Sum('amount'))['total'] or Decimal('0')
 
     available_balance = total_collected - total_expenses
 
@@ -494,6 +494,12 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
         total_collected = qs.filter(status='paid').aggregate(
             total=Sum('amount'))['total'] or Decimal('0')
+
+        total_canteen = qs.filter(status='paid').exclude(category__icontains='coconut').aggregate(
+            total=Sum('amount'))['total'] or Decimal('0')
+            
+        total_coconut = qs.filter(status='paid', category__icontains='coconut').aggregate(
+            total=Sum('amount'))['total'] or Decimal('0')
             
         outstanding = qs.filter(
             status__in=['unpaid', 'partial', 'pending'],
@@ -513,6 +519,8 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
         return Response({
             'total_collected': float(total_collected),
+            'total_canteen': float(total_canteen),
+            'total_coconut': float(total_coconut),
             'outstanding': float(outstanding),
             'overdue_count': overdue_count,
             'efficiency': efficiency,
