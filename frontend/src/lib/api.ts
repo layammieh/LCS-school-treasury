@@ -32,6 +32,13 @@ async function request<T>(
   });
 
   if (!response.ok) {
+    if (response.status === 401 && !path.includes('/auth/login')) {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_user');
+      localStorage.removeItem('view_mode');
+      window.location.href = '/';
+      return Promise.reject(new Error('Session expired. Please log in again.'));
+    }
     const error = await response.json().catch(() => ({ detail: 'An error occurred' }));
     console.error('API Error:', error);
     throw new Error(error.detail || error.error || JSON.stringify(error) || `HTTP ${response.status}`);
