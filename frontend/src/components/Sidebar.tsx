@@ -43,8 +43,8 @@ export default function Sidebar({ activePage }: SidebarProps) {
           {/* Logo Brand */}
           <div className="flex items-center justify-between px-2 py-4 mb-4 border-b border-white/10">
             <div className="flex items-center space-x-2.5">
-              <div className="bg-[#006B4D]/0 p-2 rounded-full">
-                <img src={lumbiaLogo} alt="Lumbia Central School" className="h-9 w-9 object-contain rounded-full" />
+              <div className="bg-[#006B4D]/0 p-2 rounded-full shrink-0">
+                <img src={lumbiaLogo} alt="Lumbia Central School" className="h-9 w-9 object-contain rounded-full shrink-0" />
               </div>
               <div>
                 <h2 className="font-bold text-sm tracking-wide text-white leading-none">LCS Treasury</h2>
