@@ -94,7 +94,7 @@ export default function Dashboard() {
         <main className="flex-1 p-8 space-y-6">
           
           {/* Dashboard Head */}
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-955 tracking-tight leading-none">Financial Dashboard</h1>
               <p className="text-xs text-gray-500 mt-1">Overview of Liberty Collegiate School fiscal status.</p>
@@ -210,7 +210,9 @@ export default function Dashboard() {
                 </button>
               </div>
 
-              <div className="relative flex-1 min-h-[220px] flex items-end">
+              <div className="overflow-x-auto w-full pb-4">
+                <div className="min-w-[600px]">
+                  <div className="relative flex-1 min-h-[220px] flex items-end">
                 <svg className="w-full h-[180px]" viewBox="0 0 600 180" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
@@ -257,6 +259,8 @@ export default function Dashboard() {
                   {(stats?.monthly_chart ?? []).map(m => (
                     <span key={m.month}>{m.month}</span>
                   ))}
+                </div>
+                  </div>
                 </div>
               </div>
 
