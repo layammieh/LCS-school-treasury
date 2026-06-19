@@ -298,8 +298,8 @@ export default function Dashboard() {
                     <th className="px-6 py-3.5 text-center">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 text-xs">
-                  {loading ? (
+                <tbody className={`divide-y divide-slate-200 text-xs ${loading && stats ? 'opacity-50 pointer-events-none transition-opacity' : ''}`}>
+                  {loading && !stats ? (
                     <tr><td colSpan={6} className="px-6 py-8 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" /></td></tr>
                   ) : (stats?.recent_transactions ?? []).map((txn: Transaction) => (
                     <tr key={txn.id} className="hover:bg-gray-50/50">

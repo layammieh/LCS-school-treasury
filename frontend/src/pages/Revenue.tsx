@@ -221,8 +221,8 @@ export default function Revenue() {
                 </div>
 
                 {/* Setup Rules Container Rows */}
-                <div className="space-y-3.5 max-h-[480px] overflow-y-auto pr-1">
-                  {loadingRecipients ? (
+                <div className={`space-y-3.5 max-h-[480px] overflow-y-auto pr-1 ${loadingRecipients && recipients.length > 0 ? 'opacity-50 pointer-events-none transition-opacity' : ''}`}>
+                  {loadingRecipients && recipients.length === 0 ? (
                     <div className="flex justify-center py-12">
                       <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                     </div>
@@ -390,8 +390,8 @@ export default function Revenue() {
                         <th className="px-5 py-3.5 text-right">Yield</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {loadingRecipients ? (
+                    <tbody className={`divide-y divide-gray-100 ${loadingRecipients && recipients.length > 0 ? 'opacity-50 pointer-events-none transition-opacity' : ''}`}>
+                      {loadingRecipients && recipients.length === 0 ? (
                         <tr>
                           <td colSpan={3} className="px-5 py-16 text-center">
                             <Loader2 className="h-5 w-5 animate-spin mx-auto text-gray-400" />

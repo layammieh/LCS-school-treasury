@@ -705,8 +705,8 @@ export default function Collections() {
                       <col style={{width:'15%'}} />
                       <col style={{width:'15%'}} />
                     </colgroup>
-                    <tbody className="divide-y divide-slate-200 text-xs">
-                        {loading ? (
+                    <tbody className={`divide-y divide-slate-200 text-xs ${loading && transactions.length > 0 ? 'opacity-50 pointer-events-none transition-opacity' : ''}`}>
+                        {loading && transactions.length === 0 ? (
                           <tr><td colSpan={6} className="px-4 py-10 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" /></td></tr>
                         ) : transactions.length === 0 ? (
                           <tr>
@@ -921,8 +921,8 @@ export default function Collections() {
                       <col style={{width:'10%'}} />
                       <col style={{width:'10%'}} />
                     </colgroup>
-                    <tbody className="divide-y divide-slate-200 text-xs">
-                        {loadingExpenses ? (
+                    <tbody className={`divide-y divide-slate-200 text-xs ${loadingExpenses && expenses.length > 0 ? 'opacity-50 pointer-events-none transition-opacity' : ''}`}>
+                        {loadingExpenses && expenses.length === 0 ? (
                           <tr><td colSpan={6} className="px-4 py-10 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" /></td></tr>
                         ) : expenses.length === 0 ? (
                           <tr>

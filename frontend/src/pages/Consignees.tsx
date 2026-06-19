@@ -265,8 +265,8 @@ export default function Consignees() {
                     <th className="px-10 py-3.5 w-[20%] text-center">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 text-xs bg-white">
-                  {loading ? (
+                <tbody className={`divide-y divide-slate-200 text-xs bg-white ${loading && consignees.length > 0 ? 'opacity-50 pointer-events-none transition-opacity' : ''}`}>
+                  {loading && consignees.length === 0 ? (
                     <tr><td colSpan={4} className="px-10 py-10 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" /></td></tr>
                   ) : filteredConsignees.length === 0 ? (
                     <tr><td colSpan={4} className="px-10 py-10 text-center text-gray-400">No consignees found. Click "Add New Consignee" to add one.</td></tr>
