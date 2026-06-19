@@ -48,7 +48,7 @@ export default function Revenue() {
   const [showMonthPicker, setShowMonthPicker] = useState(false);
   const monthPickerRef = useRef<HTMLDivElement>(null);
 
-  const totalPercentage = recipients.reduce((sum, r) => sum + r.percentage, 0);
+  const totalPercentage = recipients.reduce((sum, r) => sum + Number(r.percentage), 0);
 
   const icons = ['GraduationCap', 'HeartPulse', 'Wrench', 'Building', 'Shield', 'Lightbulb', 'Users', 'FileText'];
   const colors = ['[#4ADE80]', '[#a855f7]', '[#eab308]', '[#3b82f6]', '[#ef4444]', '[#06b6d4]', '[#f97316]', '[#8b5cf6]'];
