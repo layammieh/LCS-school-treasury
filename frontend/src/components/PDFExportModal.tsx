@@ -6,7 +6,7 @@ import { transactionsApi } from '../lib/api';
 import PDFTemplate from '../components/PDFTemplate';
 
 interface Recipient {
-  id: string;
+  id: string | number;
   name: string;
   percentage: number;
 }

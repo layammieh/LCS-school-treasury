@@ -7,8 +7,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 
-from .models import Consignee, Transaction, Expense
-from .serializers import ConsigneeSerializer, TransactionSerializer, ExpenseSerializer
+from .models import Consignee, Transaction, Expense, RevenueRecipient
+from .serializers import ConsigneeSerializer, TransactionSerializer, ExpenseSerializer, RevenueRecipientSerializer
 
 
 # ---------------------------------------------------------------------------
@@ -99,6 +99,7 @@ def register_view(request):
 
     from .models import UserProfile
     profile, _ = UserProfile.objects.get_or_create(user=user)
+    token, _ = Token.objects.get_or_create(user=user)
 
     return Response({
         'token': token.key,
@@ -346,6 +347,20 @@ class ConsigneeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def perform_update(self, serializer):
+        # Cascade vendor rename: update student_name on all matching transactions
+        old_name = self.get_object().vendor_name
+        instance = serializer.save()
+        new_name = instance.vendor_name
+        if old_name != new_name:
+            Transaction.objects.filter(
+                user=self.request.user,
+                student_name=old_name
+            ).update(
+                student_name=new_name,
+                student_initials=new_name.split()[0][0].upper() + (new_name.split()[1][0].upper() if len(new_name.split()) > 1 else '')
+            )
+
 
 # ---------------------------------------------------------------------------
 # Transactions / Collections
@@ -561,3 +576,37 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             'highest_expense_name': highest_name,
             'latest_expense_date': latest_date,
         })
+
+
+# ---------------------------------------------------------------------------
+# Revenue Recipients
+# ---------------------------------------------------------------------------
+
+class RevenueRecipientViewSet(viewsets.ModelViewSet):
+    queryset = RevenueRecipient.objects.all()
+    serializer_class = RevenueRecipientSerializer
+
+    def get_permissions(self):
+        # Allow unauthenticated (public/view-mode) users to read recipients
+        if self.action in ('list', 'retrieve'):
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        school_year = self.request.query_params.get('school_year')
+        user_id = self.request.query_params.get('user_id')
+        # Authenticated users see their own; view-mode callers pass user_id
+        if self.request.user and self.request.user.is_authenticated:
+            qs = qs.filter(user=self.request.user)
+        elif user_id:
+            qs = qs.filter(user_id=user_id)
+        else:
+            return qs.none()
+        if school_year:
+            qs = qs.filter(school_year=school_year)
+        return qs
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+

@@ -3,7 +3,7 @@ import depedLogo from '../assets/deped_logo.png';
 import lumbiaLogo from '../assets/lumbia_logo.png';
 
 interface Recipient {
-  id: string;
+  id: string | number;
   name: string;
   percentage: number;
 }

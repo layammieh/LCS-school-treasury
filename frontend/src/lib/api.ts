@@ -266,6 +266,38 @@ export const revenueApi = {
 };
 
 
+// ---------------------------------------------------------------------------
+// Revenue Recipients (database-backed)
+// ---------------------------------------------------------------------------
+export interface RevenueRecipient {
+  id: number;
+  name: string;
+  percentage: number;
+  icon: string;
+  color: string;
+  order: number;
+  school_year?: string;
+}
+
+export const revenueRecipientsApi = {
+  list: (params?: { schoolYear?: string; user_id?: number }) => {
+    const qs = new URLSearchParams();
+    if (params?.schoolYear) qs.set('school_year', params.schoolYear);
+    if (params?.user_id) qs.set('user_id', String(params.user_id));
+    return request<PaginatedResponse<RevenueRecipient>>(`/revenue-recipients/?${qs}`);
+  },
+
+  create: (data: Omit<RevenueRecipient, 'id'>) =>
+    request<RevenueRecipient>('/revenue-recipients/', { method: 'POST', body: JSON.stringify(data) }),
+
+  update: (id: number, data: Partial<Omit<RevenueRecipient, 'id'>>) =>
+    request<RevenueRecipient>(`/revenue-recipients/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
+
+  delete: (id: number) =>
+    request<void>(`/revenue-recipients/${id}/`, { method: 'DELETE' }),
+};
+
+
 
 
 

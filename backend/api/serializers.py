@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Consignee, Transaction, Expense
+from .models import Consignee, Transaction, Expense, RevenueRecipient
 
 
 class ConsigneeSerializer(serializers.ModelSerializer):
@@ -20,8 +20,23 @@ class TransactionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
 class ExpenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Expense
         fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make user field optional during validation (it will be set in perform_create)
+        self.fields['user'].required = False
+
+
+class RevenueRecipientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RevenueRecipient
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['user'].required = False
+        self.fields['school_year'].required = False

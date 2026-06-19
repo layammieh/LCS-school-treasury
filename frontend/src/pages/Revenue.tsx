@@ -13,43 +13,31 @@ import {
   Calendar,
   ChevronDown,
   Download,
-  Check
+  Check,
+  Loader2
 } from 'lucide-react';
-import { transactionsApi } from '../lib/api';
+import { transactionsApi, revenueRecipientsApi } from '../lib/api';
+import type { RevenueRecipient } from '../lib/api';
 import PDFExportModal from '../components/PDFExportModal';
 import { DeleteModal } from '../components/DeleteModal';
 import { useAuthStore } from '../store/authStore';
 
-interface Recipient {
-  id: string;
-  name: string;
-  percentage: number;
-  icon: string;
-  color: string;
-}
-
 export default function Revenue() {
   const schoolYear = useSchoolYearStore(state => state.schoolYear);
   const isViewMode = useAuthStore(state => state.isViewMode);
+  const authUser = useAuthStore(state => state.user);
+
   const [totalIncome, setTotalIncome] = useState(0);
-  const [recipients, setRecipients] = useState<Recipient[]>(() => {
-    const saved = localStorage.getItem('revenue_recipients');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        return [];
-      }
-    }
-    return [];
-  });
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [recipients, setRecipients] = useState<RevenueRecipient[]>([]);
+  const [loadingRecipients, setLoadingRecipients] = useState(true);
+
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [editName, setEditName] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [newRecipientName, setNewRecipientName] = useState('');
   const [newRecipientPercentage, setNewRecipientPercentage] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+  const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
   const [deleteItemName, setDeleteItemName] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -61,9 +49,27 @@ export default function Revenue() {
 
   const totalPercentage = recipients.reduce((sum, r) => sum + r.percentage, 0);
 
+  const icons = ['GraduationCap', 'HeartPulse', 'Wrench', 'Building', 'Shield', 'Lightbulb', 'Users', 'FileText'];
+  const colors = ['[#4ADE80]', '[#a855f7]', '[#eab308]', '[#3b82f6]', '[#ef4444]', '[#06b6d4]', '[#f97316]', '[#8b5cf6]'];
+
+  // Load recipients from the database
+  function loadRecipients() {
+    setLoadingRecipients(true);
+    const params: { schoolYear?: string; user_id?: number } = { schoolYear };
+    // In view mode, we need the user_id to load public recipients.
+    // authUser may carry an id if the public page was reached with a user context.
+    if (isViewMode && (authUser as any)?.id) {
+      params.user_id = (authUser as any).id;
+    }
+    revenueRecipientsApi.list(params)
+      .then(res => setRecipients(res.results))
+      .catch(console.error)
+      .finally(() => setLoadingRecipients(false));
+  }
+
   useEffect(() => {
-    localStorage.setItem('revenue_recipients', JSON.stringify(recipients));
-  }, [recipients]);
+    loadRecipients();
+  }, [schoolYear]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -83,24 +89,27 @@ export default function Revenue() {
       .catch(console.error);
   }, [schoolYear, filterMonth]);
 
-  const icons = ['GraduationCap', 'HeartPulse', 'Wrench', 'Building', 'Shield', 'Lightbulb', 'Users', 'FileText'];
-  const colors = ['[#4ADE80]', '[#a855f7]', '[#eab308]', '[#3b82f6]', '[#ef4444]', '[#06b6d4]', '[#f97316]', '[#8b5cf6]'];
-
-  const addRecipient = () => {
+  const addRecipient = async () => {
     if (!newRecipientName.trim()) return;
 
-    const newRecipient: Recipient = {
-      id: Date.now().toString(),
+    const newRecipient = {
       name: newRecipientName,
       percentage: parseInt(newRecipientPercentage) || 0,
       icon: icons[recipients.length % icons.length],
-      color: colors[recipients.length % colors.length]
+      color: colors[recipients.length % colors.length],
+      order: recipients.length,
+      school_year: schoolYear,
     };
 
-    setRecipients([...recipients, newRecipient]);
-    setNewRecipientName('');
-    setNewRecipientPercentage('');
-    setShowAddModal(false);
+    try {
+      await revenueRecipientsApi.create(newRecipient);
+      setNewRecipientName('');
+      setNewRecipientPercentage('');
+      setShowAddModal(false);
+      loadRecipients();
+    } catch (e: any) {
+      console.error('Failed to add recipient:', e);
+    }
   };
 
   const openAddModal = () => {
@@ -109,38 +118,43 @@ export default function Revenue() {
     setShowAddModal(true);
   };
 
-  const openDeleteModal = (id: string, name: string) => {
+  const openDeleteModal = (id: number, name: string) => {
     setDeleteItemId(id);
     setDeleteItemName(name);
     setDeleteModalOpen(true);
   };
 
-  const deleteRecipient = (id: string) => {
-    setRecipients(recipients.filter(r => r.id !== id));
-  };
-
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (!deleteItemId) return;
     setIsDeleting(true);
-    setTimeout(() => {
-      deleteRecipient(deleteItemId);
+    try {
+      await revenueRecipientsApi.delete(deleteItemId);
       setDeleteModalOpen(false);
       setDeleteItemId(null);
       setDeleteItemName('');
+      loadRecipients();
+    } catch (e: any) {
+      console.error('Failed to delete recipient:', e);
+    } finally {
       setIsDeleting(false);
-    }, 500);
+    }
   };
 
-  const startEditing = (recipient: Recipient) => {
+  const startEditing = (recipient: RevenueRecipient) => {
     setEditingId(recipient.id);
     setEditName(recipient.name);
   };
 
-  const saveEdit = () => {
-    if (!editName.trim()) return;
-    setRecipients(recipients.map(r => r.id === editingId ? { ...r, name: editName } : r));
-    setEditingId(null);
-    setEditName('');
+  const saveEdit = async () => {
+    if (!editName.trim() || editingId === null) return;
+    try {
+      await revenueRecipientsApi.update(editingId, { name: editName });
+      setEditingId(null);
+      setEditName('');
+      loadRecipients();
+    } catch (e: any) {
+      console.error('Failed to update recipient:', e);
+    }
   };
 
   const cancelEdit = () => {
@@ -148,8 +162,15 @@ export default function Revenue() {
     setEditName('');
   };
 
-  const updatePercentage = (id: string, value: number) => {
-    setRecipients(recipients.map(r => r.id === id ? { ...r, percentage: Math.max(0, value) } : r));
+  const updatePercentage = async (id: number, value: number) => {
+    // Optimistically update UI, then persist
+    setRecipients(prev => prev.map(r => r.id === id ? { ...r, percentage: Math.max(0, value) } : r));
+    try {
+      await revenueRecipientsApi.update(id, { percentage: Math.max(0, value) });
+    } catch (e: any) {
+      console.error('Failed to update percentage:', e);
+      loadRecipients(); // revert on error
+    }
   };
 
   return (
@@ -198,7 +219,11 @@ export default function Revenue() {
 
                 {/* Setup Rules Container Rows */}
                 <div className="space-y-3.5 max-h-[480px] overflow-y-auto pr-1">
-                  {recipients.length === 0 ? (
+                  {loadingRecipients ? (
+                    <div className="flex justify-center py-12">
+                      <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                    </div>
+                  ) : recipients.length === 0 ? (
                     <div className="text-center py-12 text-gray-400 text-xs">
                       No recipients added yet. Click "Add Recipient" to get started.
                     </div>
@@ -363,7 +388,13 @@ export default function Revenue() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                      {recipients.length === 0 ? (
+                      {loadingRecipients ? (
+                        <tr>
+                          <td colSpan={3} className="px-5 py-16 text-center">
+                            <Loader2 className="h-5 w-5 animate-spin mx-auto text-gray-400" />
+                          </td>
+                        </tr>
+                      ) : recipients.length === 0 ? (
                         <tr>
                           <td colSpan={3} className="px-5 py-16 text-center text-gray-400 text-xs">
                             Add allocation weights to run yield estimates.
@@ -447,7 +478,8 @@ export default function Revenue() {
               </button>
               <button
                 onClick={addRecipient}
-                className="flex-1 px-3 py-2 bg-[#006B4D] hover:bg-[#00523b] text-white text-xs font-semibold rounded-lg transition-colors"
+                disabled={!newRecipientName.trim()}
+                className="flex-1 px-3 py-2 bg-[#006B4D] hover:bg-[#00523b] text-white text-xs font-semibold rounded-lg transition-colors disabled:opacity-50"
               >
                 Add Recipient
               </button>
