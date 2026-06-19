@@ -350,7 +350,7 @@ export default function Collections() {
       const payload = {
         name: expenseForm.name.trim(),
         requested_by: expenseForm.requested_by.trim(),
-        amount: parseFloat(expenseForm.amount),
+        amount: parseFloat(expenseForm.amount) || 0,
         date: expenseForm.date,
         reason: expenseForm.reason.trim(),
         school_year: schoolYear,

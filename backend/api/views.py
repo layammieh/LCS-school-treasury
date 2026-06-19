@@ -402,6 +402,16 @@ class TransactionViewSet(viewsets.ModelViewSet):
             )
         return qs
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            self.perform_create(serializer)
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=201, headers=headers)
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
@@ -541,6 +551,16 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             qs = qs.filter(Q(name__icontains=search) | Q(requested_by__icontains=search))
         return qs
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            self.perform_create(serializer)
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=201, headers=headers)
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
@@ -596,16 +616,30 @@ class RevenueRecipientViewSet(viewsets.ModelViewSet):
         qs = super().get_queryset()
         school_year = self.request.query_params.get('school_year')
         user_id = self.request.query_params.get('user_id')
-        # Authenticated users see their own; view-mode callers pass user_id
-        if self.request.user and self.request.user.is_authenticated:
-            qs = qs.filter(user=self.request.user)
-        elif user_id:
+        
+        # Public view allows querying by user_id
+        if user_id:
             qs = qs.filter(user_id=user_id)
+        elif self.request.user and getattr(self.request.user, 'email', '') == 'amelitalayam@gmail.com':
+            pass # Viewer sees all recipients (filtered by school year later)
+        elif self.request.user and self.request.user.is_authenticated:
+            qs = qs.filter(user=self.request.user)
         else:
             return qs.none()
+            
         if school_year:
             qs = qs.filter(school_year=school_year)
         return qs
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            self.perform_create(serializer)
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=201, headers=headers)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
