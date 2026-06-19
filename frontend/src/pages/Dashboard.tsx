@@ -147,6 +147,12 @@ export default function Dashboard() {
           )}
 
           {/* Cards Grid */}
+          {/* Canteen Section */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Canteen</h3>
+              <div className="flex-1 h-px bg-gray-200"></div>
+            </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {/* Total Income */}
             <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between">
@@ -199,8 +205,14 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+          </div>
 
-          {/* Coconut Financial Cards */}
+          {/* Coconut Section */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Coconut</h3>
+              <div className="flex-1 h-px bg-gray-200"></div>
+            </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {/* Total Collected - COCONUT */}
             <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between">
@@ -252,6 +264,7 @@ export default function Dashboard() {
                 </p>
               </div>
             </div>
+          </div>
           </div>
 
           {/* Financial Overview Graph */}
