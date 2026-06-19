@@ -668,16 +668,18 @@ export default function Collections() {
                         <thead>
                           <tr className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                             <th className="pl-[56px] pr-2 py-3 text-center">
-                              <input
-                                type="checkbox"
-                                className="rounded text-[#006B4D] focus:ring-[#006B4D]"
-                                checked={transactions.length > 0 && transactions.every(t => selectedIds.has(t.id))}
-                                onChange={e => setSelectedIds(prev => {
-                                  const next = new Set(prev);
-                                  transactions.forEach(t => e.target.checked ? next.add(t.id) : next.delete(t.id));
-                                  return next;
-                                })}
-                              />
+                              {!isViewMode && (
+                                <input
+                                  type="checkbox"
+                                  className="rounded text-[#006B4D] focus:ring-[#006B4D]"
+                                  checked={transactions.length > 0 && transactions.every(t => selectedIds.has(t.id))}
+                                  onChange={e => setSelectedIds(prev => {
+                                    const next = new Set(prev);
+                                    transactions.forEach(t => e.target.checked ? next.add(t.id) : next.delete(t.id));
+                                    return next;
+                                  })}
+                                />
+                              )}
                             </th>
                             <th className="pl-[56px] pr-4 py-3 text-left">Consignee</th>
                             <th className="px-4 py-3 text-right">Amount</th>
@@ -716,7 +718,9 @@ export default function Collections() {
                             transactions.map(txn => (
                               <tr key={txn.id} className={`${selectedIds.has(txn.id) ? 'bg-green-50/40' : 'hover:bg-gray-50/50'} transition-colors`}>
                                 <td className="pl-[56px] pr-2 py-3">
-                                  <input type="checkbox" checked={selectedIds.has(txn.id)} onChange={() => toggleSelect(txn.id)} className="rounded text-[#006B4D] focus:ring-[#006B4D]" />
+                                  {!isViewMode && (
+                                    <input type="checkbox" checked={selectedIds.has(txn.id)} onChange={() => toggleSelect(txn.id)} className="rounded text-[#006B4D] focus:ring-[#006B4D]" />
+                                  )}
                                 </td>
                                 <td className="px-4 py-3 w-[25%]">
                                   <div className="flex items-center space-x-2">
