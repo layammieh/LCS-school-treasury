@@ -9,9 +9,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-school-treasurer-secret-key-change-in-production')
 
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+# Default to False in production
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']
+# Allow all hosts only if DEBUG is True, otherwise require ALLOWED_HOSTS env var
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
+else:
+    _hosts = os.environ.get('ALLOWED_HOSTS', '')
+    ALLOWED_HOSTS = [h.strip() for h in _hosts.split(',')] if _hosts else []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
