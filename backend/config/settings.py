@@ -18,6 +18,15 @@ if DEBUG:
 else:
     _hosts = os.environ.get('ALLOWED_HOSTS', '')
     ALLOWED_HOSTS = [h.strip() for h in _hosts.split(',')] if _hosts else []
+    
+    # Render sets RENDER_EXTERNAL_HOSTNAME automatically
+    render_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+    if render_hostname:
+        ALLOWED_HOSTS.append(render_hostname)
+        
+    # Always allow localhost for safety
+    if 'localhost' not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append('localhost')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -109,6 +118,7 @@ _cors_origins = os.environ.get('CORS_ALLOWED_ORIGINS', '')
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'https://lcs-school-treasury.vercel.app',
 ] + [o.strip() for o in _cors_origins.split(',') if o.strip()]
 
 CORS_ALLOW_HEADERS = [
