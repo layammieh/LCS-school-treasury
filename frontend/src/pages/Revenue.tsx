@@ -13,7 +13,6 @@ import {
   Calendar,
   ChevronDown,
   Download,
-  Check,
   Loader2
 } from 'lucide-react';
 import { transactionsApi, revenueRecipientsApi } from '../lib/api';
@@ -27,16 +26,22 @@ export default function Revenue() {
   const isViewMode = useAuthStore(state => state.isViewMode);
   const authUser = useAuthStore(state => state.user);
 
-  const [totalIncome, setTotalIncome] = useState(0);
+  const [canteenIncome, setCanteenIncome] = useState(0);
   const [recipients, setRecipients] = useState<RevenueRecipient[]>([]);
   const [loadingRecipients, setLoadingRecipients] = useState(true);
 
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editName, setEditName] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [newRecipientName, setNewRecipientName] = useState('');
   const [newRecipientPercentage, setNewRecipientPercentage] = useState('');
   const [modalError, setModalError] = useState('');
+
+  // Edit modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editModalId, setEditModalId] = useState<number | null>(null);
+  const [editModalName, setEditModalName] = useState('');
+  const [editModalPercentage, setEditModalPercentage] = useState('');
+  const [editModalError, setEditModalError] = useState('');
+
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
   const [deleteItemName, setDeleteItemName] = useState('');
@@ -85,7 +90,7 @@ export default function Revenue() {
   useEffect(() => {
     transactionsApi.collectionSummary(undefined, filterMonth, schoolYear)
       .then(stats => {
-        setTotalIncome(stats.total_collected);
+        setCanteenIncome(stats.total_canteen);
       })
       .catch(console.error);
   }, [schoolYear, filterMonth]);
@@ -143,26 +148,29 @@ export default function Revenue() {
     }
   };
 
-  const startEditing = (recipient: RevenueRecipient) => {
-    setEditingId(recipient.id);
-    setEditName(recipient.name);
+  const openEditModal = (recipient: RevenueRecipient) => {
+    setEditModalId(recipient.id);
+    setEditModalName(recipient.name);
+    setEditModalPercentage(String(recipient.percentage));
+    setEditModalError('');
+    setShowEditModal(true);
   };
 
-  const saveEdit = async () => {
-    if (!editName.trim() || editingId === null) return;
+  const saveEditModal = async () => {
+    if (!editModalName.trim() || editModalId === null) return;
+    setEditModalError('');
     try {
-      await revenueRecipientsApi.update(editingId, { name: editName });
-      setEditingId(null);
-      setEditName('');
+      await revenueRecipientsApi.update(editModalId, {
+        name: editModalName,
+        percentage: parseInt(editModalPercentage) || 0,
+      });
+      setShowEditModal(false);
+      setEditModalId(null);
       loadRecipients();
     } catch (e: any) {
       console.error('Failed to update recipient:', e);
+      setEditModalError(e.message || 'Failed to update recipient. Please try again.');
     }
-  };
-
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditName('');
   };
 
   const updatePercentage = async (id: number, value: number) => {
@@ -244,34 +252,7 @@ export default function Revenue() {
                             </div>
                             <div className="flex-1">
                               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Fund Name</p>
-                              {editingId === recipient.id ? (
-                                <div className="flex items-center space-x-2 mt-0.5">
-                                  <input
-                                    type="text"
-                                    value={editName}
-                                    onChange={(e) => setEditName(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
-                                    className="flex-1 px-2 py-1 border border-gray-200 rounded-md text-xs font-bold focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
-                                    autoFocus
-                                  />
-                                  <button
-                                    onClick={saveEdit}
-                                    className="p-1 bg-[#006B4D] text-white rounded-md hover:bg-[#00523b]"
-                                    title="Save name"
-                                  >
-                                    <Check className="h-3 w-3" />
-                                  </button>
-                                  <button
-                                    onClick={cancelEdit}
-                                    className="p-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-                                    title="Cancel editing"
-                                  >
-                                    <X className="h-3 w-3" />
-                                  </button>
-                                </div>
-                              ) : (
-                                <p className="text-xs font-bold text-gray-800 mt-0.5">{recipient.name}</p>
-                              )}
+                              <p className="text-xs font-bold text-gray-800 mt-0.5">{recipient.name}</p>
                             </div>
                           </div>
                           
@@ -292,9 +273,9 @@ export default function Revenue() {
                             {!isViewMode && (
                               <div className="flex items-center space-x-1">
                                 <button
-                                  onClick={() => startEditing(recipient)}
-                                  className={`p-1.5 rounded-md transition-colors ${editingId === recipient.id ? 'text-[#006B4D] bg-[#006B4D]/10' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
-                                  disabled={editingId === recipient.id}
+                                  onClick={() => openEditModal(recipient)}
+                                  className="p-1.5 rounded-md transition-colors text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                                  title="Edit recipient"
                                 >
                                   <Edit2 className="h-3.5 w-3.5" />
                                 </button>
@@ -408,8 +389,8 @@ export default function Revenue() {
                           <tr key={recipient.id} className="hover:bg-gray-50/70 transition-colors">
                             <td className="px-5 py-3.5 font-semibold text-gray-800 truncate max-w-[140px]">{recipient.name}</td>
                             <td className="px-5 py-3.5 font-bold text-gray-500">{recipient.percentage}%</td>
-                            <td className="px-5 py-3.5 text-right font-extrabold text-[#006B4D] text-sm">
-                              ₱{((totalIncome * recipient.percentage) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            <td className="px-5 py-3.5 text-right font-extrabold text-gray-900 text-sm">
+                              ₱{((canteenIncome * recipient.percentage) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </td>
                           </tr>
                         ))
@@ -421,9 +402,9 @@ export default function Revenue() {
 
               {/* Dynamic Bottom Income Banner context */}
               <div className="flex justify-between items-center bg-white p-4 border border-gray-200 rounded-xl shadow-sm">
-                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Evaluated Pool</span>
-                <span className="text-base font-black text-gray-900">
-                  ₱{totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Canteen Income</span>
+                <span className="text-base font-black text-emerald-600">
+                  ₱{canteenIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
             </div>
@@ -471,7 +452,7 @@ export default function Revenue() {
                 />
                 {newRecipientPercentage && !isNaN(parseInt(newRecipientPercentage)) && (
                   <p className="text-[10px] text-[#006B4D] mt-1 font-semibold">
-                    Allocated Amount: ₱{((totalIncome * parseInt(newRecipientPercentage)) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    Allocated Amount: ₱{((canteenIncome * parseInt(newRecipientPercentage)) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
                 )}
               </div>
@@ -490,6 +471,71 @@ export default function Revenue() {
                 className="flex-1 px-3 py-2 bg-[#006B4D] hover:bg-[#00523b] text-white text-xs font-semibold rounded-lg transition-colors disabled:opacity-50"
               >
                 Add Recipient
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Edit Recipient Modal ── */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-5">
+            <div className="flex justify-between items-center">
+              <h2 className="text-sm font-bold text-gray-900">Edit Recipient</h2>
+              <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs">
+              {editModalError && (
+                <div className="p-3 bg-red-50 text-red-700 text-xs rounded-lg border border-red-100 font-medium">
+                  {editModalError}
+                </div>
+              )}
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Recipient Name</label>
+                <input
+                  type="text"
+                  value={editModalName}
+                  onChange={(e) => setEditModalName(e.target.value)}
+                  placeholder="Enter recipient name..."
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#006B4D] placeholder:text-gray-400"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Percentage</label>
+                <input
+                  type="number"
+                  value={editModalPercentage}
+                  onChange={(e) => setEditModalPercentage(e.target.value)}
+                  placeholder="Enter percentage..."
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#006B4D] placeholder:text-gray-400"
+                />
+                {editModalPercentage && !isNaN(parseInt(editModalPercentage)) && (
+                  <p className="text-[10px] text-[#006B4D] mt-1 font-semibold">
+                    Allocated Amount: ₱{((canteenIncome * parseInt(editModalPercentage)) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex space-x-2 pt-2">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="flex-1 px-3 py-2 border border-gray-200 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveEditModal}
+                disabled={!editModalName.trim()}
+                className="flex-1 px-3 py-2 bg-[#006B4D] hover:bg-[#00523b] text-white text-xs font-semibold rounded-lg transition-colors disabled:opacity-50"
+              >
+                Save Changes
               </button>
             </div>
           </div>
