@@ -50,7 +50,7 @@ export default function Header({
     setIsLoggingOut(true);
     try {
       await logout();
-      navigate('/login');
+      navigate('/dashboard');
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
