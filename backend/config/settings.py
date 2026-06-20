@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-school-treasurer-secret-key-change-in-production')
 
 # Default to False in production
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
 # Allow all hosts only if DEBUG is True, otherwise require ALLOWED_HOSTS env var
 if DEBUG:
