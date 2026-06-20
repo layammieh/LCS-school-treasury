@@ -5,6 +5,7 @@ import { useAuthStore } from '../store/authStore';
 import { useSchoolYearStore } from '../store/schoolYearStore';
 import { useSidebarStore } from '../store/sidebarStore';
 import { ConfirmModal } from './ConfirmModal';
+import { LoginModal } from './LoginModal';
 
 interface HeaderProps {
   userName?: string;
@@ -25,6 +26,7 @@ export default function Header({
   const [showYearMenu, setShowYearMenu] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Generate school years dynamically (from 2006-2007 to 2046-2047)
   const generateSchoolYears = () => {
@@ -121,7 +123,7 @@ export default function Header({
         {/* Logout / Login */}
         {isViewMode ? (
           <button
-            onClick={() => navigate('/login')}
+            onClick={() => setShowLoginModal(true)}
             className="flex items-center space-x-1.5 px-3 py-1.5 bg-[#006B4D] hover:bg-[#005a3e] text-white text-xs font-semibold rounded-lg transition-colors"
             title="Log in to your account"
           >
@@ -169,6 +171,11 @@ export default function Header({
         message="Are you sure you want to log out?"
         isProcessing={isLoggingOut}
         icon="logout"
+      />
+
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
       />
     </header>
   );
