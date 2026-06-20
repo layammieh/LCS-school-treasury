@@ -131,6 +131,16 @@ export default function Collections() {
 
   const [expenseSearchQuery, setExpenseSearchQuery] = useState('');
   const [expenseSearchDebounceText, setExpenseSearchDebounceText] = useState('');
+  const [expandedExpenseIds, setExpandedExpenseIds] = useState<Set<number>>(new Set());
+
+  const toggleExpenseExpand = (id: number) => {
+    setExpandedExpenseIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
 
   /* ─────────────────── INCOME helpers ─────────────────── */
@@ -961,22 +971,24 @@ export default function Collections() {
                               </td>
                             </tr>
                           ) : (
-                            expenses.map(exp => (
-                              <tr key={exp.id} className="hover:bg-gray-50/50 transition-colors">
+                            expenses.map(exp => {
+                              const isExpanded = expandedExpenseIds.has(exp.id);
+                              return (
+                              <tr key={exp.id} onClick={() => toggleExpenseExpand(exp.id)} className="hover:bg-gray-50/50 transition-colors cursor-pointer">
                                 <td className="pl-8 pr-4 py-3 w-[25%]">
-                                  <span className="font-bold text-gray-800 truncate">{exp.name}</span>
+                                  <span className={`font-bold text-gray-800 ${isExpanded ? 'whitespace-normal break-words block' : 'truncate block'}`}>{exp.name}</span>
                                 </td>
                                 <td className="px-4 py-3 w-[20%]">
-                                  <span className="text-gray-700 truncate block">{exp.requested_by || '-'}</span>
+                                  <span className={`text-gray-700 ${isExpanded ? 'whitespace-normal break-words block' : 'truncate block'}`}>{exp.requested_by || '-'}</span>
                                 </td>
                                 <td className="px-4 py-3 w-[20%]">
-                                  <span className="text-gray-600 truncate block" title={exp.reason || ''}>{exp.reason || '-'}</span>
+                                  <span className={`text-gray-600 ${isExpanded ? 'whitespace-normal break-words block' : 'truncate block'}`} title={exp.reason || ''}>{exp.reason || '-'}</span>
                                 </td>
                                 <td className="px-4 py-3 w-[15%] text-center text-gray-500 font-medium text-[11px]">
                                   {new Date(exp.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                 </td>
                                 <td className="px-4 py-3 w-[10%] text-right font-bold text-red-600 whitespace-nowrap">{formatCurrency(exp.amount)}</td>
-                                <td className="px-4 py-3 w-[10%] text-center">
+                                <td className="px-4 py-3 w-[10%] text-center" onClick={(e) => e.stopPropagation()}>
                                   {!isViewMode && (
                                     <div className="flex items-center justify-center space-x-1">
                                       <button onClick={() => openEditExpenseModal(exp)} title="Edit" className="p-1 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
@@ -989,7 +1001,7 @@ export default function Collections() {
                                   )}
                                 </td>
                               </tr>
-                            ))
+                            )})
                           )}
                         </tbody>
                       </table>
