@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import { useSchoolYearStore } from '../store/schoolYearStore';
 import {
   Plus, ChevronDown, Calendar, Layers, Coins, X,
-  Pencil, Trash2, AlertCircle, Search, CreditCard, Loader2
+  Pencil, Trash2, AlertCircle, Search, CreditCard, Loader2, Download
 } from 'lucide-react';
 import { transactionsApi, consigneesApi, expensesApi } from '../lib/api';
 import type {
@@ -12,6 +12,7 @@ import type {
 } from '../lib/api';
 import { DeleteModal } from '../components/DeleteModal';
 import { useAuthStore } from '../store/authStore';
+import ExpensePDFExport from '../components/ExpensePDFExport';
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 const COLLECTION_STATUSES = ['All Statuses', 'paid', 'unpaid', 'partial', 'overdue', 'pending'] as const;
@@ -121,6 +122,7 @@ export default function Collections() {
   const [expenseModalTab, setExpenseModalTab] = useState<'canteen' | 'coconut'>('canteen');
   const [expenseForm, setExpenseForm] = useState(EMPTY_EXPENSE_FORM);
   const [editingExpenseId, setEditingExpenseId] = useState<number | null>(null);
+  const [showExpensePDFModal, setShowExpensePDFModal] = useState(false);
 
   const [expenseFilterDate, setExpenseFilterDate] = useState('');
   const [showExpenseDatePicker, setShowExpenseDatePicker] = useState(false);
@@ -352,8 +354,11 @@ export default function Collections() {
     setEditingExpenseId(exp.id);
     const isCoconut = exp.name.toLowerCase().includes('coconut');
     let displayName = exp.name;
+    // Strip the type suffix so the input field shows only the bare name
     if (isCoconut && displayName.endsWith(' (Coconut)')) {
       displayName = displayName.replace(' (Coconut)', '');
+    } else if (!isCoconut && displayName.endsWith(' (Canteen)')) {
+      displayName = displayName.replace(' (Canteen)', '');
     }
     setExpenseForm({
       name: displayName,
@@ -371,8 +376,12 @@ export default function Collections() {
     setModalError('');
     try {
       let finalName = expenseForm.name.trim();
-      if (expenseModalTab === 'coconut' && !finalName.toLowerCase().includes('coconut')) {
+      // Strip any existing suffix so we never double-append
+      finalName = finalName.replace(/ \(Canteen\)$/, '').replace(/ \(Coconut\)$/, '');
+      if (expenseModalTab === 'coconut') {
         finalName = finalName + ' (Coconut)';
+      } else {
+        finalName = finalName + ' (Canteen)';
       }
       const payload = {
         name: finalName,
@@ -451,27 +460,39 @@ export default function Collections() {
               <h1 className="text-2xl font-bold text-gray-955 tracking-tight leading-none mt-1">Collections & Ledger</h1>
               <p className="text-xs text-gray-500 mt-1">Monitor and record real-time fee collections and expenses.</p>
             </div>
-            {!isViewMode && (
-              <div className="flex space-x-2.5">
-                {activeTab === 'income' ? (
-                  <button
-                    onClick={openCreateModal}
-                    className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-[#006B4D] hover:bg-[#00523b] text-white text-xs font-semibold rounded-lg transition-colors"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    <span>Record New Payment</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={openCreateExpenseModal}
-                    className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition-colors"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    <span>Record New Expense</span>
-                  </button>
-                )}
-              </div>
-            )}
+            <div className="flex space-x-2.5 items-center">
+              {/* Export PDF is always visible on the Expenses tab */}
+              {activeTab === 'expenses' && (
+                <button
+                  onClick={() => setShowExpensePDFModal(true)}
+                  className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-white hover:bg-red-50 text-red-600 text-xs font-semibold rounded-lg border border-red-200 transition-colors"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  <span>Export PDF</span>
+                </button>
+              )}
+              {!isViewMode && (
+                <>
+                  {activeTab === 'income' ? (
+                    <button
+                      onClick={openCreateModal}
+                      className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-[#006B4D] hover:bg-[#00523b] text-white text-xs font-semibold rounded-lg transition-colors"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      <span>Record New Payment</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={openCreateExpenseModal}
+                      className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition-colors"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      <span>Record New Expense</span>
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
           </div>
 
           {/* Tabs */}
@@ -1236,6 +1257,13 @@ export default function Collections() {
             </div>
           )}
 
+
+          <ExpensePDFExport
+            isOpen={showExpensePDFModal}
+            onClose={() => setShowExpensePDFModal(false)}
+            expenses={expenses.filter(e => !e.name.toLowerCase().includes('coconut'))}
+            schoolYear={schoolYear}
+          />
 
           <DeleteModal
             isOpen={deleteModalOpen}
