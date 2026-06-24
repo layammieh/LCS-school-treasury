@@ -81,16 +81,7 @@ function ExpensePDFTemplate({
     fontSize: '10px',
   };
 
-  const monthLabelCell: React.CSSProperties = {
-    ...cell,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    backgroundColor: '#f0f0f0',
-    fontSize: '10px',
-    letterSpacing: '0.5px',
-    textTransform: 'uppercase',
-    padding: '4px 6px',
-  };
+
 
   return (
     <div style={pageStyle}>
