@@ -14,11 +14,13 @@ interface ExpensePDFExportProps {
 }
 
 // ─── Safe currency formatter (avoids locale-dependent toLocaleString issues) ──
-function fmt(n: number): string {
-  const fixed = Math.abs(n).toFixed(2);
+function fmt(n: any): string {
+  const num = Number(n);
+  if (isNaN(num)) return '0.00';
+  const fixed = Math.abs(num).toFixed(2);
   const [intPart, decPart] = fixed.split('.');
   const withCommas = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  return (n < 0 ? '-' : '') + withCommas + '.' + decPart;
+  return (num < 0 ? '-' : '') + withCommas + '.' + decPart;
 }
 
 // ─── Inline PDF Template ──────────────────────────────────────────────────────
@@ -48,7 +50,7 @@ function ExpensePDFTemplate({
   schoolId,
 }: TemplatePropType) {
   const grandTotal = monthlyExpenses.reduce(
-    (sum, { expenses }) => sum + expenses.reduce((s, e) => s + e.amount, 0),
+    (sum, { expenses }) => sum + expenses.reduce((s, e) => s + Number(e.amount || 0), 0),
     0
   );
 
@@ -131,6 +133,11 @@ function ExpensePDFTemplate({
         <div style={{ fontSize: '10px', fontWeight: 'bold', marginTop: '4px' }}>
           SCHOOL YEAR {schoolYear}
         </div>
+        {monthlyExpenses.length > 0 && (
+          <div style={{ fontSize: '10px', fontWeight: 'bold', marginTop: '2px', textTransform: 'uppercase' }}>
+            {monthlyExpenses.map(m => new Date(m.month + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })).join(', ')}
+          </div>
+        )}
       </div>
 
       {/* ── Expenses Table ── */}
@@ -155,24 +162,13 @@ function ExpensePDFTemplate({
         </thead>
         <tbody>
           {monthlyExpenses.map(({ month, expenses: exps }) => {
-            const monthLabel = new Date(month + '-01T00:00:00')
-              .toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-              .toUpperCase();
-
             // Sort by day ascending
             const sorted = [...exps].sort(
               (a, b) => new Date(a.date + 'T00:00:00').getDate() - new Date(b.date + 'T00:00:00').getDate()
             );
 
-            const monthTotal = sorted.reduce((s, e) => s + e.amount, 0);
-
             return (
               <>
-                {/* Month header row */}
-                <tr key={`month-${month}`}>
-                  <td colSpan={3} style={monthLabelCell}>{monthLabel}</td>
-                </tr>
-
                 {/* Expense rows */}
                 {sorted.map((exp, idx) => (
                   <tr key={exp.id ?? `${month}-${idx}`}>
@@ -185,30 +181,6 @@ function ExpensePDFTemplate({
                     </td>
                   </tr>
                 ))}
-
-                {/* Month subtotal */}
-                <tr key={`subtotal-${month}`}>
-                  <td colSpan={2} style={{
-                    ...cell,
-                    fontWeight: 'bold',
-                    textAlign: 'right',
-                    backgroundColor: '#f8f8f8',
-                    paddingRight: '10px',
-                    fontSize: '9px',
-                    letterSpacing: '0.3px',
-                  }}>
-                    {monthLabel} TOTAL
-                  </td>
-                  <td style={{
-                    ...cell,
-                    fontWeight: 'bold',
-                    textAlign: 'right',
-                    backgroundColor: '#f8f8f8',
-                    paddingRight: '8px',
-                  }}>
-                    {fmt(monthTotal)}
-                  </td>
-                </tr>
               </>
             );
           })}
