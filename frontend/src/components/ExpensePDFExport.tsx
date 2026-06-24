@@ -29,6 +29,8 @@ interface TemplatePropType {
   schoolYear: string;
   preparedBy: string;
   preparedTitle: string;
+  approvedBy: string;
+  approvedTitle: string;
   authorizedBy: string;
   authorizedTitle: string;
   schoolName: string;
@@ -42,6 +44,8 @@ function ExpensePDFTemplate({
   schoolYear,
   preparedBy,
   preparedTitle,
+  approvedBy,
+  approvedTitle,
   authorizedBy,
   authorizedTitle,
   schoolName,
@@ -209,14 +213,21 @@ function ExpensePDFTemplate({
         fontSize: '10px',
       }}>
         <div>
-          <div style={{ marginBottom: '26px' }}>prepared by :</div>
+          <div style={{ marginBottom: '26px' }}>Prepared by:</div>
           <div style={{ borderTop: '1px solid #000', paddingTop: '3px', width: '210px' }}>
             <div style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{preparedBy}</div>
             <div>{preparedTitle}</div>
           </div>
         </div>
         <div>
-          <div style={{ marginBottom: '26px' }}>authorized by :</div>
+          <div style={{ marginBottom: '26px' }}>Approved by:</div>
+          <div style={{ borderTop: '1px solid #000', paddingTop: '3px', width: '210px' }}>
+            <div style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{approvedBy}</div>
+            <div>{approvedTitle}</div>
+          </div>
+        </div>
+        <div>
+          <div style={{ marginBottom: '26px' }}>Authorized by:</div>
           <div style={{ borderTop: '1px solid #000', paddingTop: '3px', width: '210px' }}>
             <div style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{authorizedBy}</div>
             <div>{authorizedTitle}</div>
@@ -267,6 +278,8 @@ export default function ExpensePDFExport({
   // Signatory fields
   const [preparedBy, setPreparedBy] = useState('AMELITA C. LAYAM');
   const [preparedTitle, setPreparedTitle] = useState('SC In-Charge');
+  const [approvedBy, setApprovedBy] = useState('DANTE G. SISTO P-III');
+  const [approvedTitle, setApprovedTitle] = useState('School Principal');
   const [authorizedBy, setAuthorizedBy] = useState('LUCILDA GAPE');
   const [authorizedTitle, setAuthorizedTitle] = useState('SC Auditor/ADAS');
 
@@ -470,6 +483,24 @@ export default function ExpensePDFExport({
                 />
               </div>
               <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Approved By (Name)</label>
+                <input
+                  type="text"
+                  value={approvedBy}
+                  onChange={e => setApprovedBy(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-red-500"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Approved By (Title)</label>
+                <input
+                  type="text"
+                  value={approvedTitle}
+                  onChange={e => setApprovedTitle(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-red-500"
+                />
+              </div>
+              <div>
                 <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Authorized By (Name)</label>
                 <input
                   type="text"
@@ -581,6 +612,8 @@ export default function ExpensePDFExport({
             schoolYear={schoolYear}
             preparedBy={preparedBy}
             preparedTitle={preparedTitle}
+            approvedBy={approvedBy}
+            approvedTitle={approvedTitle}
             authorizedBy={authorizedBy}
             authorizedTitle={authorizedTitle}
             schoolName={schoolName}
