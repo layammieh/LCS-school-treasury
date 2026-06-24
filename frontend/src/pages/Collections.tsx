@@ -1261,7 +1261,6 @@ export default function Collections() {
           <ExpensePDFExport
             isOpen={showExpensePDFModal}
             onClose={() => setShowExpensePDFModal(false)}
-            expenses={expenses.filter(e => !e.name.toLowerCase().includes('coconut'))}
             schoolYear={schoolYear}
           />
 
