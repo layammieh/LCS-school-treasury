@@ -170,7 +170,7 @@ function ExpensePDFTemplate({
                     <td style={{ ...cell, textAlign: 'center' }}>
                       {new Date(exp.date + 'T00:00:00').getDate()}
                     </td>
-                    <td style={cell}>{exp.name}</td>
+                    <td style={cell}>{exp.name.replace(/ \(Canteen\)$/i, '')}</td>
                     <td style={{ ...cell, textAlign: 'right', paddingRight: '8px' }}>
                       {fmt(exp.amount)}
                     </td>
