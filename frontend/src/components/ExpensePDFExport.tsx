@@ -209,14 +209,14 @@ function ExpensePDFTemplate({
         fontSize: '10px',
       }}>
         <div>
-          <div style={{ marginBottom: '26px' }}>F prepared by :</div>
+          <div style={{ marginBottom: '26px' }}>prepared by :</div>
           <div style={{ borderTop: '1px solid #000', paddingTop: '3px', width: '210px' }}>
             <div style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{preparedBy}</div>
             <div>{preparedTitle}</div>
           </div>
         </div>
         <div>
-          <div style={{ marginBottom: '26px' }}>A authorized by :</div>
+          <div style={{ marginBottom: '26px' }}>authorized by :</div>
           <div style={{ borderTop: '1px solid #000', paddingTop: '3px', width: '210px' }}>
             <div style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{authorizedBy}</div>
             <div>{authorizedTitle}</div>
