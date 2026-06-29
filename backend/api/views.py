@@ -428,7 +428,24 @@ class TransactionViewSet(viewsets.ModelViewSet):
         try:
             self.perform_create(serializer)
         except Exception as e:
-            return Response({'error': str(e)}, status=400)
+            err_str = str(e)
+            # Auto-fix stale PostgreSQL sequence and retry once
+            if 'duplicate key value violates unique constraint' in err_str and 'pkey' in err_str:
+                from django.core.management.color import no_style
+                from django.db import connection
+                sequence_sql = connection.ops.sequence_reset_sql(no_style(), [Transaction])
+                with connection.cursor() as cursor:
+                    for sql in sequence_sql:
+                        cursor.execute(sql)
+                retry_serializer = self.get_serializer(data=request.data)
+                retry_serializer.is_valid(raise_exception=True)
+                try:
+                    retry_serializer.save(user=request.user)
+                except Exception as e2:
+                    return Response({'error': str(e2)}, status=400)
+                headers = self.get_success_headers(retry_serializer.data)
+                return Response(retry_serializer.data, status=201, headers=headers)
+            return Response({'error': err_str}, status=400)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=201, headers=headers)
 
