@@ -676,3 +676,17 @@ class RevenueRecipientViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def fix_db(request):
+    from django.core.management.color import no_style
+    from django.db import connection
+    from .models import Transaction, Consignee, Expense, RevenueRecipient
+    try:
+        sequence_sql = connection.ops.sequence_reset_sql(no_style(), [Transaction, Consignee, Expense, RevenueRecipient])
+        with connection.cursor() as cursor:
+            for sql in sequence_sql:
+                cursor.execute(sql)
+        return Response({"status": "success", "message": "Database sequences reset successfully."})
+    except Exception as e:
+        return Response({"status": "error", "message": str(e)})
