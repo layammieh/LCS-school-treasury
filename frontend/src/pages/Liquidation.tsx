@@ -21,33 +21,39 @@ function fmt(n: any): string {
   return (num < 0 ? '-' : '') + withCommas + '.' + decPart;
 }
 
-// ── PDF Template ─────────────────────────────────────────────────────
+// ── PDF Template (matches ExpensePDFTemplate style exactly) ──────────
+interface LiquidationTemplatePropType {
+  data: LiquidationType[];
+  schoolYear: string;
+  preparedBy: string;
+  preparedTitle: string;
+  approvedBy: string;
+  approvedTitle: string;
+  authorizedBy: string;
+  authorizedTitle: string;
+  schoolName: string;
+  schoolAddress: string;
+  schoolContact: string;
+  schoolId: string;
+}
+
 function LiquidationPDFTemplate({
   data,
   schoolYear,
   preparedBy,
   preparedTitle,
-  certifiedBy,
-  certifiedTitle,
   approvedBy,
   approvedTitle,
+  authorizedBy,
+  authorizedTitle,
   schoolName,
   schoolAddress,
-}: {
-  data: LiquidationType[];
-  schoolYear: string;
-  preparedBy: string;
-  preparedTitle: string;
-  certifiedBy: string;
-  certifiedTitle: string;
-  approvedBy: string;
-  approvedTitle: string;
-  schoolName: string;
-  schoolAddress: string;
-}) {
-  const totalIncome = data.reduce((s, r) => s + Number(r.income || 0), 0);
+  schoolContact,
+  schoolId,
+}: LiquidationTemplatePropType) {
+  const totalIncome   = data.reduce((s, r) => s + Number(r.income   || 0), 0);
   const totalExpenses = data.reduce((s, r) => s + Number(r.expenses || 0), 0);
-  const totalDeposit = data.reduce((s, r) => s + Number(r.cash_deposit || 0), 0);
+  const totalDeposit  = data.reduce((s, r) => s + Number(r.cash_deposit  || 0), 0);
   const totalWithdrawn = data.reduce((s, r) => s + Number(r.cash_withdrawn || 0), 0);
   const netBalance = totalIncome - totalExpenses;
 
@@ -65,44 +71,70 @@ function LiquidationPDFTemplate({
 
   const cell: React.CSSProperties = {
     border: '1px solid #000000',
-    padding: '4px 8px',
+    padding: '3px 6px',
     color: '#000000',
     backgroundColor: '#ffffff',
     verticalAlign: 'middle',
   };
 
-  const hCell: React.CSSProperties = {
+  const headerCell: React.CSSProperties = {
     ...cell,
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: '10px',
-    backgroundColor: '#f0f0f0',
   };
 
   return (
     <div style={pageStyle}>
-      {/* Government Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px', gap: '18px' }}>
-        <img src={depedLogo} alt="DepEd" style={{ width: '65px', height: '65px', objectFit: 'contain' }} />
-        <div style={{ textAlign: 'center', flex: 1 }}>
-          <div style={{ fontSize: '10px' }}>Republic of the Philippines</div>
+      {/* ── Government Header (identical to ExpensePDFTemplate) ── */}
+      <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+        <img
+          src={depedLogo}
+          alt="DepEd Logo"
+          style={{ width: '68px', height: '68px', objectFit: 'contain', marginBottom: '5px' }}
+        />
+        <div style={{ fontSize: '10px', lineHeight: '1.55' }}>
+          <div>Republic of the Philippines</div>
           <div style={{ fontWeight: 'bold', fontSize: '11px' }}>Department of Education</div>
-          <div style={{ fontSize: '10px' }}>Region X – Northern Mindanao</div>
-          <div style={{ fontSize: '10px' }}>Division of Cagayan de Oro City</div>
-          <div style={{ fontWeight: 'bold', fontSize: '13px', marginTop: '4px' }}>{schoolName}</div>
-          <div style={{ fontSize: '10px' }}>{schoolAddress}</div>
+          <div>Region X</div>
+          <div>Division of Cagayan de Oro City</div>
+          <div>Southwest 1 District</div>
         </div>
-        <img src={lumbiaLogo} alt="School Logo" style={{ width: '65px', height: '65px', objectFit: 'contain', borderRadius: '50%' }} />
       </div>
 
-      {/* Title */}
-      <div style={{ textAlign: 'center', marginBottom: '16px', borderTop: '2px solid #000', paddingTop: '10px' }}>
-        <div style={{ fontWeight: 'bold', fontSize: '14px', letterSpacing: '1px' }}>SCHOOL CANTEEN LIQUIDATION REPORT</div>
-        <div style={{ fontSize: '11px', marginTop: '3px' }}>School Year {schoolYear}</div>
+      {/* ── Report Title ── */}
+      <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+        <div style={{
+          fontSize: '13px',
+          fontWeight: 'bold',
+          color: '#cc0000',
+          textTransform: 'uppercase',
+          letterSpacing: '0.4px',
+        }}>
+          School Canteen Liquidation Report
+        </div>
+        <div style={{
+          fontSize: '12px',
+          fontWeight: 'bold',
+          textTransform: 'uppercase',
+          letterSpacing: '0.3px',
+          marginTop: '2px',
+        }}>
+          Monthly Summary
+        </div>
+        <div style={{ fontSize: '10px', fontWeight: 'bold', marginTop: '4px' }}>
+          SCHOOL YEAR {schoolYear}
+        </div>
       </div>
 
-      {/* Table */}
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px', marginBottom: '20px' }}>
+      {/* ── Liquidation Table ── */}
+      <table style={{
+        width: '100%',
+        borderCollapse: 'collapse',
+        tableLayout: 'fixed',
+        fontSize: '10px',
+        marginBottom: '16px',
+      }}>
         <colgroup>
           <col style={{ width: '15%' }} />
           <col style={{ width: '17%' }} />
@@ -113,12 +145,12 @@ function LiquidationPDFTemplate({
         </colgroup>
         <thead>
           <tr>
-            <th style={hCell}>Month</th>
-            <th style={hCell}>Income</th>
-            <th style={hCell}>Expenses</th>
-            <th style={hCell}>Cash Deposit</th>
-            <th style={hCell}>Cash Withdrawn</th>
-            <th style={hCell}>Remarks</th>
+            <th style={headerCell}>Month</th>
+            <th style={{ ...headerCell, textAlign: 'right', paddingRight: '8px' }}>Income</th>
+            <th style={{ ...headerCell, textAlign: 'right', paddingRight: '8px' }}>Expenses</th>
+            <th style={{ ...headerCell, textAlign: 'right', paddingRight: '8px' }}>Cash Deposit</th>
+            <th style={{ ...headerCell, textAlign: 'right', paddingRight: '8px' }}>Cash Withdrawn</th>
+            <th style={headerCell}>Remarks</th>
           </tr>
         </thead>
         <tbody>
@@ -127,192 +159,351 @@ function LiquidationPDFTemplate({
               <td style={{ ...cell, fontWeight: 'bold', textTransform: 'uppercase' }}>
                 {new Date(row.month + '-01').toLocaleDateString('en-US', { month: 'long' })}
               </td>
-              <td style={{ ...cell, textAlign: 'right' }}>{fmt(row.income)}</td>
-              <td style={{ ...cell, textAlign: 'right' }}>{fmt(row.expenses)}</td>
-              <td style={{ ...cell, textAlign: 'right' }}>{Number(row.cash_deposit) > 0 ? fmt(row.cash_deposit) : ''}</td>
-              <td style={{ ...cell, textAlign: 'right' }}>{Number(row.cash_withdrawn) > 0 ? fmt(row.cash_withdrawn) : ''}</td>
+              <td style={{ ...cell, textAlign: 'right', paddingRight: '8px' }}>{fmt(row.income)}</td>
+              <td style={{ ...cell, textAlign: 'right', paddingRight: '8px' }}>{fmt(row.expenses)}</td>
+              <td style={{ ...cell, textAlign: 'right', paddingRight: '8px' }}>
+                {Number(row.cash_deposit) > 0 ? fmt(row.cash_deposit) : ''}
+              </td>
+              <td style={{ ...cell, textAlign: 'right', paddingRight: '8px' }}>
+                {Number(row.cash_withdrawn) > 0 ? fmt(row.cash_withdrawn) : ''}
+              </td>
               <td style={cell}>{row.remarks || ''}</td>
             </tr>
           ))}
-          {/* Total Row */}
+
+          {/* Grand Total row — matches expense PDF style */}
           <tr>
-            <td style={{ ...cell, fontWeight: 'bold', textAlign: 'center' }}>TOTAL</td>
-            <td style={{ ...cell, fontWeight: 'bold', textAlign: 'right' }}>{fmt(totalIncome)}</td>
-            <td style={{ ...cell, fontWeight: 'bold', textAlign: 'right' }}>{fmt(totalExpenses)}</td>
-            <td style={{ ...cell, fontWeight: 'bold', textAlign: 'right' }}>{totalDeposit > 0 ? fmt(totalDeposit) : ''}</td>
-            <td style={{ ...cell, fontWeight: 'bold', textAlign: 'right' }}>{totalWithdrawn > 0 ? fmt(totalWithdrawn) : ''}</td>
-            <td style={{ ...cell, fontWeight: 'bold' }}>Net Balance: {fmt(netBalance)}</td>
+            <td style={{
+              ...cell,
+              fontWeight: 'bold',
+              textAlign: 'right',
+              backgroundColor: '#e8e8e8',
+              paddingRight: '10px',
+              letterSpacing: '0.5px',
+            }}>
+              TOTAL
+            </td>
+            <td style={{ ...cell, fontWeight: 'bold', textAlign: 'right', backgroundColor: '#e8e8e8', paddingRight: '8px' }}>
+              {fmt(totalIncome)}
+            </td>
+            <td style={{ ...cell, fontWeight: 'bold', textAlign: 'right', backgroundColor: '#e8e8e8', paddingRight: '8px' }}>
+              {fmt(totalExpenses)}
+            </td>
+            <td style={{ ...cell, fontWeight: 'bold', textAlign: 'right', backgroundColor: '#e8e8e8', paddingRight: '8px' }}>
+              {totalDeposit > 0 ? fmt(totalDeposit) : ''}
+            </td>
+            <td style={{ ...cell, fontWeight: 'bold', textAlign: 'right', backgroundColor: '#e8e8e8', paddingRight: '8px' }}>
+              {totalWithdrawn > 0 ? fmt(totalWithdrawn) : ''}
+            </td>
+            <td style={{ ...cell, fontWeight: 'bold', backgroundColor: '#e8e8e8' }}>
+              Net Balance: {fmt(netBalance)}
+            </td>
           </tr>
         </tbody>
       </table>
 
-      {/* Signature Footer */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '48px', gap: '24px' }}>
-        {[
-          { label: 'Prepared by:', name: preparedBy, title: preparedTitle },
-          { label: 'Certified by:', name: certifiedBy, title: certifiedTitle },
-          { label: 'Approved by:', name: approvedBy, title: approvedTitle },
-        ].map(({ label, name, title }) => (
-          <div key={label} style={{ flex: 1, textAlign: 'center' }}>
-            <div style={{ fontSize: '10px', color: '#555', marginBottom: '20px' }}>{label}</div>
-            <div style={{ borderBottom: '1px solid #000', marginBottom: '4px' }} />
-            <div style={{ fontWeight: 'bold', fontSize: '11px' }}>{name || '____________________'}</div>
-            <div style={{ fontSize: '10px', color: '#555' }}>{title || '____________________'}</div>
+      {/* ── Signature Block (identical to ExpensePDFTemplate) ── */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        marginTop: '28px',
+        fontSize: '10px',
+      }}>
+        <div>
+          <div style={{ marginBottom: '26px' }}>Prepared by:</div>
+          <div style={{ borderTop: '1px solid #000', paddingTop: '3px', width: '210px' }}>
+            <div style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{preparedBy}</div>
+            <div>{preparedTitle}</div>
           </div>
-        ))}
+        </div>
+        <div>
+          <div style={{ marginBottom: '26px' }}>Approved by:</div>
+          <div style={{ borderTop: '1px solid #000', paddingTop: '3px', width: '210px' }}>
+            <div style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{approvedBy}</div>
+            <div>{approvedTitle}</div>
+          </div>
+        </div>
+        <div>
+          <div style={{ marginBottom: '26px' }}>Authorized by:</div>
+          <div style={{ borderTop: '1px solid #000', paddingTop: '3px', width: '210px' }}>
+            <div style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{authorizedBy}</div>
+            <div>{authorizedTitle}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Footer (identical to ExpensePDFTemplate) ── */}
+      <div style={{
+        marginTop: '32px',
+        borderTop: '1px solid #000000',
+        paddingTop: '8px',
+        fontSize: '9px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+      }}>
+        <img
+          src={lumbiaLogo}
+          alt="Lumbia Central School Logo"
+          style={{ width: '44px', height: '44px', objectFit: 'contain' }}
+        />
+        <div>
+          <div style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{schoolName}</div>
+          <div>{schoolAddress}</div>
+          <div>{schoolContact}</div>
+          <div>SCHOOL ID: {schoolId}</div>
+        </div>
       </div>
     </div>
   );
 }
 
-// ── PDF Export Modal ───────────────────────────────────────────────────
-function LiquidationExportModal({
-  isOpen,
-  onClose,
-  data,
-  schoolYear,
-}: {
+// ── PDF Export Modal (matches ExpensePDFExport modal exactly) ─────────
+interface LiquidationPDFExportProps {
   isOpen: boolean;
   onClose: () => void;
   data: LiquidationType[];
   schoolYear: string;
-}) {
-  const [preparedBy, setPreparedBy] = useState('');
-  const [preparedTitle, setPreparedTitle] = useState('Canteen Manager');
-  const [certifiedBy, setCertifiedBy] = useState('');
-  const [certifiedTitle, setCertifiedTitle] = useState('School Treasurer');
-  const [approvedBy, setApprovedBy] = useState('');
-  const [approvedTitle, setApprovedTitle] = useState('School Principal');
-  const [schoolName, setSchoolName] = useState('Lumbia Central School');
-  const [schoolAddress, setSchoolAddress] = useState('Lumbia, Cagayan de Oro City');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const templateRef = useRef<HTMLDivElement>(null);
+}
 
-  const handleDownload = async () => {
-    if (!templateRef.current) return;
+function LiquidationPDFExport({ isOpen, onClose, data, schoolYear }: LiquidationPDFExportProps) {
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Signatory fields — same defaults as ExpensePDFExport
+  const [preparedBy, setPreparedBy]       = useState('AMELITA C. LAYAM');
+  const [preparedTitle, setPreparedTitle] = useState('SC In-Charge');
+  const [approvedBy, setApprovedBy]       = useState('DANTE G. SISTO P-III');
+  const [approvedTitle, setApprovedTitle] = useState('School Principal');
+  const [authorizedBy, setAuthorizedBy]   = useState('LUCILDA GAPE');
+  const [authorizedTitle, setAuthorizedTitle] = useState('SC Auditor/ADAS');
+
+  // School info — same defaults as ExpensePDFExport
+  const [schoolName, setSchoolName]       = useState('LUMBIA CENTRAL SCHOOL');
+  const [schoolAddress, setSchoolAddress] = useState('F. Delima St., Lumbia, Cagayan de Oro City');
+  const [schoolContact, setSchoolContact] = useState('Lumbia.cs@gmail.com | 09175275969');
+  const [schoolId, setSchoolId]           = useState('127977');
+
+  const pdfRef = useRef<HTMLDivElement>(null);
+
+  const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      await new Promise(r => setTimeout(r, 400));
-      const canvas = await html2canvas(templateRef.current, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#ffffff',
-        logging: false,
-      });
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfW = pdf.internal.pageSize.getWidth();
-      const pdfH = pdf.internal.pageSize.getHeight();
-      const imgH = (canvas.height / canvas.width) * pdfW;
+      // Wait for React to render the hidden template
+      setTimeout(async () => {
+        try {
+          if (!pdfRef.current) throw new Error('PDF template ref not found');
 
-      if (imgH <= pdfH) {
-        pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, imgH);
-      } else {
-        const pageHPx = (pdfH / pdfW) * canvas.width;
-        let yOffset = 0;
-        while (yOffset < canvas.height) {
-          const sliceH = Math.min(pageHPx, canvas.height - yOffset);
-          const sliceCanvas = document.createElement('canvas');
-          sliceCanvas.width = canvas.width;
-          sliceCanvas.height = sliceH;
-          const ctx = sliceCanvas.getContext('2d');
-          if (ctx) {
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-            ctx.drawImage(canvas, 0, -yOffset);
+          const canvas = await html2canvas(pdfRef.current, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            onclone: (_doc) => {
+              _doc.querySelectorAll('link[rel="stylesheet"]').forEach((l) =>
+                l.parentNode?.removeChild(l)
+              );
+              _doc.querySelectorAll('style').forEach((s) => {
+                if (s.textContent && s.textContent.includes('oklch')) {
+                  s.parentNode?.removeChild(s);
+                }
+              });
+            },
+          });
+
+          if (canvas.width === 0 || canvas.height === 0) {
+            throw new Error('Canvas is empty — the template could not be rendered. Try again.');
           }
-          if (yOffset > 0) pdf.addPage();
-          pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, pdfW, (sliceH / canvas.width) * pdfW);
-          yOffset += pageHPx;
+
+          const imgData = canvas.toDataURL('image/jpeg', 0.95);
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfPageWidth  = pdf.internal.pageSize.getWidth();
+          const pdfPageHeight = pdf.internal.pageSize.getHeight();
+          const imgHeightMm   = (canvas.height / canvas.width) * pdfPageWidth;
+
+          if (imgHeightMm <= pdfPageHeight) {
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdfPageWidth, imgHeightMm);
+          } else {
+            const pageHeightPx = (pdfPageHeight / pdfPageWidth) * canvas.width;
+            let yOffset = 0;
+            while (yOffset < canvas.height) {
+              const sliceH = Math.min(pageHeightPx, canvas.height - yOffset);
+              const sliceCanvas = document.createElement('canvas');
+              sliceCanvas.width  = canvas.width;
+              sliceCanvas.height = sliceH;
+              const ctx = sliceCanvas.getContext('2d');
+              if (ctx) {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+                ctx.drawImage(canvas, 0, -yOffset);
+              }
+              if (yOffset > 0) pdf.addPage();
+              const sliceHeightMm = (sliceH / canvas.width) * pdfPageWidth;
+              pdf.addImage(
+                sliceCanvas.toDataURL('image/jpeg', 0.95),
+                'JPEG', 0, 0, pdfPageWidth, sliceHeightMm
+              );
+              yOffset += pageHeightPx;
+            }
+          }
+
+          const label = schoolYear.replace(/\//g, '-');
+          pdf.save(`Liquidation_Report_${label}.pdf`);
+        } catch (error) {
+          console.error('Failed to generate PDF:', error);
+          alert('Failed to generate PDF: ' + (error instanceof Error ? error.message : String(error)));
+        } finally {
+          setIsGenerating(false);
+          onClose();
         }
-      }
-      pdf.save(`Liquidation_Report_${schoolYear.replace(/\//g, '-')}.pdf`);
-    } catch (err) {
-      alert('Failed to generate PDF: ' + (err instanceof Error ? err.message : String(err)));
-    } finally {
+      }, 500);
+    } catch (error) {
+      console.error('Failed to generate PDF:', error);
+      alert('Failed to generate PDF: ' + (error instanceof Error ? error.message : String(error)));
       setIsGenerating(false);
-      onClose();
     }
   };
 
   if (!isOpen) return null;
 
-  const Field = ({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) => (
-    <div className="space-y-1">
-      <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">{label}</label>
-      <input
-        type="text"
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
-      />
-    </div>
-  );
-
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl flex flex-col max-h-[90vh]">
-        {/* Header */}
+
+        {/* ── Header ── */}
         <div className="flex justify-between items-center p-6 border-b border-gray-100 shrink-0">
           <div>
             <h2 className="text-lg font-bold text-gray-900">Export Liquidation PDF</h2>
-            <p className="text-xs text-gray-500 mt-1">Fill in signatories and school info, then download.</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Generates a School Canteen Liquidation Report (Monthly Summary).
+            </p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X className="h-5 w-5" /></button>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
-        {/* Form */}
-        <div className="p-6 space-y-4 overflow-y-auto flex-1">
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="School Name" value={schoolName} onChange={setSchoolName} />
-            <Field label="School Address" value={schoolAddress} onChange={setSchoolAddress} />
+        {/* ── Scrollable Content ── */}
+        <div className="p-6 overflow-y-auto space-y-5 flex-1">
+
+          {/* Signatories */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Signatories</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Prepared By (Name)</label>
+                <input type="text" value={preparedBy} onChange={e => setPreparedBy(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-red-500" />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Prepared By (Title)</label>
+                <input type="text" value={preparedTitle} onChange={e => setPreparedTitle(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-red-500" />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Approved By (Name)</label>
+                <input type="text" value={approvedBy} onChange={e => setApprovedBy(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-red-500" />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Approved By (Title)</label>
+                <input type="text" value={approvedTitle} onChange={e => setApprovedTitle(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-red-500" />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Authorized By (Name)</label>
+                <input type="text" value={authorizedBy} onChange={e => setAuthorizedBy(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-red-500" />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Authorized By (Title)</label>
+                <input type="text" value={authorizedTitle} onChange={e => setAuthorizedTitle(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-red-500" />
+              </div>
+            </div>
           </div>
+
           <hr className="border-gray-100" />
-          <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">Prepared By</p>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Full Name" value={preparedBy} onChange={setPreparedBy} />
-            <Field label="Title / Position" value={preparedTitle} onChange={setPreparedTitle} />
-          </div>
-          <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">Certified By</p>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Full Name" value={certifiedBy} onChange={setCertifiedBy} />
-            <Field label="Title / Position" value={certifiedTitle} onChange={setCertifiedTitle} />
-          </div>
-          <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">Approved By</p>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Full Name" value={approvedBy} onChange={setApprovedBy} />
-            <Field label="Title / Position" value={approvedTitle} onChange={setApprovedTitle} />
+
+          {/* School Info */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">School Information</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-2">
+                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">School Name</label>
+                <input type="text" value={schoolName} onChange={e => setSchoolName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm font-bold focus:outline-none focus:ring-1 focus:ring-red-500" />
+              </div>
+              <div className="col-span-2">
+                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">School Address</label>
+                <input type="text" value={schoolAddress} onChange={e => setSchoolAddress(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-red-500" />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Contact Details</label>
+                <input type="text" value={schoolContact} onChange={e => setSchoolContact(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-red-500" />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">School ID</label>
+                <input type="text" value={schoolId} onChange={e => setSchoolId(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-red-500" />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="p-6 border-t border-gray-100 shrink-0 flex justify-end space-x-3">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-800">Cancel</button>
+        {/* ── Footer ── */}
+        <div className="p-6 border-t border-gray-100 flex justify-end space-x-3 shrink-0 bg-gray-50 rounded-b-2xl">
           <button
-            onClick={handleDownload}
-            disabled={isGenerating}
-            className="flex items-center px-5 py-2 bg-[#006B4D] text-white text-sm font-bold rounded-lg hover:bg-[#005a40] disabled:opacity-50"
+            onClick={onClose}
+            className="px-5 py-2.5 border border-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-white transition-colors text-sm"
           >
-            {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
-            {isGenerating ? 'Generating…' : 'Download PDF'}
+            Cancel
+          </button>
+          <button
+            onClick={handleGenerate}
+            disabled={isGenerating}
+            className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors flex items-center text-sm disabled:opacity-50"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Generating PDF...
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4 mr-2" />
+                Download PDF
+              </>
+            )}
           </button>
         </div>
       </div>
 
-      {/* Hidden PDF template (off-screen) */}
-      <div style={{ position: 'absolute', top: '-9999px', left: '-9999px' }}>
-        <div ref={templateRef}>
+      {/* ── Hidden PDF render target (matches ExpensePDFExport placement) ── */}
+      <div style={{
+        position: 'fixed',
+        top: '100vh',
+        left: 0,
+        width: '794px',
+        backgroundColor: '#ffffff',
+        color: '#000000',
+        zIndex: -1,
+        pointerEvents: 'none',
+      }}>
+        <div ref={pdfRef} style={{ width: '794px', backgroundColor: '#ffffff', color: '#000000' }}>
           <LiquidationPDFTemplate
             data={data}
             schoolYear={schoolYear}
             preparedBy={preparedBy}
             preparedTitle={preparedTitle}
-            certifiedBy={certifiedBy}
-            certifiedTitle={certifiedTitle}
             approvedBy={approvedBy}
             approvedTitle={approvedTitle}
+            authorizedBy={authorizedBy}
+            authorizedTitle={authorizedTitle}
             schoolName={schoolName}
             schoolAddress={schoolAddress}
+            schoolContact={schoolContact}
+            schoolId={schoolId}
           />
         </div>
       </div>
@@ -387,9 +578,9 @@ export default function Liquidation() {
     }
   };
 
-  const totalIncome = data.reduce((s, r) => s + Number(r.income || 0), 0);
-  const totalExpenses = data.reduce((s, r) => s + Number(r.expenses || 0), 0);
-  const totalDeposit = data.reduce((s, r) => s + Number(r.cash_deposit || 0), 0);
+  const totalIncome    = data.reduce((s, r) => s + Number(r.income    || 0), 0);
+  const totalExpenses  = data.reduce((s, r) => s + Number(r.expenses  || 0), 0);
+  const totalDeposit   = data.reduce((s, r) => s + Number(r.cash_deposit   || 0), 0);
   const totalWithdrawn = data.reduce((s, r) => s + Number(r.cash_withdrawn || 0), 0);
   const netBalance = totalIncome - totalExpenses;
 
@@ -490,8 +681,7 @@ export default function Liquidation() {
                               <span className="font-medium">{fmt(row.cash_deposit)}</span>
                             ) : (
                               <input
-                                type="number"
-                                step="0.01"
+                                type="number" step="0.01"
                                 className="w-28 text-right border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
                                 value={row.cash_deposit || ''}
                                 onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, cash_deposit: Number(e.target.value) } : item))}
@@ -504,8 +694,7 @@ export default function Liquidation() {
                               <span className="font-medium">{fmt(row.cash_withdrawn)}</span>
                             ) : (
                               <input
-                                type="number"
-                                step="0.01"
+                                type="number" step="0.01"
                                 className="w-28 text-right border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
                                 value={row.cash_withdrawn || ''}
                                 onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, cash_withdrawn: Number(e.target.value) } : item))}
@@ -518,8 +707,7 @@ export default function Liquidation() {
                               <span className="text-gray-600">{row.remarks}</span>
                             ) : (
                               <input
-                                type="text"
-                                placeholder="Add remarks…"
+                                type="text" placeholder="Add remarks…"
                                 className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
                                 value={row.remarks || ''}
                                 onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, remarks: e.target.value } : item))}
@@ -567,7 +755,7 @@ export default function Liquidation() {
       </div>
 
       {/* PDF Export Modal */}
-      <LiquidationExportModal
+      <LiquidationPDFExport
         isOpen={exportOpen}
         onClose={() => setExportOpen(false)}
         data={data}
