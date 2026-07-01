@@ -199,7 +199,7 @@ function IncomePDFTemplate({
                       {row.day}
                     </td>
                     <td style={{ ...cell, paddingLeft: '8px', color: row.totalIncome > 0 ? '#000' : '#555' }}>
-                      {row.totalIncome > 0 ? '' : row.remarks}
+                      {row.remarks}
                     </td>
                     <td style={{
                       ...cell,
@@ -611,7 +611,7 @@ export default function IncomePDFExport({
                 Daily Income Preview &amp; Remarks
               </h3>
               <p className="text-[10px] text-gray-400">
-                Days with <span className="font-bold text-gray-600">no income</span> are highlighted in amber. Type a remark (e.g. HOLIDAY, NO CLASS) for those days.
+                Days with <span className="font-bold text-gray-600">no income</span> are highlighted in amber. You can add remarks for any day.
               </p>
               {previewData.map(({ month, rows }) => {
                 const monthLabel = new Date(month + '-01T00:00:00').toLocaleDateString('en-US', {
@@ -648,17 +648,13 @@ export default function IncomePDFExport({
                                     : '\u2014'}
                                 </td>
                                 <td className="px-3 py-1">
-                                  {!hasIncome ? (
-                                    <input
-                                      type="text"
-                                      value={remarks[dateKey] || ''}
-                                      onChange={e => handleRemarkChange(dateKey, e.target.value)}
-                                      placeholder="e.g. HOLIDAY, NO CLASS..."
-                                      className="w-full px-2 py-1 border border-gray-200 rounded text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#006B4D] bg-white"
-                                    />
-                                  ) : (
-                                    <span className="text-gray-300 text-[10px] italic">—</span>
-                                  )}
+                                  <input
+                                    type="text"
+                                    value={remarks[dateKey] || ''}
+                                    onChange={e => handleRemarkChange(dateKey, e.target.value)}
+                                    placeholder={hasIncome ? "Optional remark..." : "e.g. HOLIDAY, NO CLASS..."}
+                                    className="w-full px-2 py-1 border border-gray-200 rounded text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#006B4D] bg-white"
+                                  />
                                 </td>
                               </tr>
                             );
