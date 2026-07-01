@@ -656,7 +656,7 @@ export default function IncomePDFExport({
                                 <td className="px-3 py-1">
                                   <input
                                     type="text"
-                                    value={remarks[dateKey] || ''}
+                                    value={remarks[dateKey] ?? row.remarks}
                                     onChange={e => handleRemarkChange(dateKey, e.target.value)}
                                     placeholder={hasIncome ? "Optional remark..." : "e.g. HOLIDAY, NO CLASS..."}
                                     className="w-full px-2 py-1 border border-gray-200 rounded text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#006B4D] bg-white"
