@@ -398,10 +398,16 @@ export default function IncomePDFExport({
     const rows: DayRow[] = [];
     for (let day = 1; day <= daysInMonth; day++) {
       const dateKey = `${month}-${String(day).padStart(2, '0')}`;
+      
+      let defaultRemark = '';
+      const dateObj = new Date(year, mon - 1, day);
+      if (dateObj.getDay() === 0) defaultRemark = 'SUNDAY';
+      else if (dateObj.getDay() === 6) defaultRemark = 'SATURDAY';
+
       rows.push({
         day,
         totalIncome: dailyTotals[day] || 0,
-        remarks: currentRemarks[dateKey] || '',
+        remarks: currentRemarks[dateKey] ?? defaultRemark,
       });
     }
     return rows;
