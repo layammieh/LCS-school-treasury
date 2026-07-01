@@ -78,7 +78,7 @@ function IncomePDFTemplate({
   const pageStyle: React.CSSProperties = {
     width: '794px',
     minHeight: '1123px',
-    padding: '36px 48px',
+    padding: '24px 48px',
     boxSizing: 'border-box',
     fontFamily: '"Arial", "Helvetica", sans-serif',
     color: '#000000',
@@ -122,7 +122,7 @@ function IncomePDFTemplate({
       </div>
 
       {/* Report Title */}
-      <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+      <div style={{ textAlign: 'center', marginBottom: '8px' }}>
         <div style={{
           fontSize: '13px',
           fontWeight: 'bold',
@@ -130,16 +130,7 @@ function IncomePDFTemplate({
           textTransform: 'uppercase',
           letterSpacing: '0.4px',
         }}>
-          School Canteen Income Report
-        </div>
-        <div style={{
-          fontSize: '12px',
-          fontWeight: 'bold',
-          textTransform: 'uppercase',
-          letterSpacing: '0.3px',
-          marginTop: '2px',
-        }}>
-          Cash In / Daily Income Summary
+          School Canteen Monthly Income
         </div>
         <div style={{ fontSize: '10px', fontWeight: 'bold', marginTop: '4px' }}>
           SCHOOL YEAR {schoolYear}
