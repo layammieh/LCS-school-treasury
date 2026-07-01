@@ -182,14 +182,14 @@ function IncomePDFTemplate({
             }}>
               <colgroup>
                 <col style={{ width: '8%' }} />
-                <col style={{ width: '62%' }} />
-                <col style={{ width: '30%' }} />
+                <col style={{ width: '22%' }} />
+                <col style={{ width: '70%' }} />
               </colgroup>
               <thead>
                 <tr>
                   <th style={headerCell}>Day</th>
-                  <th style={{ ...headerCell, textAlign: 'left', paddingLeft: '8px' }}>Remarks</th>
                   <th style={{ ...headerCell, textAlign: 'right', paddingRight: '8px' }}>Total Income</th>
+                  <th style={{ ...headerCell, textAlign: 'left', paddingLeft: '8px' }}>Remarks</th>
                 </tr>
               </thead>
               <tbody>
@@ -197,9 +197,6 @@ function IncomePDFTemplate({
                   <tr key={row.day}>
                     <td style={{ ...cell, textAlign: 'center', fontWeight: row.totalIncome > 0 ? 'bold' : 'normal' }}>
                       {row.day}
-                    </td>
-                    <td style={{ ...cell, paddingLeft: '8px', color: row.totalIncome > 0 ? '#000' : '#555' }}>
-                      {row.remarks}
                     </td>
                     <td style={{
                       ...cell,
@@ -210,21 +207,22 @@ function IncomePDFTemplate({
                     }}>
                       {row.totalIncome > 0 ? fmt(row.totalIncome) : '\u2014'}
                     </td>
+                    <td style={{ ...cell, paddingLeft: '8px', color: row.totalIncome > 0 ? '#000' : '#555' }}>
+                      {row.remarks}
+                    </td>
                   </tr>
                 ))}
 
                 {/* Month subtotal */}
                 <tr>
-                  <td colSpan={2} style={{
+                  <td style={{
                     ...cell,
                     fontWeight: 'bold',
-                    textAlign: 'right',
+                    textAlign: 'center',
                     backgroundColor: '#d4edda',
-                    paddingRight: '10px',
-                    letterSpacing: '0.5px',
                     color: '#006B4D',
                   }}>
-                    TOTAL \u2014 {monthLabel.toUpperCase()}
+                    TOTAL
                   </td>
                   <td style={{
                     ...cell,
@@ -235,6 +233,17 @@ function IncomePDFTemplate({
                     color: '#006B4D',
                   }}>
                     {fmt(monthTotal)}
+                  </td>
+                  <td style={{
+                    ...cell,
+                    fontWeight: 'bold',
+                    textAlign: 'left',
+                    backgroundColor: '#d4edda',
+                    paddingLeft: '8px',
+                    letterSpacing: '0.5px',
+                    color: '#006B4D',
+                  }}>
+                    — {monthLabel.toUpperCase()}
                   </td>
                 </tr>
               </tbody>
@@ -247,21 +256,20 @@ function IncomePDFTemplate({
       {monthlyData.length > 1 && (
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px', marginBottom: '16px' }}>
           <colgroup>
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '22%' }} />
             <col style={{ width: '70%' }} />
-            <col style={{ width: '30%' }} />
           </colgroup>
           <tbody>
             <tr>
               <td style={{
                 ...cell,
                 fontWeight: 'bold',
-                textAlign: 'right',
+                textAlign: 'center',
                 backgroundColor: '#006B4D',
                 color: '#ffffff',
-                paddingRight: '10px',
-                letterSpacing: '0.5px',
               }}>
-                GRAND TOTAL
+                TOTAL
               </td>
               <td style={{
                 ...cell,
@@ -272,6 +280,17 @@ function IncomePDFTemplate({
                 paddingRight: '8px',
               }}>
                 {fmt(grandTotal)}
+              </td>
+              <td style={{
+                ...cell,
+                fontWeight: 'bold',
+                textAlign: 'left',
+                backgroundColor: '#006B4D',
+                color: '#ffffff',
+                paddingLeft: '8px',
+                letterSpacing: '0.5px',
+              }}>
+                — GRAND TOTAL (ALL MONTHS)
               </td>
             </tr>
           </tbody>
