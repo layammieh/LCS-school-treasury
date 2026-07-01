@@ -3,7 +3,8 @@ import { useAuthStore } from '../store/authStore';
 import { useSchoolYearStore } from '../store/schoolYearStore';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
-import { liquidationApi, Liquidation as LiquidationType } from '../lib/api';
+import { liquidationApi } from '../lib/api';
+import type { Liquidation as LiquidationType } from '../lib/api';
 import { Plus, Loader2 } from 'lucide-react';
 
 export default function Liquidation() {
@@ -72,7 +73,7 @@ export default function Liquidation() {
     <div className="flex h-screen bg-[#F8FAFC]">
       <Sidebar activePage="liquidation" />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Header title="Liquidation Report" />
+        <Header />
         <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
           <div className="max-w-6xl mx-auto space-y-6">
             <div className="flex items-center justify-between">
