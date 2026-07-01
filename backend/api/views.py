@@ -701,9 +701,9 @@ class RevenueRecipientViewSet(viewsets.ModelViewSet):
 def fix_db(request):
     from django.core.management.color import no_style
     from django.db import connection
-    from .models import Transaction, Consignee, Expense, RevenueRecipient
+    from .models import Transaction, Consignee, Expense, RevenueRecipient, Liquidation
     try:
-        sequence_sql = connection.ops.sequence_reset_sql(no_style(), [Transaction, Consignee, Expense, RevenueRecipient])
+        sequence_sql = connection.ops.sequence_reset_sql(no_style(), [Transaction, Consignee, Expense, RevenueRecipient, Liquidation])
         with connection.cursor() as cursor:
             for sql in sequence_sql:
                 cursor.execute(sql)
@@ -723,4 +723,9 @@ class LiquidationViewSet(viewsets.ModelViewSet):
         return qs
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        from django.db import IntegrityError
+        from rest_framework.exceptions import ValidationError
+        try:
+            serializer.save(user=self.request.user)
+        except IntegrityError:
+            raise ValidationError({"detail": "This month already exists for this school year."})
