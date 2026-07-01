@@ -188,8 +188,8 @@ function IncomePDFTemplate({
               <thead>
                 <tr>
                   <th style={headerCell}>Day</th>
-                  <th style={{ ...headerCell, textAlign: 'right', paddingRight: '8px' }}>Total Income</th>
-                  <th style={{ ...headerCell, textAlign: 'left', paddingLeft: '8px' }}>Remarks</th>
+                  <th style={{ ...headerCell, textAlign: 'center' }}>Total Income</th>
+                  <th style={{ ...headerCell, textAlign: 'center' }}>Remarks</th>
                 </tr>
               </thead>
               <tbody>
@@ -200,14 +200,13 @@ function IncomePDFTemplate({
                     </td>
                     <td style={{
                       ...cell,
-                      textAlign: 'right',
-                      paddingRight: '8px',
+                      textAlign: 'center',
                       fontWeight: row.totalIncome > 0 ? 'bold' : 'normal',
                       color: row.totalIncome > 0 ? '#000000' : '#888888',
                     }}>
                       {row.totalIncome > 0 ? fmt(row.totalIncome) : '\u2014'}
                     </td>
-                    <td style={{ ...cell, paddingLeft: '8px', color: row.totalIncome > 0 ? '#000' : '#555' }}>
+                    <td style={{ ...cell, textAlign: 'center', color: row.totalIncome > 0 ? '#000' : '#555' }}>
                       {row.remarks}
                     </td>
                   </tr>
@@ -227,9 +226,8 @@ function IncomePDFTemplate({
                   <td style={{
                     ...cell,
                     fontWeight: 'bold',
-                    textAlign: 'right',
+                    textAlign: 'center',
                     backgroundColor: '#d4edda',
-                    paddingRight: '8px',
                     color: '#006B4D',
                   }}>
                     {fmt(monthTotal)}
@@ -237,9 +235,8 @@ function IncomePDFTemplate({
                   <td style={{
                     ...cell,
                     fontWeight: 'bold',
-                    textAlign: 'left',
+                    textAlign: 'center',
                     backgroundColor: '#d4edda',
-                    paddingLeft: '8px',
                     letterSpacing: '0.5px',
                     color: '#006B4D',
                   }}>
@@ -274,20 +271,18 @@ function IncomePDFTemplate({
               <td style={{
                 ...cell,
                 fontWeight: 'bold',
-                textAlign: 'right',
+                textAlign: 'center',
                 backgroundColor: '#006B4D',
                 color: '#ffffff',
-                paddingRight: '8px',
               }}>
                 {fmt(grandTotal)}
               </td>
               <td style={{
                 ...cell,
                 fontWeight: 'bold',
-                textAlign: 'left',
+                textAlign: 'center',
                 backgroundColor: '#006B4D',
                 color: '#ffffff',
-                paddingLeft: '8px',
                 letterSpacing: '0.5px',
               }}>
                 — GRAND TOTAL (ALL MONTHS)
