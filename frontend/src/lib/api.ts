@@ -364,3 +364,34 @@ export const expensesApi = {
     return request<ExpenseSummary>(`/expenses/expense-summary/?${qs}`);
   },
 };
+
+// ---------------------------------------------------------------------------
+// Liquidations
+// ---------------------------------------------------------------------------
+export interface Liquidation {
+  id: number;
+  school_year: string;
+  month: string;
+  cash_deposit: number;
+  cash_withdrawn: number;
+  remarks: string;
+  income: number;
+  expenses: number;
+}
+
+export const liquidationApi = {
+  list: (params?: { schoolYear?: string }) => {
+    const qs = new URLSearchParams();
+    if (params?.schoolYear) qs.set('school_year', params.schoolYear);
+    return request<PaginatedResponse<Liquidation>>(`/liquidations/?${qs}`);
+  },
+
+  create: (data: Partial<Liquidation>) =>
+    request<Liquidation>('/liquidations/', { method: 'POST', body: JSON.stringify(data) }),
+
+  update: (id: number, data: Partial<Liquidation>) =>
+    request<Liquidation>(`/liquidations/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
+
+  delete: (id: number) =>
+    request<void>(`/liquidations/${id}/`, { method: 'DELETE' }),
+};

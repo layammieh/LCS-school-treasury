@@ -153,3 +153,22 @@ class RevenueRecipient(models.Model):
     def __str__(self):
         return f"{self.name} ({self.percentage}%)"
 
+class Liquidation(models.Model):
+    """Monthly liquidation report summary tracking cash deposit/withdrawn and remarks."""
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liquidations', null=True, blank=True)
+    school_year = models.CharField(max_length=20, default='2026-2027', db_index=True)
+    month = models.CharField(max_length=7, db_index=True) # Format: "YYYY-MM"
+    cash_deposit = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    cash_withdrawn = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    remarks = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['month']
+        unique_together = ['school_year', 'month']
+
+    def __str__(self):
+        return f"Liquidation {self.month} ({self.school_year})"
+

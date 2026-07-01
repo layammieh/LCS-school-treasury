@@ -7,6 +7,7 @@ import Consignees from '../pages/Consignees';
 import Collections from '../pages/Collections';
 import Calendar from '../pages/Calendar';
 import Revenue from '../pages/Revenue';
+import Liquidation from '../pages/Liquidation';
 import Settings from '../pages/Settings';
 import { useAuthStore } from '../store/authStore';
 
@@ -56,6 +57,7 @@ export default function AppRoutes() {
       <Route path="/collections" element={<AppRoute><Collections /></AppRoute>} />
       <Route path="/calendar" element={<AppRoute><Calendar /></AppRoute>} />
       <Route path="/revenue" element={<AppRoute><Revenue /></AppRoute>} />
+      <Route path="/liquidation" element={<AppRoute><Liquidation /></AppRoute>} />
       <Route path="/settings" element={<AppRoute><Settings /></AppRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

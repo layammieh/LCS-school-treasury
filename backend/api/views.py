@@ -1,14 +1,17 @@
 from decimal import Decimal
 from django.db.models import Sum, Count, Q
 from django.contrib.auth import authenticate
+from decimal import Decimal
+from django.db.models import Sum, Count, Q
+from django.contrib.auth import authenticate
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 
-from .models import Consignee, Transaction, Expense, RevenueRecipient
-from .serializers import ConsigneeSerializer, TransactionSerializer, ExpenseSerializer, RevenueRecipientSerializer
+from .models import Consignee, Transaction, Expense, RevenueRecipient, Liquidation
+from .serializers import ConsigneeSerializer, TransactionSerializer, ExpenseSerializer, RevenueRecipientSerializer, LiquidationSerializer
 
 
 # ---------------------------------------------------------------------------
@@ -706,4 +709,18 @@ def fix_db(request):
                 cursor.execute(sql)
         return Response({"status": "success", "message": "Database sequences reset successfully."})
     except Exception as e:
-        return Response({"status": "error", "message": str(e)})
+        return Response({"status": "error", "message": str(e)}, status=500)
+
+class LiquidationViewSet(viewsets.ModelViewSet):
+    serializer_class = LiquidationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = Liquidation.objects.filter(user=self.request.user)
+        school_year = self.request.query_params.get('school_year')
+        if school_year:
+            qs = qs.filter(school_year=school_year)
+        return qs
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

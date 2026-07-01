@@ -6,6 +6,7 @@ import {
   Users,
   Coins,
   TrendingUp,
+  FileSpreadsheet,
   Settings,
   X
 } from 'lucide-react';
@@ -26,6 +27,7 @@ export default function Sidebar({ activePage }: SidebarProps) {
     { id: 'consignees', label: 'Consignees', path: '/consignees', icon: Users },
     { id: 'collections', label: 'Collections', path: '/collections', icon: Coins },
     { id: 'revenue', label: 'Revenue', path: '/revenue', icon: TrendingUp },
+    { id: 'liquidation', label: 'Liquidation', path: '/liquidation', icon: FileSpreadsheet },
   ];
 
   return (
