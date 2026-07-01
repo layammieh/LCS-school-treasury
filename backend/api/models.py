@@ -167,7 +167,7 @@ class Liquidation(models.Model):
 
     class Meta:
         ordering = ['month']
-        unique_together = ['school_year', 'month']
+        unique_together = ['user', 'school_year', 'month']
 
     def __str__(self):
         return f"Liquidation {self.month} ({self.school_year})"
