@@ -172,3 +172,4 @@ class Liquidation(models.Model):
     def __str__(self):
         return f"Liquidation {self.month} ({self.school_year})"
 
+# trigger github desktop
