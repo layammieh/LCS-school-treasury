@@ -13,6 +13,7 @@ import type {
 import { DeleteModal } from '../components/DeleteModal';
 import { useAuthStore } from '../store/authStore';
 import ExpensePDFExport from '../components/ExpensePDFExport';
+import IncomePDFExport from '../components/IncomePDFExport';
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 const COLLECTION_STATUSES = ['All Statuses', 'paid', 'unpaid', 'partial', 'overdue', 'pending'] as const;
@@ -123,6 +124,7 @@ export default function Collections() {
   const [expenseForm, setExpenseForm] = useState(EMPTY_EXPENSE_FORM);
   const [editingExpenseId, setEditingExpenseId] = useState<number | null>(null);
   const [showExpensePDFModal, setShowExpensePDFModal] = useState(false);
+  const [showIncomePDFModal, setShowIncomePDFModal] = useState(false);
 
   const [expenseFilterDate, setExpenseFilterDate] = useState('');
   const [showExpenseDatePicker, setShowExpenseDatePicker] = useState(false);
@@ -461,7 +463,16 @@ export default function Collections() {
               <p className="text-xs text-gray-500 mt-1">Monitor and record real-time fee collections and expenses.</p>
             </div>
             <div className="flex space-x-2.5 items-center">
-              {/* Export PDF is always visible on the Expenses tab */}
+              {/* Export PDF buttons */}
+              {activeTab === 'income' && (
+                <button
+                  onClick={() => setShowIncomePDFModal(true)}
+                  className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-white hover:bg-green-50 text-[#006B4D] text-xs font-semibold rounded-lg border border-green-200 transition-colors"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  <span>Export PDF</span>
+                </button>
+              )}
               {activeTab === 'expenses' && (
                 <button
                   onClick={() => setShowExpensePDFModal(true)}
@@ -1257,6 +1268,12 @@ export default function Collections() {
             </div>
           )}
 
+
+          <IncomePDFExport
+            isOpen={showIncomePDFModal}
+            onClose={() => setShowIncomePDFModal(false)}
+            schoolYear={schoolYear}
+          />
 
           <ExpensePDFExport
             isOpen={showExpensePDFModal}
