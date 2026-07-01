@@ -89,7 +89,7 @@ function IncomePDFTemplate({
 
   const cell: React.CSSProperties = {
     border: '1px solid #000000',
-    padding: '3px 6px',
+    padding: '1.5px 4px',
     color: '#000000',
     backgroundColor: '#ffffff',
     verticalAlign: 'middle',
@@ -106,13 +106,13 @@ function IncomePDFTemplate({
   return (
     <div style={pageStyle}>
       {/* Government Header */}
-      <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+      <div style={{ textAlign: 'center', marginBottom: '6px' }}>
         <img
           src={depedLogo}
           alt="DepEd Logo"
-          style={{ width: '68px', height: '68px', objectFit: 'contain', marginBottom: '5px' }}
+          style={{ width: '56px', height: '56px', objectFit: 'contain', marginBottom: '2px' }}
         />
-        <div style={{ fontSize: '10px', lineHeight: '1.55' }}>
+        <div style={{ fontSize: '10px', lineHeight: '1.2' }}>
           <div>Republic of the Philippines</div>
           <div style={{ fontWeight: 'bold', fontSize: '11px' }}>Department of Education</div>
           <div>Region X</div>
