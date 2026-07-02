@@ -159,18 +159,18 @@ export default function Dashboard() {
             {/* Total Income */}
             <div 
               onClick={() => navigate('/collections', { state: { tab: 'income' } })}
-              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer hover:bg-green-50 active:bg-green-100 transition-colors"
+              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#003D29] active:bg-[#002619] transition-colors"
             >
               <div className="flex justify-between items-start">
-                <div className="bg-[#4ade80]/10 p-2 rounded-lg text-[#006B4D]">
+                <div className="bg-[#4ade80]/10 p-2 rounded-lg text-[#006B4D] group-hover:bg-[#4ade80]/20 group-hover:text-[#4ade80] transition-colors">
                   <Coins className="h-5 w-5" />
                 </div>
               </div>
               <div className="mt-4">
-                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                   Total Income - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                 </span>
-                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
+                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
                   {loading ? '...' : formatCurrency(stats?.total_collections ?? 0)}
                 </p>
               </div>
@@ -179,35 +179,35 @@ export default function Dashboard() {
             {/* Total Expenses */}
             <div 
               onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
-              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer hover:bg-green-50 active:bg-green-100 transition-colors"
+              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#003D29] active:bg-[#002619] transition-colors"
             >
               <div className="flex justify-between items-start">
-                <div className="bg-red-50 p-2 rounded-lg text-red-600">
+                <div className="bg-red-50 p-2 rounded-lg text-red-600 group-hover:bg-red-500/20 group-hover:text-red-400 transition-colors">
                   <CreditCard className="h-5 w-5" />
                 </div>
               </div>
               <div className="mt-4">
-                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                   Total Expenses - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                 </span>
-                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
+                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
                   {loading ? '...' : formatCurrency(stats?.total_expenses ?? 0)}
                 </p>
               </div>
             </div>
 
             {/* Total Balance */}
-            <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between">
+            <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between group hover:bg-[#003D29] transition-colors">
               <div className="flex justify-between items-start">
-                <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600">
+                <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">
                   <Wallet className="h-5 w-5" />
                 </div>
               </div>
               <div className="mt-4">
-                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                   Total Balance - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                 </span>
-                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
+                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
                   {loading ? '...' : formatCurrency((stats?.total_collections ?? 0) - (stats?.total_expenses ?? 0))}
                 </p>
               </div>
@@ -225,18 +225,18 @@ export default function Dashboard() {
             {/* Total Collected - COCONUT */}
             <div 
               onClick={() => navigate('/collections', { state: { tab: 'income' } })}
-              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer hover:bg-green-50 active:bg-green-100 transition-colors"
+              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#003D29] active:bg-[#002619] transition-colors"
             >
               <div className="flex justify-between items-start">
-                <div className="bg-[#4ade80]/15 p-2 rounded-lg text-[#006B4D]">
+                <div className="bg-[#4ade80]/15 p-2 rounded-lg text-[#006B4D] group-hover:bg-[#4ade80]/20 group-hover:text-[#4ade80] transition-colors">
                   <TrendingUp className="h-5 w-5" />
                 </div>
               </div>
               <div className="mt-4">
-                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                   Total Collected - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                 </span>
-                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
+                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
                   {loading ? '...' : formatCurrency(stats?.total_coconut_collections ?? 0)}
                 </p>
               </div>
@@ -245,35 +245,38 @@ export default function Dashboard() {
             {/* Total Expenses - COCONUT */}
             <div 
               onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
-              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer hover:bg-green-50 active:bg-green-100 transition-colors"
+              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#003D29] active:bg-[#002619] transition-colors"
             >
               <div className="flex justify-between items-start">
-                <div className="bg-red-50 p-2 rounded-lg text-red-600">
+                <div className="bg-red-50 p-2 rounded-lg text-red-600 group-hover:bg-red-500/20 group-hover:text-red-400 transition-colors">
                   <Activity className="h-5 w-5" />
                 </div>
               </div>
               <div className="mt-4">
-                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                   Total Expenses - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                 </span>
-                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
+                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
                   {loading ? '...' : formatCurrency(stats?.total_coconut_expenses ?? 0)}
                 </p>
               </div>
             </div>
 
             {/* Total Balance - COCONUT */}
-            <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between">
+            <div 
+              onClick={() => navigate('/collections', { state: { tab: 'balance' } })}
+              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#003D29] active:bg-[#002619] transition-colors"
+            >
               <div className="flex justify-between items-start">
-                <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600">
+                <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">
                   <Wallet className="h-5 w-5" />
                 </div>
               </div>
               <div className="mt-4">
-                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                   Total Balance - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                 </span>
-                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
+                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
                   {loading ? '...' : formatCurrency(stats?.coconut_balance ?? 0)}
                 </p>
               </div>
