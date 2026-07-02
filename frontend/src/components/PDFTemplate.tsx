@@ -64,7 +64,7 @@ export default function PDFTemplate({
 
   const cell: React.CSSProperties = {
     border: '1px solid #000000',
-    padding: '3px 4px',
+    padding: '5px 10px',
     color: '#000000',
     backgroundColor: '#ffffff',
   };
