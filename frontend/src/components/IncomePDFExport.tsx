@@ -89,7 +89,7 @@ function IncomePDFTemplate({
 
   const cell: React.CSSProperties = {
     border: '1px solid #000000',
-    padding: '3px 4px',
+    padding: '2px 4.5px',
     color: '#000000',
     backgroundColor: '#ffffff',
     verticalAlign: 'middle',
