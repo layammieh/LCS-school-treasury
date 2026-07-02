@@ -578,10 +578,13 @@ export default function Liquidation() {
     }
   };
 
-  const totalIncome    = data.reduce((s, r) => s + Number(r.income    || 0), 0);
-  const totalExpenses  = data.reduce((s, r) => s + Number(r.expenses  || 0), 0);
-  const totalDeposit   = data.reduce((s, r) => s + Number(r.cash_deposit   || 0), 0);
-  const totalWithdrawn = data.reduce((s, r) => s + Number(r.cash_withdrawn || 0), 0);
+  // In public view mode, hide all data — liquidation records belong to the authenticated user only
+  const displayData = isViewMode ? [] : data;
+
+  const totalIncome    = displayData.reduce((s, r) => s + Number(r.income    || 0), 0);
+  const totalExpenses  = displayData.reduce((s, r) => s + Number(r.expenses  || 0), 0);
+  const totalDeposit   = displayData.reduce((s, r) => s + Number(r.cash_deposit   || 0), 0);
+  const totalWithdrawn = displayData.reduce((s, r) => s + Number(r.cash_withdrawn || 0), 0);
   const netBalance = totalIncome - totalExpenses;
 
   return (
@@ -590,33 +593,37 @@ export default function Liquidation() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header />
         <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-          <div className="max-w-6xl mx-auto space-y-6">
+          <div className="max-w-6xl mx-auto space-y-5">
 
-            {/* Page heading */}
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h1 className="text-2xl font-bold text-gray-900">Monthly Liquidation</h1>
-              <div className="flex items-center gap-2 flex-wrap">
-                {data.length > 0 && (
+            {/* ── Page heading ── */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Monthly Liquidation</h1>
+
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                {/* Export PDF — hidden in public view mode */}
+                {!isViewMode && displayData.length > 0 && (
                   <button
                     onClick={() => setExportOpen(true)}
-                    className="flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 shadow-sm"
+                    className="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 shadow-sm transition-colors"
                   >
                     <Download className="w-4 h-4 mr-2 text-[#006B4D]" />
                     Export PDF
                   </button>
                 )}
+
+                {/* Add Month — hidden in public view mode */}
                 {!isViewMode && (
                   <div className="flex items-center gap-2">
                     <input
                       type="month"
                       value={newMonth}
                       onChange={e => { setNewMonth(e.target.value); setErrorMsg(''); }}
-                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
+                      className="flex-1 min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
                     />
                     <button
                       onClick={handleAddMonth}
                       disabled={!newMonth || adding}
-                      className="flex items-center px-4 py-2 bg-[#006B4D] text-white text-sm font-bold rounded-lg hover:bg-[#005a40] disabled:opacity-50 shadow-sm"
+                      className="flex items-center whitespace-nowrap px-4 py-2 bg-[#006B4D] text-white text-sm font-bold rounded-lg hover:bg-[#005a40] disabled:opacity-50 shadow-sm transition-colors"
                     >
                       {adding ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
                       Add Month
@@ -634,8 +641,16 @@ export default function Liquidation() {
               </div>
             )}
 
-            {/* Table */}
-            <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+            {/* Public view notice banner */}
+            {isViewMode && (
+              <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-lg">
+                <span className="text-base leading-tight">🔒</span>
+                <p>Liquidation records are only visible to authorized users. Please log in to view or manage this data.</p>
+              </div>
+            )}
+
+            {/* ── Desktop / Tablet Table (sm and up) ── */}
+            <div className="hidden sm:block bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left">
                   <thead className="bg-[#003D29] text-white">
@@ -646,7 +661,7 @@ export default function Liquidation() {
                       <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs text-right whitespace-nowrap">Cash Deposit</th>
                       <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs text-right whitespace-nowrap">Cash Withdrawn</th>
                       <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">Remarks</th>
-                      {!isViewMode && <th className="px-4 py-3 text-xs" />}
+                      {!isViewMode && <th className="px-4 py-3 text-xs w-10" />}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -657,15 +672,21 @@ export default function Liquidation() {
                           Loading…
                         </td>
                       </tr>
-                    ) : data.length === 0 ? (
+                    ) : displayData.length === 0 ? (
                       <tr>
                         <td colSpan={7} className="px-4 py-10 text-center text-gray-400 text-sm">
-                          No liquidation records for this school year.<br />
-                          <span className="text-xs">Select a month above and click <strong>Add Month</strong> to start tracking.</span>
+                          {isViewMode ? (
+                            <span>No records available in public view.</span>
+                          ) : (
+                            <>
+                              No liquidation records for this school year.<br />
+                              <span className="text-xs">Select a month above and click <strong>Add Month</strong> to start tracking.</span>
+                            </>
+                          )}
                         </td>
                       </tr>
                     ) : (
-                      data.map((row) => (
+                      displayData.map((row) => (
                         <tr key={row.id} className="hover:bg-gray-50 transition-colors">
                           <td className="px-4 py-3 font-semibold text-gray-900 uppercase whitespace-nowrap">
                             {new Date(row.month + '-01').toLocaleDateString('en-US', { month: 'long' })}
@@ -677,43 +698,31 @@ export default function Liquidation() {
                             {fmt(row.expenses)}
                           </td>
                           <td className="px-4 py-3 text-right">
-                            {isViewMode ? (
-                              <span className="font-medium">{fmt(row.cash_deposit)}</span>
-                            ) : (
-                              <input
-                                type="number" step="0.01"
-                                className="w-28 text-right border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
-                                value={row.cash_deposit || ''}
-                                onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, cash_deposit: Number(e.target.value) } : item))}
-                                onBlur={e => handleUpdate(row.id, 'cash_deposit', Number(e.target.value) || 0)}
-                              />
-                            )}
+                            <input
+                              type="number" step="0.01"
+                              className="w-28 text-right border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
+                              value={row.cash_deposit || ''}
+                              onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, cash_deposit: Number(e.target.value) } : item))}
+                              onBlur={e => handleUpdate(row.id, 'cash_deposit', Number(e.target.value) || 0)}
+                            />
                           </td>
                           <td className="px-4 py-3 text-right">
-                            {isViewMode ? (
-                              <span className="font-medium">{fmt(row.cash_withdrawn)}</span>
-                            ) : (
-                              <input
-                                type="number" step="0.01"
-                                className="w-28 text-right border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
-                                value={row.cash_withdrawn || ''}
-                                onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, cash_withdrawn: Number(e.target.value) } : item))}
-                                onBlur={e => handleUpdate(row.id, 'cash_withdrawn', Number(e.target.value) || 0)}
-                              />
-                            )}
+                            <input
+                              type="number" step="0.01"
+                              className="w-28 text-right border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
+                              value={row.cash_withdrawn || ''}
+                              onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, cash_withdrawn: Number(e.target.value) } : item))}
+                              onBlur={e => handleUpdate(row.id, 'cash_withdrawn', Number(e.target.value) || 0)}
+                            />
                           </td>
                           <td className="px-4 py-3">
-                            {isViewMode ? (
-                              <span className="text-gray-600">{row.remarks}</span>
-                            ) : (
-                              <input
-                                type="text" placeholder="Add remarks…"
-                                className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
-                                value={row.remarks || ''}
-                                onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, remarks: e.target.value } : item))}
-                                onBlur={e => handleUpdate(row.id, 'remarks', e.target.value)}
-                              />
-                            )}
+                            <input
+                              type="text" placeholder="Add remarks…"
+                              className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
+                              value={row.remarks || ''}
+                              onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, remarks: e.target.value } : item))}
+                              onBlur={e => handleUpdate(row.id, 'remarks', e.target.value)}
+                            />
                           </td>
                           {!isViewMode && (
                             <td className="px-4 py-3">
@@ -731,7 +740,7 @@ export default function Liquidation() {
                       ))
                     )}
                   </tbody>
-                  {data.length > 0 && (
+                  {displayData.length > 0 && (
                     <tfoot className="bg-[#e8f5e9] border-t-2 border-[#003D29]">
                       <tr>
                         <td className="px-4 py-4 font-bold text-[#003D29] uppercase tracking-wider text-sm">TOTAL</td>
@@ -750,17 +759,138 @@ export default function Liquidation() {
               </div>
             </div>
 
+            {/* ── Mobile Cards (visible only on small screens, < sm) ── */}
+            <div className="sm:hidden space-y-3">
+              {loading ? (
+                <div className="bg-white rounded-xl border border-gray-200 shadow-sm px-4 py-10 text-center text-gray-400">
+                  <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#006B4D]" />
+                  Loading…
+                </div>
+              ) : displayData.length === 0 ? (
+                <div className="bg-white rounded-xl border border-gray-200 shadow-sm px-4 py-10 text-center text-gray-400 text-sm">
+                  {isViewMode ? (
+                    <span>No records available in public view.</span>
+                  ) : (
+                    <>
+                      No liquidation records for this school year.<br />
+                      <span className="text-xs">Select a month above and click <strong>Add Month</strong> to start tracking.</span>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <>
+                  {displayData.map((row) => (
+                    <div key={row.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 space-y-3">
+                      {/* Card Header */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-bold text-gray-900 uppercase tracking-wide">
+                          {new Date(row.month + '-01').toLocaleDateString('en-US', { month: 'long' })}
+                        </span>
+                        {!isViewMode && (
+                          <button
+                            onClick={() => handleDelete(row.id)}
+                            disabled={deletingId === row.id}
+                            className="text-gray-300 hover:text-red-500 transition-colors"
+                            title="Delete row"
+                          >
+                            {deletingId === row.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Income / Expenses */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="bg-green-50 rounded-lg p-2.5">
+                          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Income</p>
+                          <p className="text-sm font-bold text-[#006B4D]">{fmt(row.income)}</p>
+                        </div>
+                        <div className="bg-red-50 rounded-lg p-2.5">
+                          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Expenses</p>
+                          <p className="text-sm font-bold text-red-600">{fmt(row.expenses)}</p>
+                        </div>
+                      </div>
+
+                      {/* Cash Deposit */}
+                      <div>
+                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Cash Deposit</label>
+                        <input
+                          type="number" step="0.01"
+                          className="w-full text-right border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
+                          value={row.cash_deposit || ''}
+                          onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, cash_deposit: Number(e.target.value) } : item))}
+                          onBlur={e => handleUpdate(row.id, 'cash_deposit', Number(e.target.value) || 0)}
+                        />
+                      </div>
+
+                      {/* Cash Withdrawn */}
+                      <div>
+                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Cash Withdrawn</label>
+                        <input
+                          type="number" step="0.01"
+                          className="w-full text-right border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
+                          value={row.cash_withdrawn || ''}
+                          onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, cash_withdrawn: Number(e.target.value) } : item))}
+                          onBlur={e => handleUpdate(row.id, 'cash_withdrawn', Number(e.target.value) || 0)}
+                        />
+                      </div>
+
+                      {/* Remarks */}
+                      <div>
+                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Remarks</label>
+                        <input
+                          type="text" placeholder="Add remarks…"
+                          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
+                          value={row.remarks || ''}
+                          onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, remarks: e.target.value } : item))}
+                          onBlur={e => handleUpdate(row.id, 'remarks', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Mobile Totals Card */}
+                  <div className="bg-[#003D29] rounded-xl p-4 space-y-2 text-white">
+                    <p className="text-xs font-bold uppercase tracking-wider text-white/70 mb-3">Summary Totals</p>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                      <div>
+                        <p className="text-[10px] text-white/60 uppercase tracking-wider">Total Income</p>
+                        <p className="font-bold text-green-300">{fmt(totalIncome)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-white/60 uppercase tracking-wider">Total Expenses</p>
+                        <p className="font-bold text-red-300">{fmt(totalExpenses)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-white/60 uppercase tracking-wider">Cash Deposit</p>
+                        <p className="font-bold">{totalDeposit > 0 ? fmt(totalDeposit) : '—'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-white/60 uppercase tracking-wider">Cash Withdrawn</p>
+                        <p className="font-bold">{totalWithdrawn > 0 ? fmt(totalWithdrawn) : '—'}</p>
+                      </div>
+                    </div>
+                    <div className="border-t border-white/20 pt-2 mt-1">
+                      <p className="text-[10px] text-white/60 uppercase tracking-wider">Net Balance</p>
+                      <p className={`text-base font-bold ${netBalance >= 0 ? 'text-green-300' : 'text-red-300'}`}>{fmt(netBalance)}</p>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
           </div>
         </main>
       </div>
 
-      {/* PDF Export Modal */}
-      <LiquidationPDFExport
-        isOpen={exportOpen}
-        onClose={() => setExportOpen(false)}
-        data={data}
-        schoolYear={schoolYear}
-      />
+      {/* PDF Export Modal — only rendered for authenticated users */}
+      {!isViewMode && (
+        <LiquidationPDFExport
+          isOpen={exportOpen}
+          onClose={() => setExportOpen(false)}
+          data={displayData}
+          schoolYear={schoolYear}
+        />
+      )}
     </div>
   );
 }
