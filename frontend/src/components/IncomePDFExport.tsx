@@ -89,7 +89,7 @@ function IncomePDFTemplate({
 
   const cell: React.CSSProperties = {
     border: '1px solid #000000',
-    padding: '1.5px 4px',
+    padding: '3px 4px',
     color: '#000000',
     backgroundColor: '#ffffff',
     verticalAlign: 'middle',
@@ -403,7 +403,7 @@ export default function IncomePDFExport({
     const rows: DayRow[] = [];
     for (let day = 1; day <= daysInMonth; day++) {
       const dateKey = `${month}-${String(day).padStart(2, '0')}`;
-      
+
       let defaultRemark = '';
       const dateObj = new Date(year, mon - 1, day);
       if (dateObj.getDay() === 0) defaultRemark = 'SUNDAY';
