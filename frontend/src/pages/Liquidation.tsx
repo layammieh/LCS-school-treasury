@@ -525,7 +525,6 @@ export default function Liquidation() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{ id: number; month: string } | null>(null);
-  const [filterMonth, setFilterMonth] = useState('');
 
   const loadData = async () => {
     try {
@@ -589,9 +588,7 @@ export default function Liquidation() {
     }
   };
 
-  const displayData = isViewMode && filterMonth 
-    ? data.filter(row => row.month === filterMonth) 
-    : data;
+  const displayData = data;
 
   const totalIncome    = displayData.reduce((s, r) => s + Number(r.income    || 0), 0);
   const totalExpenses  = displayData.reduce((s, r) => s + Number(r.expenses  || 0), 0);
@@ -623,39 +620,23 @@ export default function Liquidation() {
                   </button>
                 )}
 
-                {/* Month Input — behaves as a Filter in public view, and Add Month in private view */}
-                {isViewMode ? (
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="month"
-                      value={filterMonth}
-                      onChange={e => setFilterMonth(e.target.value)}
-                      className="flex-1 min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
-                    />
-                    {filterMonth && (
-                      <button onClick={() => setFilterMonth('')} className="text-sm font-semibold text-gray-500 hover:text-gray-700">
-                        Clear
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="month"
-                      value={newMonth}
-                      onChange={e => { setNewMonth(e.target.value); setErrorMsg(''); }}
-                      className="flex-1 min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
-                    />
-                    <button
-                      onClick={handleAddMonth}
-                      disabled={!newMonth || adding}
-                      className="flex items-center whitespace-nowrap px-4 py-2 bg-[#006B4D] text-white text-sm font-bold rounded-lg hover:bg-[#005a40] disabled:opacity-50 shadow-sm transition-colors"
-                    >
-                      {adding ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
-                      Add Month
-                    </button>
-                  </div>
-                )}
+                {/* Add Month */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="month"
+                    value={newMonth}
+                    onChange={e => { setNewMonth(e.target.value); setErrorMsg(''); }}
+                    className="flex-1 min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
+                  />
+                  <button
+                    onClick={handleAddMonth}
+                    disabled={!newMonth || adding}
+                    className="flex items-center whitespace-nowrap px-4 py-2 bg-[#006B4D] text-white text-sm font-bold rounded-lg hover:bg-[#005a40] disabled:opacity-50 shadow-sm transition-colors"
+                  >
+                    {adding ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
+                    Add Month
+                  </button>
+                </div>
               </div>
             </div>
 
