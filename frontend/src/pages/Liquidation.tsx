@@ -52,9 +52,9 @@ function LiquidationPDFTemplate({
   schoolContact,
   schoolId,
 }: LiquidationTemplatePropType) {
-  const totalIncome   = data.reduce((s, r) => s + Number(r.income   || 0), 0);
+  const totalIncome = data.reduce((s, r) => s + Number(r.income || 0), 0);
   const totalExpenses = data.reduce((s, r) => s + Number(r.expenses || 0), 0);
-  const totalDeposit  = data.reduce((s, r) => s + Number(r.cash_deposit  || 0), 0);
+  const totalDeposit = data.reduce((s, r) => s + Number(r.cash_deposit || 0), 0);
   const totalWithdrawn = data.reduce((s, r) => s + Number(r.cash_withdrawn || 0), 0);
   const netBalance = totalIncome - totalExpenses;
 
@@ -72,7 +72,7 @@ function LiquidationPDFTemplate({
 
   const cell: React.CSSProperties = {
     border: '1px solid #000000',
-    padding: '3px 6px',
+    padding: '5px 10px',
     color: '#000000',
     backgroundColor: '#ffffff',
     verticalAlign: 'middle',
@@ -271,18 +271,18 @@ function LiquidationPDFExport({ isOpen, onClose, data, schoolYear }: Liquidation
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Signatory fields — same defaults as ExpensePDFExport
-  const [preparedBy, setPreparedBy]       = useState('AMELITA C. LAYAM');
+  const [preparedBy, setPreparedBy] = useState('AMELITA C. LAYAM');
   const [preparedTitle, setPreparedTitle] = useState('SC In-Charge');
-  const [approvedBy, setApprovedBy]       = useState('DANTE G. SISTO P-III');
+  const [approvedBy, setApprovedBy] = useState('DANTE G. SISTO P-III');
   const [approvedTitle, setApprovedTitle] = useState('School Principal');
-  const [authorizedBy, setAuthorizedBy]   = useState('LUCILDA GAPE');
+  const [authorizedBy, setAuthorizedBy] = useState('LUCILDA GAPE');
   const [authorizedTitle, setAuthorizedTitle] = useState('SC Auditor/ADAS');
 
   // School info — same defaults as ExpensePDFExport
-  const [schoolName, setSchoolName]       = useState('LUMBIA CENTRAL SCHOOL');
+  const [schoolName, setSchoolName] = useState('LUMBIA CENTRAL SCHOOL');
   const [schoolAddress, setSchoolAddress] = useState('F. Delima St., Lumbia, Cagayan de Oro City');
   const [schoolContact, setSchoolContact] = useState('Lumbia.cs@gmail.com | 09175275969');
-  const [schoolId, setSchoolId]           = useState('127977');
+  const [schoolId, setSchoolId] = useState('127977');
 
   const pdfRef = useRef<HTMLDivElement>(null);
 
@@ -316,9 +316,9 @@ function LiquidationPDFExport({ isOpen, onClose, data, schoolYear }: Liquidation
 
           const imgData = canvas.toDataURL('image/jpeg', 0.95);
           const pdf = new jsPDF('p', 'mm', 'a4');
-          const pdfPageWidth  = pdf.internal.pageSize.getWidth();
+          const pdfPageWidth = pdf.internal.pageSize.getWidth();
           const pdfPageHeight = pdf.internal.pageSize.getHeight();
-          const imgHeightMm   = (canvas.height / canvas.width) * pdfPageWidth;
+          const imgHeightMm = (canvas.height / canvas.width) * pdfPageWidth;
 
           if (imgHeightMm <= pdfPageHeight) {
             pdf.addImage(imgData, 'JPEG', 0, 0, pdfPageWidth, imgHeightMm);
@@ -328,7 +328,7 @@ function LiquidationPDFExport({ isOpen, onClose, data, schoolYear }: Liquidation
             while (yOffset < canvas.height) {
               const sliceH = Math.min(pageHeightPx, canvas.height - yOffset);
               const sliceCanvas = document.createElement('canvas');
-              sliceCanvas.width  = canvas.width;
+              sliceCanvas.width = canvas.width;
               sliceCanvas.height = sliceH;
               const ctx = sliceCanvas.getContext('2d');
               if (ctx) {
@@ -590,9 +590,9 @@ export default function Liquidation() {
 
   const displayData = data;
 
-  const totalIncome    = displayData.reduce((s, r) => s + Number(r.income    || 0), 0);
-  const totalExpenses  = displayData.reduce((s, r) => s + Number(r.expenses  || 0), 0);
-  const totalDeposit   = displayData.reduce((s, r) => s + Number(r.cash_deposit   || 0), 0);
+  const totalIncome = displayData.reduce((s, r) => s + Number(r.income || 0), 0);
+  const totalExpenses = displayData.reduce((s, r) => s + Number(r.expenses || 0), 0);
+  const totalDeposit = displayData.reduce((s, r) => s + Number(r.cash_deposit || 0), 0);
   const totalWithdrawn = displayData.reduce((s, r) => s + Number(r.cash_withdrawn || 0), 0);
   const netBalance = totalIncome - totalExpenses;
 
