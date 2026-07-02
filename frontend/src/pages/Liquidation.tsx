@@ -660,7 +660,7 @@ export default function Liquidation() {
                       <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs text-right whitespace-nowrap">Cash Deposit</th>
                       <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs text-right whitespace-nowrap">Cash Withdrawn</th>
                       <th className="px-4 py-3 font-semibold uppercase tracking-wider text-xs">Remarks</th>
-                      {!isViewMode && <th className="px-4 py-3 text-xs w-10" />}
+                      <th className="px-4 py-3 text-xs w-10" />
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -735,18 +735,16 @@ export default function Liquidation() {
                               />
                             )}
                           </td>
-                          {!isViewMode && (
-                            <td className="px-4 py-3">
-                              <button
-                                onClick={() => requestDelete(row.id, row.month)}
-                                disabled={deletingId === row.id}
-                                className="text-gray-300 hover:text-red-500 transition-colors"
-                                title="Delete row"
-                              >
-                                {deletingId === row.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                              </button>
-                            </td>
-                          )}
+                          <td className="px-4 py-3">
+                            <button
+                              onClick={() => requestDelete(row.id, row.month)}
+                              disabled={deletingId === row.id}
+                              className="text-gray-300 hover:text-red-500 transition-colors"
+                              title="Delete row"
+                            >
+                              {deletingId === row.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                            </button>
+                          </td>
                         </tr>
                       ))
                     )}
@@ -762,7 +760,7 @@ export default function Liquidation() {
                         <td className="px-4 py-4 font-bold text-[#003D29]">
                           Net Balance: <span className={netBalance >= 0 ? 'text-[#006B4D]' : 'text-red-600'}>{fmt(netBalance)}</span>
                         </td>
-                        {!isViewMode && <td />}
+                        <td />
                       </tr>
                     </tfoot>
                   )}
@@ -797,16 +795,14 @@ export default function Liquidation() {
                         <span className="text-sm font-bold text-gray-900 uppercase tracking-wide">
                           {new Date(row.month + '-01').toLocaleDateString('en-US', { month: 'long' })}
                         </span>
-                        {!isViewMode && (
-                          <button
-                            onClick={() => requestDelete(row.id, row.month)}
-                            disabled={deletingId === row.id}
-                            className="text-gray-300 hover:text-red-500 transition-colors"
-                            title="Delete row"
-                          >
-                            {deletingId === row.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                          </button>
-                        )}
+                        <button
+                          onClick={() => requestDelete(row.id, row.month)}
+                          disabled={deletingId === row.id}
+                          className="text-gray-300 hover:text-red-500 transition-colors"
+                          title="Delete row"
+                        >
+                          {deletingId === row.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                        </button>
                       </div>
 
                       {/* Income / Expenses */}
