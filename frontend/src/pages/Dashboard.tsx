@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import { useSchoolYearStore } from '../store/schoolYearStore';
@@ -34,6 +35,7 @@ function getStatusBadge(status: string) {
 
 export default function Dashboard() {
   const schoolYear = useSchoolYearStore(state => state.schoolYear);
+  const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -155,7 +157,10 @@ export default function Dashboard() {
             </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {/* Total Income */}
-            <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between">
+            <div 
+              onClick={() => navigate('/collections', { state: { tab: 'income' } })}
+              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer hover:bg-green-50 active:bg-green-100 transition-colors"
+            >
               <div className="flex justify-between items-start">
                 <div className="bg-[#4ade80]/10 p-2 rounded-lg text-[#006B4D]">
                   <Coins className="h-5 w-5" />
@@ -172,7 +177,10 @@ export default function Dashboard() {
             </div>
 
             {/* Total Expenses */}
-            <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between">
+            <div 
+              onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
+              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer hover:bg-green-50 active:bg-green-100 transition-colors"
+            >
               <div className="flex justify-between items-start">
                 <div className="bg-red-50 p-2 rounded-lg text-red-600">
                   <CreditCard className="h-5 w-5" />
@@ -215,7 +223,10 @@ export default function Dashboard() {
             </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {/* Total Collected - COCONUT */}
-            <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between">
+            <div 
+              onClick={() => navigate('/collections', { state: { tab: 'income' } })}
+              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer hover:bg-green-50 active:bg-green-100 transition-colors"
+            >
               <div className="flex justify-between items-start">
                 <div className="bg-[#4ade80]/15 p-2 rounded-lg text-[#006B4D]">
                   <TrendingUp className="h-5 w-5" />
@@ -232,7 +243,10 @@ export default function Dashboard() {
             </div>
 
             {/* Total Expenses - COCONUT */}
-            <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between">
+            <div 
+              onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
+              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer hover:bg-green-50 active:bg-green-100 transition-colors"
+            >
               <div className="flex justify-between items-start">
                 <div className="bg-red-50 p-2 rounded-lg text-red-600">
                   <Activity className="h-5 w-5" />

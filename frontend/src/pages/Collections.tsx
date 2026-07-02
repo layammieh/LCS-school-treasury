@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import { useSchoolYearStore } from '../store/schoolYearStore';
@@ -66,8 +67,19 @@ function normalizeCanteen(value?: string | null): CanteenName {
 export default function Collections() {
   const schoolYear = useSchoolYearStore(state => state.schoolYear);
   const isViewMode = useAuthStore(state => state.isViewMode);
+  const location = useLocation();
 
-  const [activeTab, setActiveTab] = useState<'income' | 'expenses'>('income');
+  const [activeTab, setActiveTab] = useState<'income' | 'expenses'>(
+    location.state?.tab === 'expenses' ? 'expenses' : 'income'
+  );
+
+  useEffect(() => {
+    if (location.state?.tab === 'expenses') {
+      setActiveTab('expenses');
+    } else if (location.state?.tab === 'income') {
+      setActiveTab('income');
+    }
+  }, [location.state]);
 
   /* ─────────────────── COMMON state ─────────────────── */
   const [error, setError] = useState('');
