@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 
 import { useSidebarStore } from '../store/sidebarStore';
+import { useAuthStore } from '../store/authStore';
 import {
   LayoutDashboard,
   Users,
@@ -21,6 +22,7 @@ export default function Sidebar({ activePage }: SidebarProps) {
 
   const isOpen = useSidebarStore(state => state.isOpen);
   const close = useSidebarStore(state => state.close);
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
@@ -83,18 +85,20 @@ export default function Sidebar({ activePage }: SidebarProps) {
         </div>
 
         {/* Sidebar Footer */}
-        <div className="border-t border-white/10 pt-4">
-          <Link
-            to="/settings"
-            className={`flex items-center space-x-3 px-3 py-2 rounded-lg font-semibold text-xs transition-colors ${activePage === 'settings'
-                ? 'text-[#003D29] bg-[#4ADE80]'
-                : 'text-gray-300 hover:text-white hover:bg-white/5'
-              }`}
-          >
-            <Settings className="h-4.5 w-4.5 shrink-0" />
-            <span>Settings</span>
-          </Link>
-        </div>
+        {isAuthenticated && (
+          <div className="border-t border-white/10 pt-4">
+            <Link
+              to="/settings"
+              className={`flex items-center space-x-3 px-3 py-2 rounded-lg font-semibold text-xs transition-colors ${activePage === 'settings'
+                  ? 'text-[#003D29] bg-[#4ADE80]'
+                  : 'text-gray-300 hover:text-white hover:bg-white/5'
+                }`}
+            >
+              <Settings className="h-4.5 w-4.5 shrink-0" />
+              <span>Settings</span>
+            </Link>
+          </div>
+        )}
       </aside>
     </>
   );
