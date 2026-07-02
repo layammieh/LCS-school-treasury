@@ -525,6 +525,7 @@ export default function Liquidation() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{ id: number; month: string } | null>(null);
+  const [filterMonth, setFilterMonth] = useState('');
 
   const loadData = async () => {
     try {
@@ -588,7 +589,9 @@ export default function Liquidation() {
     }
   };
 
-  const displayData = data;
+  const displayData = isViewMode && filterMonth 
+    ? data.filter(row => row.month === filterMonth) 
+    : data;
 
   const totalIncome    = displayData.reduce((s, r) => s + Number(r.income    || 0), 0);
   const totalExpenses  = displayData.reduce((s, r) => s + Number(r.expenses  || 0), 0);
@@ -620,8 +623,22 @@ export default function Liquidation() {
                   </button>
                 )}
 
-                {/* Add Month — hidden in public view mode */}
-                {!isViewMode && (
+                {/* Month Input — behaves as a Filter in public view, and Add Month in private view */}
+                {isViewMode ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="month"
+                      value={filterMonth}
+                      onChange={e => setFilterMonth(e.target.value)}
+                      className="flex-1 min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
+                    />
+                    {filterMonth && (
+                      <button onClick={() => setFilterMonth('')} className="text-sm font-semibold text-gray-500 hover:text-gray-700">
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                ) : (
                   <div className="flex items-center gap-2">
                     <input
                       type="month"
