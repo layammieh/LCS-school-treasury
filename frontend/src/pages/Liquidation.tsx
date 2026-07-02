@@ -10,6 +10,7 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import depedLogo from '../assets/deped_logo.png';
 import lumbiaLogo from '../assets/lumbia_logo.png';
+import { DeleteModal } from '../components/DeleteModal';
 
 // ── Currency formatter ──────────────────────────────────────────────
 function fmt(n: any): string {
@@ -522,6 +523,8 @@ export default function Liquidation() {
   const [errorMsg, setErrorMsg] = useState('');
   const [exportOpen, setExportOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{ id: number; month: string } | null>(null);
 
   const loadData = async () => {
     try {
@@ -565,21 +568,27 @@ export default function Liquidation() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Delete this month\'s record?')) return;
-    setDeletingId(id);
+  const requestDelete = (id: number, month: string) => {
+    setItemToDelete({ id, month });
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+    setDeletingId(itemToDelete.id);
     try {
-      await liquidationApi.delete(id);
+      await liquidationApi.delete(itemToDelete.id);
       loadData();
     } catch (err) {
       console.error(err);
     } finally {
       setDeletingId(null);
+      setDeleteModalOpen(false);
+      setItemToDelete(null);
     }
   };
 
-  // In public view mode, hide all data — liquidation records belong to the authenticated user only
-  const displayData = isViewMode ? [] : data;
+  const displayData = data;
 
   const totalIncome    = displayData.reduce((s, r) => s + Number(r.income    || 0), 0);
   const totalExpenses  = displayData.reduce((s, r) => s + Number(r.expenses  || 0), 0);
@@ -641,14 +650,6 @@ export default function Liquidation() {
               </div>
             )}
 
-            {/* Public view notice banner */}
-            {isViewMode && (
-              <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-lg">
-                <span className="text-base leading-tight">🔒</span>
-                <p>Liquidation records are only visible to authorized users. Please log in to view or manage this data.</p>
-              </div>
-            )}
-
             {/* ── Desktop / Tablet Table (sm and up) ── */}
             <div className="hidden sm:block bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
@@ -698,36 +699,48 @@ export default function Liquidation() {
                             {fmt(row.expenses)}
                           </td>
                           <td className="px-4 py-3 text-right">
-                            <input
-                              type="number" step="0.01"
-                              className="w-28 text-right border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
-                              value={row.cash_deposit || ''}
-                              onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, cash_deposit: Number(e.target.value) } : item))}
-                              onBlur={e => handleUpdate(row.id, 'cash_deposit', Number(e.target.value) || 0)}
-                            />
+                            {isViewMode ? (
+                              <span className="font-medium">{fmt(row.cash_deposit)}</span>
+                            ) : (
+                              <input
+                                type="number" step="0.01"
+                                className="w-28 text-right border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
+                                value={row.cash_deposit || ''}
+                                onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, cash_deposit: Number(e.target.value) } : item))}
+                                onBlur={e => handleUpdate(row.id, 'cash_deposit', Number(e.target.value) || 0)}
+                              />
+                            )}
                           </td>
                           <td className="px-4 py-3 text-right">
-                            <input
-                              type="number" step="0.01"
-                              className="w-28 text-right border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
-                              value={row.cash_withdrawn || ''}
-                              onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, cash_withdrawn: Number(e.target.value) } : item))}
-                              onBlur={e => handleUpdate(row.id, 'cash_withdrawn', Number(e.target.value) || 0)}
-                            />
+                            {isViewMode ? (
+                              <span className="font-medium">{fmt(row.cash_withdrawn)}</span>
+                            ) : (
+                              <input
+                                type="number" step="0.01"
+                                className="w-28 text-right border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
+                                value={row.cash_withdrawn || ''}
+                                onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, cash_withdrawn: Number(e.target.value) } : item))}
+                                onBlur={e => handleUpdate(row.id, 'cash_withdrawn', Number(e.target.value) || 0)}
+                              />
+                            )}
                           </td>
                           <td className="px-4 py-3">
-                            <input
-                              type="text" placeholder="Add remarks…"
-                              className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
-                              value={row.remarks || ''}
-                              onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, remarks: e.target.value } : item))}
-                              onBlur={e => handleUpdate(row.id, 'remarks', e.target.value)}
-                            />
+                            {isViewMode ? (
+                              <span className="text-gray-600">{row.remarks}</span>
+                            ) : (
+                              <input
+                                type="text" placeholder="Add remarks…"
+                                className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
+                                value={row.remarks || ''}
+                                onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, remarks: e.target.value } : item))}
+                                onBlur={e => handleUpdate(row.id, 'remarks', e.target.value)}
+                              />
+                            )}
                           </td>
                           {!isViewMode && (
                             <td className="px-4 py-3">
                               <button
-                                onClick={() => handleDelete(row.id)}
+                                onClick={() => requestDelete(row.id, row.month)}
                                 disabled={deletingId === row.id}
                                 className="text-gray-300 hover:text-red-500 transition-colors"
                                 title="Delete row"
@@ -788,7 +801,7 @@ export default function Liquidation() {
                         </span>
                         {!isViewMode && (
                           <button
-                            onClick={() => handleDelete(row.id)}
+                            onClick={() => requestDelete(row.id, row.month)}
                             disabled={deletingId === row.id}
                             className="text-gray-300 hover:text-red-500 transition-colors"
                             title="Delete row"
@@ -813,37 +826,49 @@ export default function Liquidation() {
                       {/* Cash Deposit */}
                       <div>
                         <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Cash Deposit</label>
-                        <input
-                          type="number" step="0.01"
-                          className="w-full text-right border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
-                          value={row.cash_deposit || ''}
-                          onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, cash_deposit: Number(e.target.value) } : item))}
-                          onBlur={e => handleUpdate(row.id, 'cash_deposit', Number(e.target.value) || 0)}
-                        />
+                        {isViewMode ? (
+                          <div className="w-full text-right bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium">{fmt(row.cash_deposit)}</div>
+                        ) : (
+                          <input
+                            type="number" step="0.01"
+                            className="w-full text-right border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
+                            value={row.cash_deposit || ''}
+                            onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, cash_deposit: Number(e.target.value) } : item))}
+                            onBlur={e => handleUpdate(row.id, 'cash_deposit', Number(e.target.value) || 0)}
+                          />
+                        )}
                       </div>
 
                       {/* Cash Withdrawn */}
                       <div>
                         <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Cash Withdrawn</label>
-                        <input
-                          type="number" step="0.01"
-                          className="w-full text-right border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
-                          value={row.cash_withdrawn || ''}
-                          onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, cash_withdrawn: Number(e.target.value) } : item))}
-                          onBlur={e => handleUpdate(row.id, 'cash_withdrawn', Number(e.target.value) || 0)}
-                        />
+                        {isViewMode ? (
+                          <div className="w-full text-right bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium">{fmt(row.cash_withdrawn)}</div>
+                        ) : (
+                          <input
+                            type="number" step="0.01"
+                            className="w-full text-right border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
+                            value={row.cash_withdrawn || ''}
+                            onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, cash_withdrawn: Number(e.target.value) } : item))}
+                            onBlur={e => handleUpdate(row.id, 'cash_withdrawn', Number(e.target.value) || 0)}
+                          />
+                        )}
                       </div>
 
                       {/* Remarks */}
                       <div>
                         <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">Remarks</label>
-                        <input
-                          type="text" placeholder="Add remarks…"
-                          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
-                          value={row.remarks || ''}
-                          onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, remarks: e.target.value } : item))}
-                          onBlur={e => handleUpdate(row.id, 'remarks', e.target.value)}
-                        />
+                        {isViewMode ? (
+                          <div className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 min-h-[38px]">{row.remarks || ''}</div>
+                        ) : (
+                          <input
+                            type="text" placeholder="Add remarks…"
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
+                            value={row.remarks || ''}
+                            onChange={e => setData(prev => prev.map(item => item.id === row.id ? { ...item, remarks: e.target.value } : item))}
+                            onBlur={e => handleUpdate(row.id, 'remarks', e.target.value)}
+                          />
+                        )}
                       </div>
                     </div>
                   ))}
@@ -891,6 +916,16 @@ export default function Liquidation() {
           schoolYear={schoolYear}
         />
       )}
+
+      <DeleteModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="Delete Liquidation Record"
+        message="Are you sure you want to delete the record for"
+        itemName={itemToDelete ? new Date(itemToDelete.month + '-01').toLocaleDateString('en-US', { month: 'long' }) : undefined}
+        isDeleting={deletingId !== null}
+      />
     </div>
   );
 }
