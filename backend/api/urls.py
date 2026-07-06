@@ -8,6 +8,7 @@ router.register(r'transactions', views.TransactionViewSet, basename='transaction
 router.register(r'expenses', views.ExpenseViewSet, basename='expense')
 router.register(r'revenue-recipients', views.RevenueRecipientViewSet, basename='revenue-recipient')
 router.register(r'liquidations', views.LiquidationViewSet, basename='liquidation')
+router.register(r'cash-on-bank', views.CashOnBankViewSet, basename='cash-on-bank')
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -18,5 +19,4 @@ urlpatterns = [
     path('auth/change-password/', views.change_password_view, name='change-password'),
     path('dashboard/', views.dashboard_stats, name='dashboard-stats'),
     path('fix-db/', views.fix_db, name='fix-db'),
-    path('cash-on-bank/', views.cash_on_bank_view, name='cash-on-bank'),
 ]

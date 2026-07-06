@@ -7,9 +7,9 @@ import {
   Plus, ChevronDown, Calendar, Layers, Coins, X,
   Pencil, Trash2, AlertCircle, Search, CreditCard, Loader2, Download
 } from 'lucide-react';
-import { transactionsApi, consigneesApi, expensesApi, cashOnBankApi } from '../lib/api';
+import { transactionsApi, consigneesApi, expensesApi, cashOnBankApi, dashboardApi } from '../lib/api';
 import type {
-  Transaction, CollectionSummary, Consignee, Expense, ExpenseSummary
+  Transaction, CollectionSummary, Consignee, Expense, ExpenseSummary, CashOnBankDeposit, DashboardStats
 } from '../lib/api';
 import { DeleteModal } from '../components/DeleteModal';
 import { useAuthStore } from '../store/authStore';
@@ -84,12 +84,15 @@ export default function Collections() {
   }, [location.state]);
 
   /* ─────────────────── CASH ON BANK state ─────────────────── */
-  const [cashOnBankAmount, setCashOnBankAmount] = useState(0);
+  const [cashOnBankDeposits, setCashOnBankDeposits] = useState<CashOnBankDeposit[]>([]);
+  const cashOnBankAmount = cashOnBankDeposits.reduce((acc, d) => acc + d.amount, 0);
   const [cashOnBankInput, setCashOnBankInput] = useState('');
+  const [cashOnBankDate, setCashOnBankDate] = useState(TODAY);
   const [loadingCashOnBank, setLoadingCashOnBank] = useState(false);
   const [savingCashOnBank, setSavingCashOnBank] = useState(false);
   const [cashOnBankSaved, setCashOnBankSaved] = useState(false);
   const [cashOnBankError, setCashOnBankError] = useState('');
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
 
   /* ─────────────────── COMMON state ─────────────────── */
   const [error, setError] = useState('');
@@ -226,9 +229,12 @@ export default function Collections() {
     setLoadingCashOnBank(true);
     setCashOnBankError('');
     try {
-      const res = await cashOnBankApi.get(schoolYear);
-      setCashOnBankAmount(res.amount);
-      setCashOnBankInput(res.amount > 0 ? String(res.amount) : '');
+      const [res, stats] = await Promise.all([
+        cashOnBankApi.list(schoolYear),
+        dashboardApi.getStats(schoolYear, '')
+      ]);
+      setCashOnBankDeposits(res.results || []);
+      setDashboardStats(stats);
     } catch (e: any) {
       setCashOnBankError(e.message || 'Failed to load cash on bank.');
     } finally {
@@ -238,18 +244,30 @@ export default function Collections() {
 
   async function handleSaveCashOnBank() {
     const amount = parseFloat(cashOnBankInput) || 0;
+    if (amount <= 0) return;
     setSavingCashOnBank(true);
     setCashOnBankError('');
     try {
-      const res = await cashOnBankApi.set(schoolYear, amount);
-      setCashOnBankAmount(res.amount);
-      setCashOnBankInput(String(res.amount));
+      await cashOnBankApi.create({ school_year: schoolYear, amount, date: cashOnBankDate });
+      setCashOnBankInput('');
+      setCashOnBankDate(TODAY);
       setCashOnBankSaved(true);
+      loadCashOnBank();
       setTimeout(() => setCashOnBankSaved(false), 2500);
     } catch (e: any) {
       setCashOnBankError(e.message || 'Failed to save.');
     } finally {
       setSavingCashOnBank(false);
+    }
+  }
+
+  async function handleDeleteCashOnBank(id: number) {
+    if (!confirm('Are you sure you want to delete this deposit?')) return;
+    try {
+      await cashOnBankApi.delete(id);
+      loadCashOnBank();
+    } catch (e: any) {
+      setCashOnBankError(e.message || 'Failed to delete deposit.');
     }
   }
 
@@ -1143,9 +1161,8 @@ export default function Collections() {
                   <div className="mt-4">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Balance (Canteen)</span>
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
-                      {loading ? '...' : formatCurrency((summary?.total_canteen ?? 0) - 0)}
+                      {loadingCashOnBank ? '...' : formatCurrency((dashboardStats?.total_collections ?? 0) - (dashboardStats?.total_expenses ?? 0))}
                     </p>
-                    <p className="text-[10px] text-gray-400 mt-1">income collected</p>
                   </div>
                 </div>
 
@@ -1160,61 +1177,126 @@ export default function Collections() {
                   <div className="mt-4">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Cash on Hand</span>
                     <p className={`text-2xl font-bold tracking-tight mt-0.5 ${
-                      (summary?.total_canteen ?? 0) - cashOnBankAmount >= 0 ? 'text-gray-900' : 'text-red-600'
+                      ((dashboardStats?.total_collections ?? 0) - (dashboardStats?.total_expenses ?? 0)) - cashOnBankAmount >= 0 ? 'text-gray-900' : 'text-red-600'
                     }`}>
-                      {loading || loadingCashOnBank ? '...' : formatCurrency((summary?.total_canteen ?? 0) - cashOnBankAmount)}
+                      {loadingCashOnBank ? '...' : formatCurrency(((dashboardStats?.total_collections ?? 0) - (dashboardStats?.total_expenses ?? 0)) - cashOnBankAmount)}
                     </p>
                     <p className="text-[10px] text-gray-400 mt-1">Total Balance − Cash on Bank</p>
                   </div>
                 </div>
               </div>
 
-              {/* Input section */}
-              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                <div className="max-w-md">
-                  <h3 className="text-sm font-bold text-gray-900 mb-1">Update Cash on Bank</h3>
-                  <p className="text-xs text-gray-500 mb-5">
-                    Enter the amount currently deposited in your bank account. This will be subtracted from the Total Balance to compute your Cash on Hand.
-                  </p>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Input section */}
+                <div className="lg:col-span-1">
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sticky top-6">
+                    <h3 className="text-sm font-bold text-gray-900 mb-1">Add Bank Deposit</h3>
+                    <p className="text-xs text-gray-500 mb-5">
+                      Record a new bank deposit.
+                    </p>
 
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Bank Balance (PHP)</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">₱</span>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Amount (PHP)</label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">₱</span>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={cashOnBankInput}
+                            onChange={e => setCashOnBankInput(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && handleSaveCashOnBank()}
+                            placeholder="0.00"
+                            className="w-full pl-8 pr-4 py-2.5 border border-gray-200 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Date Deposited</label>
                         <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={cashOnBankInput}
-                          onChange={e => setCashOnBankInput(e.target.value)}
-                          onKeyDown={e => e.key === 'Enter' && handleSaveCashOnBank()}
-                          placeholder="0.00"
-                          className="w-full pl-8 pr-4 py-2.5 border border-gray-200 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                          type="date"
+                          value={cashOnBankDate}
+                          onChange={e => setCashOnBankDate(e.target.value)}
+                          className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         />
                       </div>
-                    </div>
 
-                    <div className="flex items-center space-x-3">
-                      <button
-                        onClick={handleSaveCashOnBank}
-                        disabled={savingCashOnBank}
-                        className="flex items-center space-x-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors"
-                      >
-                        {savingCashOnBank ? (
-                          <svg className="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        ) : (
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                        )}
-                        <span>{savingCashOnBank ? 'Saving...' : 'Save Amount'}</span>
-                      </button>
+                      <div className="flex items-center space-x-3 pt-2">
+                        <button
+                          onClick={handleSaveCashOnBank}
+                          disabled={savingCashOnBank || !cashOnBankInput}
+                          className="flex items-center space-x-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors w-full justify-center"
+                        >
+                          {savingCashOnBank ? (
+                            <Loader2 className="animate-spin h-3.5 w-3.5" />
+                          ) : (
+                            <Plus className="h-3.5 w-3.5" />
+                          )}
+                          <span>{savingCashOnBank ? 'Saving...' : 'Add Deposit'}</span>
+                        </button>
+                      </div>
 
                       {cashOnBankSaved && (
-                        <span className="flex items-center space-x-1 text-emerald-600 text-xs font-semibold animate-pulse">
+                        <div className="flex items-center justify-center space-x-1 text-emerald-600 text-xs font-semibold animate-pulse">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                           <span>Saved successfully!</span>
-                        </span>
+                        </div>
                       )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Table section */}
+                <div className="lg:col-span-2">
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                      <h3 className="text-sm font-bold text-gray-800">Deposit History</h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-gray-50/80 border-b border-gray-200">
+                            <th className="px-5 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider w-1/3">Date Deposited</th>
+                            <th className="px-5 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider w-1/2 text-right">Amount</th>
+                            <th className="px-5 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider text-center w-1/6">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {loadingCashOnBank && cashOnBankDeposits.length === 0 ? (
+                            <tr>
+                              <td colSpan={3} className="px-5 py-10 text-center"><Loader2 className="w-5 h-5 animate-spin mx-auto text-gray-400" /></td>
+                            </tr>
+                          ) : cashOnBankDeposits.length === 0 ? (
+                            <tr>
+                              <td colSpan={3} className="px-5 py-10 text-center text-gray-400 text-xs">No bank deposits found for this school year.</td>
+                            </tr>
+                          ) : (
+                            cashOnBankDeposits.map((dep) => (
+                              <tr key={dep.id} className="hover:bg-blue-50/30 transition-colors">
+                                <td className="px-5 py-3 text-sm text-gray-600 font-medium">
+                                  {new Date(dep.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                                </td>
+                                <td className="px-5 py-3 text-sm font-bold text-gray-900 text-right">
+                                  {formatCurrency(dep.amount)}
+                                </td>
+                                <td className="px-5 py-3 text-center">
+                                  {!isViewMode && (
+                                    <button 
+                                      onClick={() => handleDeleteCashOnBank(dep.id)}
+                                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors inline-flex"
+                                      title="Delete deposit"
+                                    >
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>

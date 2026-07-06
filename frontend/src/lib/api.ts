@@ -399,17 +399,28 @@ export const liquidationApi = {
 // ---------------------------------------------------------------------------
 // Cash on Bank
 // ---------------------------------------------------------------------------
+export interface CashOnBankDeposit {
+  id: number;
+  school_year: string;
+  amount: number;
+  date: string;
+  updated_at: string;
+}
+
 export const cashOnBankApi = {
-  get: (schoolYear: string) => {
+  list: (schoolYear: string) => {
     const qs = new URLSearchParams();
     if (schoolYear) qs.set('school_year', schoolYear);
-    return request<{ amount: number }>(`/cash-on-bank/?${qs}`);
+    return request<PaginatedResponse<CashOnBankDeposit>>(`/cash-on-bank/?${qs}`);
   },
 
-  set: (schoolYear: string, amount: number) =>
-    request<{ amount: number }>('/cash-on-bank/', {
-      method: 'PUT',
-      body: JSON.stringify({ school_year: schoolYear, amount }),
+  create: (data: { school_year: string; amount: number; date: string }) =>
+    request<CashOnBankDeposit>('/cash-on-bank/', {
+      method: 'POST',
+      body: JSON.stringify(data),
     }),
+
+  delete: (id: number) =>
+    request<void>(`/cash-on-bank/${id}/`, { method: 'DELETE' }),
 };
 

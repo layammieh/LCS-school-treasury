@@ -64,8 +64,8 @@ export default function Dashboard() {
   }, [schoolYear, filterMonth]);
 
   useEffect(() => {
-    cashOnBankApi.get(schoolYear)
-      .then(res => setCashOnBank(res.amount))
+    cashOnBankApi.list(schoolYear)
+      .then(res => setCashOnBank(res.results.reduce((acc, d) => acc + d.amount, 0)))
       .catch(() => setCashOnBank(0));
   }, [schoolYear]);
 
@@ -163,7 +163,7 @@ export default function Dashboard() {
               <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Canteen</h3>
               <div className="flex-1 h-px bg-gray-200"></div>
             </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-5">
             {/* Total Income */}
             <div 
               onClick={() => navigate('/collections', { state: { tab: 'income' } })}
@@ -204,8 +204,8 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Total Balance - split into 2 columns */}
-            <div className="grid grid-cols-2 gap-5 md:col-span-2">
+            {/* Balances - split into 3 columns */}
+            <div className="grid grid-cols-3 gap-5 md:col-span-3">
               {/* Total Balance sub-card */}
               <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between group hover:bg-[#003D29] transition-colors">
                 <div className="flex justify-between items-start">
@@ -239,6 +239,26 @@ export default function Dashboard() {
                   </span>
                   <p className="text-xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
                     {loading ? '...' : formatCurrency(cashOnBank)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Cash on Hand sub-card */}
+              <div
+                onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
+                className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-emerald-600 active:bg-emerald-700 transition-colors"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="bg-emerald-50 p-2 rounded-lg text-emerald-600 group-hover:bg-emerald-500/30 group-hover:text-emerald-100 transition-colors">
+                    <Coins className="h-5 w-5" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-emerald-100 transition-colors">
+                    Cash on Hand
+                  </span>
+                  <p className="text-xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                    {loading ? '...' : formatCurrency(((stats?.total_collections ?? 0) - (stats?.total_expenses ?? 0)) - cashOnBank)}
                   </p>
                 </div>
               </div>
