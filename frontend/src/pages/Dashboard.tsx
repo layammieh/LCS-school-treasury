@@ -228,7 +228,7 @@ export default function Dashboard() {
               {/* Cash on Bank sub-card */}
               <div
                 onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
-                className="bg-white p-5 rounded-xl border border-blue-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-blue-600 active:bg-blue-700 transition-colors"
+                className="bg-white p-5 rounded-xl border border-blue-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#003D29] active:bg-[#002619] transition-colors"
               >
                 <div className="flex justify-between items-start">
                   <div className="bg-blue-50 p-2 rounded-lg text-blue-600 group-hover:bg-blue-500/30 group-hover:text-blue-100 transition-colors">
@@ -236,7 +236,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-blue-100 transition-colors">
+                  <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                     Cash on Bank
                   </span>
                   <p className="text-xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
@@ -248,7 +248,7 @@ export default function Dashboard() {
               {/* Cash on Hand sub-card */}
               <div
                 onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
-                className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-emerald-600 active:bg-emerald-700 transition-colors"
+                className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#003D29] active:bg-[#002619] transition-colors"
               >
                 <div className="flex justify-between items-start">
                   <div className="bg-emerald-50 p-2 rounded-lg text-emerald-600 group-hover:bg-emerald-500/30 group-hover:text-emerald-100 transition-colors">
@@ -256,7 +256,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-emerald-100 transition-colors">
+                  <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                     Cash on Hand
                   </span>
                   <p className="text-xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
