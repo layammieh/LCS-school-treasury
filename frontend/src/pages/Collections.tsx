@@ -94,6 +94,7 @@ export default function Collections() {
   const [savingCashOnBank, setSavingCashOnBank] = useState(false);
   const [cashOnBankSaved, setCashOnBankSaved] = useState(false);
   const [cashOnBankError, setCashOnBankError] = useState('');
+  const [editingCashOnBankId, setEditingCashOnBankId] = useState<number | null>(null);
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
 
   /* ─────────────────── COMMON state ─────────────────── */
@@ -250,9 +251,14 @@ export default function Collections() {
     setSavingCashOnBank(true);
     setCashOnBankError('');
     try {
-      await cashOnBankApi.create({ school_year: schoolYear, amount, date: cashOnBankDate });
+      if (editingCashOnBankId !== null) {
+        await cashOnBankApi.update(editingCashOnBankId, { school_year: schoolYear, amount, date: cashOnBankDate });
+      } else {
+        await cashOnBankApi.create({ school_year: schoolYear, amount, date: cashOnBankDate });
+      }
       setCashOnBankInput('');
       setCashOnBankDate(TODAY);
+      setEditingCashOnBankId(null);
       setCashOnBankSaved(true);
       loadCashOnBank();
       setTimeout(() => setCashOnBankSaved(false), 2500);
@@ -271,6 +277,13 @@ export default function Collections() {
     } catch (e: any) {
       setCashOnBankError(e.message || 'Failed to delete deposit.');
     }
+  }
+
+  function handleEditCashOnBank(dep: CashOnBankDeposit) {
+    setEditingCashOnBankId(dep.id);
+    setCashOnBankInput(String(dep.amount));
+    setCashOnBankDate(dep.date);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   useEffect(() => {
@@ -1192,9 +1205,11 @@ export default function Collections() {
                 {/* Input section */}
                 <div className="lg:col-span-1">
                   <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sticky top-6">
-                    <h3 className="text-sm font-bold text-gray-900 mb-1">Add Bank Deposit</h3>
+                    <h3 className="text-sm font-bold text-gray-900 mb-1">
+                      {editingCashOnBankId !== null ? 'Edit Bank Deposit' : 'Add Bank Deposit'}
+                    </h3>
                     <p className="text-xs text-gray-500 mb-5">
-                      Record a new bank deposit.
+                      {editingCashOnBankId !== null ? 'Update the details of the selected deposit.' : 'Record a new bank deposit.'}
                     </p>
 
                     <div className="space-y-4">
@@ -1226,17 +1241,31 @@ export default function Collections() {
                       </div>
 
                       <div className="flex items-center space-x-3 pt-2">
+                        {editingCashOnBankId !== null && (
+                          <button
+                            onClick={() => {
+                              setEditingCashOnBankId(null);
+                              setCashOnBankInput('');
+                              setCashOnBankDate(TODAY);
+                            }}
+                            className="px-4 py-2.5 border border-gray-200 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        )}
                         <button
                           onClick={handleSaveCashOnBank}
                           disabled={savingCashOnBank || !cashOnBankInput}
-                          className="flex items-center space-x-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors w-full justify-center"
+                          className="flex-1 flex items-center space-x-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors justify-center"
                         >
                           {savingCashOnBank ? (
                             <Loader2 className="animate-spin h-3.5 w-3.5" />
+                          ) : editingCashOnBankId !== null ? (
+                            <Pencil className="h-3.5 w-3.5" />
                           ) : (
                             <Plus className="h-3.5 w-3.5" />
                           )}
-                          <span>{savingCashOnBank ? 'Saving...' : 'Add Deposit'}</span>
+                          <span>{savingCashOnBank ? 'Saving...' : editingCashOnBankId !== null ? 'Save Changes' : 'Add Deposit'}</span>
                         </button>
                       </div>
 
@@ -1285,13 +1314,22 @@ export default function Collections() {
                                 </td>
                                 <td className="px-5 py-3 text-center">
                                   {!isViewMode && (
-                                    <button 
-                                      onClick={() => handleDeleteCashOnBank(dep.id)}
-                                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors inline-flex"
-                                      title="Delete deposit"
-                                    >
-                                      <Trash2 className="h-3.5 w-3.5" />
-                                    </button>
+                                    <div className="flex items-center justify-center space-x-1">
+                                      <button 
+                                        onClick={() => handleEditCashOnBank(dep)}
+                                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                                        title="Edit deposit"
+                                      >
+                                        <Pencil className="h-3.5 w-3.5" />
+                                      </button>
+                                      <button 
+                                        onClick={() => handleDeleteCashOnBank(dep.id)}
+                                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                        title="Delete deposit"
+                                      >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                      </button>
+                                    </div>
                                   )}
                                 </td>
                               </tr>

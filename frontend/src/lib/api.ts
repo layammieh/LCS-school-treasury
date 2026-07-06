@@ -420,6 +420,12 @@ export const cashOnBankApi = {
       body: JSON.stringify(data),
     }),
 
+  update: (id: number, data: { school_year: string; amount: number; date: string }) =>
+    request<CashOnBankDeposit>(`/cash-on-bank/${id}/`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
   delete: (id: number) =>
     request<void>(`/cash-on-bank/${id}/`, { method: 'DELETE' }),
 };
