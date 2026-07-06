@@ -20,8 +20,10 @@ import IncomePDFExport from '../components/IncomePDFExport';
 const COLLECTION_STATUSES = ['All Statuses', 'paid', 'unpaid', 'partial', 'overdue', 'pending'] as const;
 type CollectionStatusFilter = typeof COLLECTION_STATUSES[number];
 
-function formatCurrency(n: number) {
-  return n.toLocaleString('en-US', { style: 'currency', currency: 'PHP' });
+function formatCurrency(n: any) {
+  const num = Number(n);
+  if (isNaN(num)) return '₱0.00';
+  return num.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
 }
 
 function statusBadge(status: string) {
@@ -85,7 +87,7 @@ export default function Collections() {
 
   /* ─────────────────── CASH ON BANK state ─────────────────── */
   const [cashOnBankDeposits, setCashOnBankDeposits] = useState<CashOnBankDeposit[]>([]);
-  const cashOnBankAmount = cashOnBankDeposits.reduce((acc, d) => acc + d.amount, 0);
+  const cashOnBankAmount = cashOnBankDeposits.reduce((acc, d) => acc + Number(d.amount || 0), 0);
   const [cashOnBankInput, setCashOnBankInput] = useState('');
   const [cashOnBankDate, setCashOnBankDate] = useState(TODAY);
   const [loadingCashOnBank, setLoadingCashOnBank] = useState(false);
@@ -1161,7 +1163,7 @@ export default function Collections() {
                   <div className="mt-4">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Balance (Canteen)</span>
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
-                      {loadingCashOnBank ? '...' : formatCurrency((dashboardStats?.total_collections ?? 0) - (dashboardStats?.total_expenses ?? 0))}
+                      {loadingCashOnBank ? '...' : formatCurrency(Number(dashboardStats?.total_collections || 0) - Number(dashboardStats?.total_expenses || 0))}
                     </p>
                   </div>
                 </div>
@@ -1177,9 +1179,9 @@ export default function Collections() {
                   <div className="mt-4">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Cash on Hand</span>
                     <p className={`text-2xl font-bold tracking-tight mt-0.5 ${
-                      ((dashboardStats?.total_collections ?? 0) - (dashboardStats?.total_expenses ?? 0)) - cashOnBankAmount >= 0 ? 'text-gray-900' : 'text-red-600'
+                      (Number(dashboardStats?.total_collections || 0) - Number(dashboardStats?.total_expenses || 0)) - Number(cashOnBankAmount) >= 0 ? 'text-gray-900' : 'text-red-600'
                     }`}>
-                      {loadingCashOnBank ? '...' : formatCurrency(((dashboardStats?.total_collections ?? 0) - (dashboardStats?.total_expenses ?? 0)) - cashOnBankAmount)}
+                      {loadingCashOnBank ? '...' : formatCurrency((Number(dashboardStats?.total_collections || 0) - Number(dashboardStats?.total_expenses || 0)) - Number(cashOnBankAmount))}
                     </p>
                     <p className="text-[10px] text-gray-400 mt-1">Total Balance − Cash on Bank</p>
                   </div>

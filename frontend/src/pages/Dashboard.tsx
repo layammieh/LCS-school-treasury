@@ -19,8 +19,10 @@ import {
 import { dashboardApi, cashOnBankApi } from '../lib/api';
 import type { DashboardStats, Transaction } from '../lib/api';
 
-function formatCurrency(n: number) {
-  return n.toLocaleString('en-US', { style: 'currency', currency: 'PHP' });
+function formatCurrency(n: any) {
+  const num = Number(n);
+  if (isNaN(num)) return '₱0.00';
+  return num.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
 }
 
 function getStatusBadge(status: string) {
@@ -65,7 +67,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     cashOnBankApi.list(schoolYear)
-      .then(res => setCashOnBank(res.results.reduce((acc, d) => acc + d.amount, 0)))
+      .then(res => setCashOnBank(res.results.reduce((acc, d) => acc + Number(d.amount || 0), 0)))
       .catch(() => setCashOnBank(0));
   }, [schoolYear]);
 
@@ -218,7 +220,7 @@ export default function Dashboard() {
                     Total Balance{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                   </span>
                   <p className="text-xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                    {loading ? '...' : formatCurrency((stats?.total_collections ?? 0) - (stats?.total_expenses ?? 0))}
+                    {loading ? '...' : formatCurrency(Number(stats?.total_collections || 0) - Number(stats?.total_expenses || 0))}
                   </p>
                 </div>
               </div>
@@ -258,7 +260,7 @@ export default function Dashboard() {
                     Cash on Hand
                   </span>
                   <p className="text-xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                    {loading ? '...' : formatCurrency(((stats?.total_collections ?? 0) - (stats?.total_expenses ?? 0)) - cashOnBank)}
+                    {loading ? '...' : formatCurrency((Number(stats?.total_collections || 0) - Number(stats?.total_expenses || 0)) - Number(cashOnBank))}
                   </p>
                 </div>
               </div>
