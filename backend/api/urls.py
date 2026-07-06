@@ -18,4 +18,5 @@ urlpatterns = [
     path('auth/change-password/', views.change_password_view, name='change-password'),
     path('dashboard/', views.dashboard_stats, name='dashboard-stats'),
     path('fix-db/', views.fix_db, name='fix-db'),
+    path('cash-on-bank/', views.cash_on_bank_view, name='cash-on-bank'),
 ]

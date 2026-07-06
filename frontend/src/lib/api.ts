@@ -395,3 +395,21 @@ export const liquidationApi = {
   delete: (id: number) =>
     request<void>(`/liquidations/${id}/`, { method: 'DELETE' }),
 };
+
+// ---------------------------------------------------------------------------
+// Cash on Bank
+// ---------------------------------------------------------------------------
+export const cashOnBankApi = {
+  get: (schoolYear: string) => {
+    const qs = new URLSearchParams();
+    if (schoolYear) qs.set('school_year', schoolYear);
+    return request<{ amount: number }>(`/cash-on-bank/?${qs}`);
+  },
+
+  set: (schoolYear: string, amount: number) =>
+    request<{ amount: number }>('/cash-on-bank/', {
+      method: 'PUT',
+      body: JSON.stringify({ school_year: schoolYear, amount }),
+    }),
+};
+

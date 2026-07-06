@@ -13,9 +13,10 @@ import {
   ChevronDown,
   Loader2,
   TrendingUp,
-  Activity
+  Activity,
+  Landmark
 } from 'lucide-react';
-import { dashboardApi } from '../lib/api';
+import { dashboardApi, cashOnBankApi } from '../lib/api';
 import type { DashboardStats, Transaction } from '../lib/api';
 
 function formatCurrency(n: number) {
@@ -42,6 +43,7 @@ export default function Dashboard() {
   const [filterMonth, setFilterMonth] = useState('');
   const [showMonthPicker, setShowMonthPicker] = useState(false);
   const monthPickerRef = useRef<HTMLDivElement>(null);
+  const [cashOnBank, setCashOnBank] = useState(0);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -60,6 +62,12 @@ export default function Dashboard() {
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [schoolYear, filterMonth]);
+
+  useEffect(() => {
+    cashOnBankApi.get(schoolYear)
+      .then(res => setCashOnBank(res.amount))
+      .catch(() => setCashOnBank(0));
+  }, [schoolYear]);
 
   // Build SVG chart path from monthly data
   const buildChartPath = (data: { revenue: number; expenses: number }[], key: 'revenue' | 'expenses') => {
@@ -155,7 +163,7 @@ export default function Dashboard() {
               <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Canteen</h3>
               <div className="flex-1 h-px bg-gray-200"></div>
             </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
             {/* Total Income */}
             <div 
               onClick={() => navigate('/collections', { state: { tab: 'income' } })}
@@ -196,20 +204,43 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Total Balance */}
-            <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between group hover:bg-[#003D29] transition-colors">
-              <div className="flex justify-between items-start">
-                <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">
-                  <Wallet className="h-5 w-5" />
+            {/* Total Balance - split into 2 columns */}
+            <div className="grid grid-cols-2 gap-5 md:col-span-2">
+              {/* Total Balance sub-card */}
+              <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between group hover:bg-[#003D29] transition-colors">
+                <div className="flex justify-between items-start">
+                  <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">
+                    <Wallet className="h-5 w-5" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
+                    Total Balance{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                  </span>
+                  <p className="text-xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                    {loading ? '...' : formatCurrency((stats?.total_collections ?? 0) - (stats?.total_expenses ?? 0))}
+                  </p>
                 </div>
               </div>
-              <div className="mt-4">
-                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
-                  Total Balance - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
-                </span>
-                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                  {loading ? '...' : formatCurrency((stats?.total_collections ?? 0) - (stats?.total_expenses ?? 0))}
-                </p>
+
+              {/* Cash on Bank sub-card */}
+              <div
+                onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
+                className="bg-white p-5 rounded-xl border border-blue-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-blue-600 active:bg-blue-700 transition-colors"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="bg-blue-50 p-2 rounded-lg text-blue-600 group-hover:bg-blue-500/30 group-hover:text-blue-100 transition-colors">
+                    <Landmark className="h-5 w-5" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-blue-100 transition-colors">
+                    Cash on Bank
+                  </span>
+                  <p className="text-xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                    {loading ? '...' : formatCurrency(cashOnBank)}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

@@ -10,8 +10,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 
-from .models import Consignee, Transaction, Expense, RevenueRecipient, Liquidation
-from .serializers import ConsigneeSerializer, TransactionSerializer, ExpenseSerializer, RevenueRecipientSerializer, LiquidationSerializer
+from .models import Consignee, Transaction, Expense, RevenueRecipient, Liquidation, CashOnBank
+from .serializers import ConsigneeSerializer, TransactionSerializer, ExpenseSerializer, RevenueRecipientSerializer, LiquidationSerializer, CashOnBankSerializer
 
 
 # ---------------------------------------------------------------------------
@@ -729,3 +729,35 @@ class LiquidationViewSet(viewsets.ModelViewSet):
             serializer.save(user=self.request.user)
         except IntegrityError:
             raise ValidationError({"detail": "This month already exists for this school year."})
+
+
+# ---------------------------------------------------------------------------
+# Cash on Bank
+# ---------------------------------------------------------------------------
+
+@api_view(['GET', 'PUT'])
+@permission_classes([IsAuthenticated])
+def cash_on_bank_view(request):
+    """
+    GET  /cash-on-bank/?school_year=2026-2027  → returns { amount: float }
+    PUT  /cash-on-bank/                         → body { school_year, amount } → upserts and returns { amount: float }
+    """
+    school_year = request.query_params.get('school_year') or request.data.get('school_year', '2026-2027')
+
+    if request.method == 'GET':
+        obj = CashOnBank.objects.filter(user=request.user, school_year=school_year).first()
+        return Response({'amount': float(obj.amount) if obj else 0.0})
+
+    # PUT
+    amount = request.data.get('amount', 0)
+    try:
+        amount = float(amount)
+    except (TypeError, ValueError):
+        return Response({'error': 'Invalid amount.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    obj, _ = CashOnBank.objects.update_or_create(
+        user=request.user,
+        school_year=school_year,
+        defaults={'amount': amount}
+    )
+    return Response({'amount': float(obj.amount)})

@@ -7,7 +7,7 @@ import {
   Plus, ChevronDown, Calendar, Layers, Coins, X,
   Pencil, Trash2, AlertCircle, Search, CreditCard, Loader2, Download
 } from 'lucide-react';
-import { transactionsApi, consigneesApi, expensesApi } from '../lib/api';
+import { transactionsApi, consigneesApi, expensesApi, cashOnBankApi } from '../lib/api';
 import type {
   Transaction, CollectionSummary, Consignee, Expense, ExpenseSummary
 } from '../lib/api';
@@ -69,8 +69,8 @@ export default function Collections() {
   const isViewMode = useAuthStore(state => state.isViewMode);
   const location = useLocation();
 
-  const [activeTab, setActiveTab] = useState<'income' | 'expenses'>(
-    location.state?.tab === 'expenses' ? 'expenses' : 'income'
+  const [activeTab, setActiveTab] = useState<'income' | 'expenses' | 'cash-on-bank'>(
+    location.state?.tab === 'expenses' ? 'expenses' : location.state?.tab === 'cash-on-bank' ? 'cash-on-bank' : 'income'
   );
 
   useEffect(() => {
@@ -78,8 +78,18 @@ export default function Collections() {
       setActiveTab('expenses');
     } else if (location.state?.tab === 'income') {
       setActiveTab('income');
+    } else if (location.state?.tab === 'cash-on-bank') {
+      setActiveTab('cash-on-bank');
     }
   }, [location.state]);
+
+  /* ─────────────────── CASH ON BANK state ─────────────────── */
+  const [cashOnBankAmount, setCashOnBankAmount] = useState(0);
+  const [cashOnBankInput, setCashOnBankInput] = useState('');
+  const [loadingCashOnBank, setLoadingCashOnBank] = useState(false);
+  const [savingCashOnBank, setSavingCashOnBank] = useState(false);
+  const [cashOnBankSaved, setCashOnBankSaved] = useState(false);
+  const [cashOnBankError, setCashOnBankError] = useState('');
 
   /* ─────────────────── COMMON state ─────────────────── */
   const [error, setError] = useState('');
@@ -201,14 +211,47 @@ export default function Collections() {
   useEffect(() => {
     if (activeTab === 'income') {
       loadData(page, filterDate, filterStatus, filterMonth, searchDebounceText);
-    } else {
+    } else if (activeTab === 'expenses') {
       loadExpensesData(expensePage, expenseFilterDate, expenseFilterMonth, expenseSearchDebounceText);
+    } else if (activeTab === 'cash-on-bank') {
+      loadCashOnBank();
     }
   }, [
     activeTab, schoolYear,
     page, filterDate, filterStatus, filterMonth, searchDebounceText,
     expensePage, expenseFilterDate, expenseFilterMonth, expenseSearchDebounceText
   ]);
+
+  async function loadCashOnBank() {
+    setLoadingCashOnBank(true);
+    setCashOnBankError('');
+    try {
+      const res = await cashOnBankApi.get(schoolYear);
+      setCashOnBankAmount(res.amount);
+      setCashOnBankInput(res.amount > 0 ? String(res.amount) : '');
+    } catch (e: any) {
+      setCashOnBankError(e.message || 'Failed to load cash on bank.');
+    } finally {
+      setLoadingCashOnBank(false);
+    }
+  }
+
+  async function handleSaveCashOnBank() {
+    const amount = parseFloat(cashOnBankInput) || 0;
+    setSavingCashOnBank(true);
+    setCashOnBankError('');
+    try {
+      const res = await cashOnBankApi.set(schoolYear, amount);
+      setCashOnBankAmount(res.amount);
+      setCashOnBankInput(String(res.amount));
+      setCashOnBankSaved(true);
+      setTimeout(() => setCashOnBankSaved(false), 2500);
+    } catch (e: any) {
+      setCashOnBankError(e.message || 'Failed to save.');
+    } finally {
+      setSavingCashOnBank(false);
+    }
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -494,7 +537,7 @@ export default function Collections() {
                   <span>Export PDF</span>
                 </button>
               )}
-              {!isViewMode && (
+              {!isViewMode && activeTab !== 'cash-on-bank' && (
                 <>
                   {activeTab === 'income' ? (
                     <button
@@ -533,6 +576,13 @@ export default function Collections() {
                 }`}
             >
               Expenses
+            </button>
+            <button
+              onClick={() => setActiveTab('cash-on-bank')}
+              className={`pb-3 text-sm font-bold tracking-tight transition-colors border-b-2 ${activeTab === 'cash-on-bank' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+            >
+              Cash on Bank
             </button>
           </div>
 
@@ -1056,6 +1106,121 @@ export default function Collections() {
             </div>
           )}
 
+          {/* ================= CASH ON BANK VIEW ================= */}
+          {activeTab === 'cash-on-bank' && (
+            <div className="space-y-6">
+              {cashOnBankError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 text-xs font-semibold px-4 py-3 rounded-lg">{cashOnBankError}</div>
+              )}
+
+              {/* Info cards row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Cash on Bank card */}
+                <div className="bg-white p-5 rounded-xl border-2 border-blue-200 shadow-sm flex flex-col justify-between">
+                  <div className="flex justify-between items-start">
+                    <div className="bg-blue-50 p-2 rounded-lg text-blue-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                    </div>
+                    <span className="text-[9px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Bank</span>
+                  </div>
+                  <div className="mt-4">
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Current Cash on Bank</span>
+                    <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
+                      {loadingCashOnBank ? '...' : formatCurrency(cashOnBankAmount)}
+                    </p>
+                    <p className="text-[10px] text-gray-400 mt-1">for {schoolYear}</p>
+                  </div>
+                </div>
+
+                {/* Total Balance card */}
+                <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
+                  <div className="flex justify-between items-start">
+                    <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    </div>
+                    <span className="text-[9px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Canteen</span>
+                  </div>
+                  <div className="mt-4">
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Balance (Canteen)</span>
+                    <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
+                      {loading ? '...' : formatCurrency((summary?.total_canteen ?? 0) - 0)}
+                    </p>
+                    <p className="text-[10px] text-gray-400 mt-1">income collected</p>
+                  </div>
+                </div>
+
+                {/* Cash on Hand card */}
+                <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
+                  <div className="flex justify-between items-start">
+                    <div className="bg-emerald-50 p-2 rounded-lg text-emerald-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-wider">On Hand</span>
+                  </div>
+                  <div className="mt-4">
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Cash on Hand</span>
+                    <p className={`text-2xl font-bold tracking-tight mt-0.5 ${
+                      (summary?.total_canteen ?? 0) - cashOnBankAmount >= 0 ? 'text-gray-900' : 'text-red-600'
+                    }`}>
+                      {loading || loadingCashOnBank ? '...' : formatCurrency((summary?.total_canteen ?? 0) - cashOnBankAmount)}
+                    </p>
+                    <p className="text-[10px] text-gray-400 mt-1">Total Balance − Cash on Bank</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Input section */}
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                <div className="max-w-md">
+                  <h3 className="text-sm font-bold text-gray-900 mb-1">Update Cash on Bank</h3>
+                  <p className="text-xs text-gray-500 mb-5">
+                    Enter the amount currently deposited in your bank account. This will be subtracted from the Total Balance to compute your Cash on Hand.
+                  </p>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Bank Balance (PHP)</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">₱</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={cashOnBankInput}
+                          onChange={e => setCashOnBankInput(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && handleSaveCashOnBank()}
+                          placeholder="0.00"
+                          className="w-full pl-8 pr-4 py-2.5 border border-gray-200 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={handleSaveCashOnBank}
+                        disabled={savingCashOnBank}
+                        className="flex items-center space-x-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors"
+                      >
+                        {savingCashOnBank ? (
+                          <svg className="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        ) : (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                        )}
+                        <span>{savingCashOnBank ? 'Saving...' : 'Save Amount'}</span>
+                      </button>
+
+                      {cashOnBankSaved && (
+                        <span className="flex items-center space-x-1 text-emerald-600 text-xs font-semibold animate-pulse">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                          <span>Saved successfully!</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* ══════════════ INCOME MODAL ══════════════ */}
           {showModal && (

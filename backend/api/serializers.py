@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Consignee, Transaction, Expense, RevenueRecipient, Liquidation
+from .models import Consignee, Transaction, Expense, RevenueRecipient, Liquidation, CashOnBank
 
 
 class ConsigneeSerializer(serializers.ModelSerializer):
@@ -83,3 +83,15 @@ class LiquidationSerializer(serializers.ModelSerializer):
             return total or 0
         except Exception:
             return 0
+
+
+class CashOnBankSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CashOnBank
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['user'].required = False
+        self.fields['school_year'].required = False
+
