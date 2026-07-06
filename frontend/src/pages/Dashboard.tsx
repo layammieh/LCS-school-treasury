@@ -169,7 +169,7 @@ export default function Dashboard() {
             {/* Total Income */}
             <div 
               onClick={() => navigate('/collections', { state: { tab: 'income' } })}
-              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#003D29] active:bg-[#002619] transition-colors"
+              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
             >
               <div className="flex justify-between items-start">
                 <div className="bg-[#4ade80]/10 p-2 rounded-lg text-[#006B4D] group-hover:bg-[#4ade80]/20 group-hover:text-[#4ade80] transition-colors">
@@ -189,7 +189,7 @@ export default function Dashboard() {
             {/* Total Expenses */}
             <div 
               onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
-              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#003D29] active:bg-[#002619] transition-colors"
+              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
             >
               <div className="flex justify-between items-start">
                 <div className="bg-red-50 p-2 rounded-lg text-red-600 group-hover:bg-red-500/20 group-hover:text-red-400 transition-colors">
@@ -209,7 +209,7 @@ export default function Dashboard() {
             {/* Balances - split into 3 columns */}
             <div className="grid grid-cols-3 gap-5 md:col-span-3">
               {/* Total Balance sub-card */}
-              <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between group hover:bg-[#003D29] transition-colors">
+              <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between group hover:bg-[#006B4D] transition-colors">
                 <div className="flex justify-between items-start">
                   <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">
                     <Wallet className="h-5 w-5" />
@@ -219,7 +219,7 @@ export default function Dashboard() {
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                     Total Balance{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                   </span>
-                  <p className="text-xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                  <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
                     {loading ? '...' : formatCurrency(Number(stats?.total_collections || 0) - Number(stats?.total_expenses || 0))}
                   </p>
                 </div>
@@ -228,7 +228,7 @@ export default function Dashboard() {
               {/* Cash on Bank sub-card */}
               <div
                 onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
-                className="bg-white p-5 rounded-xl border border-blue-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#003D29] active:bg-[#002619] transition-colors"
+                className="bg-white p-5 rounded-xl border border-blue-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
               >
                 <div className="flex justify-between items-start">
                   <div className="bg-blue-50 p-2 rounded-lg text-blue-600 group-hover:bg-blue-500/30 group-hover:text-blue-100 transition-colors">
@@ -239,7 +239,7 @@ export default function Dashboard() {
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                     Cash on Bank
                   </span>
-                  <p className="text-xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                  <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
                     {loading ? '...' : formatCurrency(cashOnBank)}
                   </p>
                 </div>
@@ -248,7 +248,7 @@ export default function Dashboard() {
               {/* Cash on Hand sub-card */}
               <div
                 onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
-                className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#003D29] active:bg-[#002619] transition-colors"
+                className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
               >
                 <div className="flex justify-between items-start">
                   <div className="bg-emerald-50 p-2 rounded-lg text-emerald-600 group-hover:bg-emerald-500/30 group-hover:text-emerald-100 transition-colors">
@@ -259,7 +259,7 @@ export default function Dashboard() {
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                     Cash on Hand
                   </span>
-                  <p className="text-xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                  <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
                     {loading ? '...' : formatCurrency((Number(stats?.total_collections || 0) - Number(stats?.total_expenses || 0)) - Number(cashOnBank))}
                   </p>
                 </div>
@@ -278,7 +278,7 @@ export default function Dashboard() {
             {/* Total Collected - COCONUT */}
             <div 
               onClick={() => navigate('/collections', { state: { tab: 'income' } })}
-              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#003D29] active:bg-[#002619] transition-colors"
+              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
             >
               <div className="flex justify-between items-start">
                 <div className="bg-[#4ade80]/15 p-2 rounded-lg text-[#006B4D] group-hover:bg-[#4ade80]/20 group-hover:text-[#4ade80] transition-colors">
@@ -298,7 +298,7 @@ export default function Dashboard() {
             {/* Total Expenses - COCONUT */}
             <div 
               onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
-              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#003D29] active:bg-[#002619] transition-colors"
+              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
             >
               <div className="flex justify-between items-start">
                 <div className="bg-red-50 p-2 rounded-lg text-red-600 group-hover:bg-red-500/20 group-hover:text-red-400 transition-colors">
@@ -318,7 +318,7 @@ export default function Dashboard() {
             {/* Total Balance - COCONUT */}
             <div 
               onClick={() => navigate('/collections', { state: { tab: 'balance' } })}
-              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#003D29] active:bg-[#002619] transition-colors"
+              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
             >
               <div className="flex justify-between items-start">
                 <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">
