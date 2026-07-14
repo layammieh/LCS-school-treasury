@@ -327,13 +327,23 @@ def dashboard_stats(request):
     
     coconut_balance = total_coconut_collections - total_coconut_expenses
 
-    canteen_cash_return = CashReturn.objects.filter(
+    canteen_cash_return_qs = CashReturn.objects.filter(
         user=request.user, school_year=school_year, type='Canteen'
-    ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
+    )
+    if month_filter:
+        parts = month_filter.split('-')
+        if len(parts) == 2:
+            canteen_cash_return_qs = canteen_cash_return_qs.filter(date__year=parts[0], date__month=parts[1])
+    canteen_cash_return = canteen_cash_return_qs.aggregate(total=Sum('amount'))['total'] or Decimal('0')
 
-    coconut_cash_return = CashReturn.objects.filter(
+    coconut_cash_return_qs = CashReturn.objects.filter(
         user=request.user, school_year=school_year, type='Coconut'
-    ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
+    )
+    if month_filter:
+        parts = month_filter.split('-')
+        if len(parts) == 2:
+            coconut_cash_return_qs = coconut_cash_return_qs.filter(date__year=parts[0], date__month=parts[1])
+    coconut_cash_return = coconut_cash_return_qs.aggregate(total=Sum('amount'))['total'] or Decimal('0')
 
     return Response({
         'total_collections': float(total_collected),
@@ -754,6 +764,11 @@ class CashOnBankViewSet(viewsets.ModelViewSet):
         school_year = self.request.query_params.get('school_year')
         if school_year:
             qs = qs.filter(school_year=school_year)
+        month_filter = self.request.query_params.get('month')
+        if month_filter:
+            parts = month_filter.split('-')
+            if len(parts) == 2:
+                qs = qs.filter(date__year=parts[0], date__month=parts[1])
         return qs.order_by('-date', '-updated_at')
 
     def perform_create(self, serializer):

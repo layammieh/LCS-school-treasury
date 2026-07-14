@@ -59,17 +59,17 @@ export default function Dashboard() {
 
   useEffect(() => {
     setLoading(true);
-    dashboardApi.getStats(schoolYear, filterMonth)
-      .then(setStats)
+    Promise.all([
+      dashboardApi.getStats(schoolYear, filterMonth),
+      cashOnBankApi.list(schoolYear, filterMonth)
+    ])
+      .then(([statsRes, cobRes]) => {
+        setStats(statsRes);
+        setCashOnBank(cobRes.results.reduce((acc, d) => acc + Number(d.amount || 0), 0));
+      })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [schoolYear, filterMonth]);
-
-  useEffect(() => {
-    cashOnBankApi.list(schoolYear)
-      .then(res => setCashOnBank(res.results.reduce((acc, d) => acc + Number(d.amount || 0), 0)))
-      .catch(() => setCashOnBank(0));
-  }, [schoolYear]);
 
   // Build SVG chart path from monthly data
   const buildChartPath = (data: { revenue: number; expenses: number }[], key: 'revenue' | 'expenses') => {

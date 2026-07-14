@@ -410,9 +410,10 @@ export interface CashOnBankDeposit {
 }
 
 export const cashOnBankApi = {
-  list: (schoolYear: string) => {
+  list: (schoolYear: string, month?: string) => {
     const qs = new URLSearchParams();
     if (schoolYear) qs.set('school_year', schoolYear);
+    if (month) qs.set('month', month);
     return request<PaginatedResponse<CashOnBankDeposit>>(`/cash-on-bank/?${qs}`);
   },
 
