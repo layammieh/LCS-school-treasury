@@ -942,16 +942,7 @@ export default function Collections() {
                       )}
                     </div>
 
-                    {selectedIds.size > 0 && (
-                      <>
-                        <button onClick={handleBulkPaid} className="px-3 py-1.5 border border-primary/20 text-[#006B4D] hover:bg-[#006B4D]/5 text-xs font-bold rounded-lg transition-colors">
-                          Mark Paid ({selectedIds.size})
-                        </button>
-                        <button onClick={handleBulkDelete} className="px-3 py-1.5 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold rounded-lg transition-colors">
-                          Delete All ({selectedIds.size})
-                        </button>
-                      </>
-                    )}
+
                   </div>
                 </div>
 
@@ -961,30 +952,15 @@ export default function Collections() {
                     <div className="bg-gray-50 border-b border-gray-200 rounded-t-xl overflow-hidden">
                       <table className="w-full table-fixed text-left border-collapse">
                         <colgroup>
-                          <col style={{ width: '80px' }} />
-                          <col style={{ width: '25%' }} />
+                          <col style={{ width: '30%' }} />
                           <col style={{ width: '20%' }} />
-                          <col style={{ width: '25%' }} />
+                          <col style={{ width: '20%' }} />
                           <col style={{ width: '15%' }} />
                           <col style={{ width: '15%' }} />
                         </colgroup>
                         <thead>
                           <tr className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                            <th className="pl-[56px] pr-2 py-3 text-center">
-                              {!isViewMode && (
-                                <input
-                                  type="checkbox"
-                                  className="rounded text-[#006B4D] focus:ring-[#006B4D]"
-                                  checked={transactions.length > 0 && transactions.every(t => selectedIds.has(t.id))}
-                                  onChange={e => setSelectedIds(prev => {
-                                    const next = new Set(prev);
-                                    transactions.forEach(t => e.target.checked ? next.add(t.id) : next.delete(t.id));
-                                    return next;
-                                  })}
-                                />
-                              )}
-                            </th>
-                            <th className="pl-[56px] pr-4 py-3 text-left">Consignee</th>
+                            <th className="pl-8 pr-4 py-3 text-left">Consignee</th>
                             <th className="px-4 py-3 text-right">Amount</th>
                             <th className="px-4 py-3 text-center">Date</th>
                             <th className="px-4 py-3 text-center">Status</th>
@@ -998,10 +974,9 @@ export default function Collections() {
                     <div className="overflow-y-auto max-h-[400px]">
                       <table className="w-full table-fixed text-left border-collapse">
                         <colgroup>
-                          <col style={{ width: '80px' }} />
-                          <col style={{ width: '25%' }} />
+                          <col style={{ width: '30%' }} />
                           <col style={{ width: '20%' }} />
-                          <col style={{ width: '25%' }} />
+                          <col style={{ width: '20%' }} />
                           <col style={{ width: '15%' }} />
                           <col style={{ width: '15%' }} />
                         </colgroup>
@@ -1019,13 +994,8 @@ export default function Collections() {
                             </tr>
                           ) : (
                             transactions.map(txn => (
-                              <tr key={txn.id} className={`${selectedIds.has(txn.id) ? 'bg-green-50/40' : 'hover:bg-gray-50/50'} transition-colors`}>
-                                <td className="pl-[56px] pr-2 py-3">
-                                  {!isViewMode && (
-                                    <input type="checkbox" checked={selectedIds.has(txn.id)} onChange={() => toggleSelect(txn.id)} className="rounded text-[#006B4D] focus:ring-[#006B4D]" />
-                                  )}
-                                </td>
-                                <td className="px-4 py-3 w-[25%]">
+                              <tr key={txn.id} className="hover:bg-gray-50/50 transition-colors">
+                                <td className="pl-8 pr-4 py-3 w-[30%]">
                                   <div className="flex items-center space-x-2">
                                     <div className="w-8 h-8 rounded-full bg-emerald-50 text-[#006B4D] flex items-center justify-center font-bold text-[11px] shrink-0">
                                       {txn.student_initials || txn.student_name?.slice(0, 2).toUpperCase()}
@@ -1034,7 +1004,7 @@ export default function Collections() {
                                   </div>
                                 </td>
                                 <td className="px-4 py-3 w-[20%] text-right font-bold text-gray-800 whitespace-nowrap">{formatCurrency(txn.amount)}</td>
-                                <td className="px-4 py-3 w-[25%] text-center text-gray-500 font-medium text-[11px]">
+                                <td className="px-4 py-3 w-[20%] text-center text-gray-500 font-medium text-[11px]">
                                   {new Date(txn.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                 </td>
                                 <td className="px-4 py-3 w-[15%] text-center">
