@@ -334,8 +334,12 @@ export default function Collections() {
   async function loadCashReturn(p = 1, date?: string, month?: string, search?: string) {
     setLoadingCashReturn(true);
     try {
-      const res = await cashReturnApi.list({ schoolYear, page: p, date, month, search });
+      const [res, stats] = await Promise.all([
+        cashReturnApi.list({ schoolYear, page: p, date, month, search }),
+        dashboardApi.getStats(schoolYear, month || '')
+      ]);
       setCashReturnDeposits(res.results || []);
+      setDashboardStats(stats);
     } catch (e: any) {
       setError(e.message || 'Failed to load cash return.');
     } finally {
