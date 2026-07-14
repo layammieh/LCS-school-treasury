@@ -150,7 +150,6 @@ export default function Collections() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [summary, setSummary] = useState<CollectionSummary | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [page, setPage] = useState(1);
 
   const [showModal, setShowModal] = useState(false);
@@ -469,35 +468,6 @@ export default function Collections() {
     setConsigneeQuery(c.vendor_name);
     setForm(prev => ({ ...prev, consignee_name: c.vendor_name, canteen: normalizeCanteen(c.stall_no) }));
     setShowSuggestions(false);
-  }
-
-  function toggleSelect(id: number) {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  }
-
-  async function handleBulkPaid() {
-    if (!selectedIds.size) return;
-    await transactionsApi.bulkPaid(Array.from(selectedIds));
-    setSelectedIds(new Set());
-    loadData(page, filterDate, filterStatus, filterMonth, searchDebounceText);
-  }
-
-  async function handleBulkDelete() {
-    if (!selectedIds.size) return;
-    if (window.confirm(`Are you sure you want to delete ${selectedIds.size} selected payment(s)?`)) {
-      try {
-        await transactionsApi.bulkDelete(Array.from(selectedIds));
-        setSelectedIds(new Set());
-        setPage(1);
-        loadData(1, filterDate, filterStatus, filterMonth, searchDebounceText);
-      } catch (e: any) {
-        setError(e.message || 'Failed to delete payments.');
-      }
-    }
   }
 
   async function handleSaveIncome() {
