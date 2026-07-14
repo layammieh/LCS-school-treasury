@@ -1199,9 +1199,10 @@ export default function Collections() {
                     <div className="bg-gray-50 border-b border-gray-200 rounded-t-xl overflow-hidden">
                       <table className="w-full table-fixed text-left border-collapse">
                         <colgroup>
-                          <col style={{ width: '25%' }} />
                           <col style={{ width: '20%' }} />
-                          <col style={{ width: '20%' }} />
+                          <col style={{ width: '15%' }} />
+                          <col style={{ width: '15%' }} />
+                          <col style={{ width: '15%' }} />
                           <col style={{ width: '15%' }} />
                           <col style={{ width: '10%' }} />
                           <col style={{ width: '10%' }} />
@@ -1209,6 +1210,7 @@ export default function Collections() {
                         <thead>
                           <tr className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                             <th className="pl-8 pr-4 py-3 text-left">Expense Name</th>
+                            <th className="px-4 py-3 text-center">Type</th>
                             <th className="px-4 py-3 text-left">Requested By</th>
                             <th className="px-4 py-3 text-left">Reason</th>
                             <th className="px-4 py-3 text-center">Date</th>
@@ -1223,9 +1225,10 @@ export default function Collections() {
                     <div className="overflow-y-auto max-h-[400px]">
                       <table className="w-full table-fixed text-left border-collapse">
                         <colgroup>
-                          <col style={{ width: '25%' }} />
                           <col style={{ width: '20%' }} />
-                          <col style={{ width: '20%' }} />
+                          <col style={{ width: '15%' }} />
+                          <col style={{ width: '15%' }} />
+                          <col style={{ width: '15%' }} />
                           <col style={{ width: '15%' }} />
                           <col style={{ width: '10%' }} />
                           <col style={{ width: '10%' }} />
@@ -1245,15 +1248,32 @@ export default function Collections() {
                           ) : (
                             expenses.map(exp => {
                               const isExpanded = expandedExpenseIds.has(exp.id);
+                              let displayName = exp.name;
+                              let expType = '';
+                              if (displayName.endsWith(' (Coconut)')) {
+                                expType = 'Coconut';
+                                displayName = displayName.replace(' (Coconut)', '');
+                              } else if (displayName.endsWith(' (Canteen)')) {
+                                expType = 'Canteen';
+                                displayName = displayName.replace(' (Canteen)', '');
+                              } else {
+                                expType = 'Canteen';
+                              }
+
                               return (
                               <tr key={exp.id} onClick={() => toggleExpenseExpand(exp.id)} className="hover:bg-gray-50/50 transition-colors cursor-pointer">
-                                <td className="pl-8 pr-4 py-3 w-[25%]">
-                                  <span className={`font-bold text-gray-800 ${isExpanded ? 'whitespace-normal break-words block' : 'truncate block'}`}>{exp.name}</span>
+                                <td className="pl-8 pr-4 py-3 w-[20%]">
+                                  <span className={`font-bold text-gray-800 ${isExpanded ? 'whitespace-normal break-words block' : 'truncate block'}`}>{displayName}</span>
                                 </td>
-                                <td className="px-4 py-3 w-[20%]">
+                                <td className="px-4 py-3 w-[15%] text-center">
+                                  <span className={`inline-block px-2 py-1 text-[10px] font-bold rounded-full ${expType === 'Canteen' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'}`}>
+                                    {expType}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-3 w-[15%]">
                                   <span className={`text-gray-700 ${isExpanded ? 'whitespace-normal break-words block' : 'truncate block'}`}>{exp.requested_by || '-'}</span>
                                 </td>
-                                <td className="px-4 py-3 w-[20%]">
+                                <td className="px-4 py-3 w-[15%]">
                                   <span className={`text-gray-600 ${isExpanded ? 'whitespace-normal break-words block' : 'truncate block'}`} title={exp.reason || ''}>{exp.reason || '-'}</span>
                                 </td>
                                 <td className="px-4 py-3 w-[15%] text-center text-gray-500 font-medium text-[11px]">
