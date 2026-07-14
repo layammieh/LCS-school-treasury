@@ -238,7 +238,7 @@ export default function Dashboard() {
                 </div>
                 <div className="mt-4">
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
-                    Cash on Bank
+                    Cash on Bank{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                   </span>
                   <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
                     {loading ? '...' : formatCurrency(cashOnBank)}
@@ -278,7 +278,7 @@ export default function Dashboard() {
                 </div>
                 <div className="mt-4">
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
-                    Cash on Hand
+                    Cash on Hand - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                   </span>
                   <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
                     {loading ? '...' : formatCurrency((Number(stats?.total_collections || 0) - Number(stats?.total_expenses || 0) + Number(stats?.canteen_cash_return || 0)) - Number(cashOnBank))}
@@ -368,7 +368,7 @@ export default function Dashboard() {
               </div>
               <div className="mt-4">
                 <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
-                  Cash Return
+                  Cash Return - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                 </span>
                 <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
                   {loading ? '...' : formatCurrency(stats?.coconut_cash_return ?? 0)}
