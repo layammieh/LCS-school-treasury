@@ -111,7 +111,6 @@ export default function Collections() {
 
   /* ─────────────────── CASH RETURN state ─────────────────── */
   const [cashReturnDeposits, setCashReturnDeposits] = useState<CashReturnDeposit[]>([]);
-  const cashReturnAmount = cashReturnDeposits.reduce((acc, d) => acc + Number(d.amount || 0), 0);
   const [loadingCashReturn, setLoadingCashReturn] = useState(false);
   const [cashReturnPage, setCashReturnPage] = useState(1);
   const [showCashReturnModal, setShowCashReturnModal] = useState(false);
@@ -143,7 +142,7 @@ export default function Collections() {
   const [error, setError] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
-  const [deleteItemType, setDeleteItemType] = useState<'income' | 'expense'>('income');
+  const [deleteItemType, setDeleteItemType] = useState<'income' | 'expense' | 'cash-return'>('income');
   const [deleteItemName, setDeleteItemName] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -384,18 +383,7 @@ export default function Collections() {
     }
   }
 
-  async function handleDeleteCashReturn(id: number) {
-    setIsDeleting(true);
-    try {
-      await cashReturnApi.delete(id);
-      loadCashReturn(cashReturnPage, cashReturnFilterDate, cashReturnFilterMonth, cashReturnSearchDebounceText);
-      setDeleteModalOpen(false);
-    } catch (e: any) {
-      setError(e.message || 'Failed to delete cash return entry.');
-    } finally {
-      setIsDeleting(false);
-    }
-  }
+
 
   function handleEditCashReturn(dep: CashReturnDeposit) {
     setEditingCashReturnId(dep.id);
@@ -431,6 +419,14 @@ export default function Collections() {
     }, 300);
     return () => clearTimeout(timer);
   }, [expenseSearchQuery]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCashReturnSearchDebounceText(cashReturnSearchQuery);
+      setCashReturnPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [cashReturnSearchQuery]);
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -634,7 +630,7 @@ export default function Collections() {
 
 
   /* ─────────────────── COMMON actions ─────────────────── */
-  function openDeleteModal(id: number, name: string, type: 'income' | 'expense') {
+  function openDeleteModal(id: number, name: string, type: 'income' | 'expense' | 'cash-return') {
     setDeleteItemId(id);
     setDeleteItemName(name);
     setDeleteItemType(type);
@@ -649,10 +645,14 @@ export default function Collections() {
         await transactionsApi.delete(deleteItemId);
         setPage(1);
         loadData(1, filterDate, filterStatus, filterMonth, searchDebounceText);
-      } else {
+      } else if (deleteItemType === 'expense') {
         await expensesApi.delete(deleteItemId);
         setExpensePage(1);
         loadExpensesData(1, expenseFilterDate, expenseFilterMonth, expenseSearchDebounceText);
+      } else if (deleteItemType === 'cash-return') {
+        await cashReturnApi.delete(deleteItemId);
+        setCashReturnPage(1);
+        loadCashReturn(1, cashReturnFilterDate, cashReturnFilterMonth, cashReturnSearchDebounceText);
       }
       setDeleteModalOpen(false);
       setDeleteItemId(null);
@@ -1933,7 +1933,6 @@ export default function Collections() {
                   </button>
                 </div>
               </div>
-            </div>
             </div>
           )}
 
