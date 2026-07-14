@@ -55,6 +55,13 @@ const EMPTY_EXPENSE_FORM = {
   reason: '',
 };
 
+const EMPTY_CASH_RETURN_FORM = {
+  returned_by: '',
+  amount: '',
+  date: TODAY,
+  reason: '',
+};
+
 const CANTEENS = ['Canteen 1', 'Canteen 2'] as const;
 type CanteenName = typeof CANTEENS[number];
 
@@ -105,13 +112,32 @@ export default function Collections() {
   /* ─────────────────── CASH RETURN state ─────────────────── */
   const [cashReturnDeposits, setCashReturnDeposits] = useState<CashReturnDeposit[]>([]);
   const cashReturnAmount = cashReturnDeposits.reduce((acc, d) => acc + Number(d.amount || 0), 0);
-  const [cashReturnInput, setCashReturnInput] = useState('');
-  const [cashReturnDate, setCashReturnDate] = useState(TODAY);
   const [loadingCashReturn, setLoadingCashReturn] = useState(false);
-  const [savingCashReturn, setSavingCashReturn] = useState(false);
-  const [cashReturnSaved, setCashReturnSaved] = useState(false);
-  const [cashReturnError, setCashReturnError] = useState('');
+  const [cashReturnPage, setCashReturnPage] = useState(1);
+  const [showCashReturnModal, setShowCashReturnModal] = useState(false);
+  const [cashReturnModalTab, setCashReturnModalTab] = useState<'Canteen' | 'Coconut'>('Canteen');
+  const [cashReturnForm, setCashReturnForm] = useState(EMPTY_CASH_RETURN_FORM);
   const [editingCashReturnId, setEditingCashReturnId] = useState<number | null>(null);
+  
+  const [cashReturnFilterDate, setCashReturnFilterDate] = useState('');
+  const [showCashReturnDatePicker, setShowCashReturnDatePicker] = useState(false);
+  const [cashReturnFilterMonth, setCashReturnFilterMonth] = useState('');
+  const [showCashReturnMonthPicker, setShowCashReturnMonthPicker] = useState(false);
+  const cashReturnDatePickerRef = useRef<HTMLDivElement>(null);
+  const cashReturnMonthPickerRef = useRef<HTMLDivElement>(null);
+
+  const [cashReturnSearchQuery, setCashReturnSearchQuery] = useState('');
+  const [cashReturnSearchDebounceText, setCashReturnSearchDebounceText] = useState('');
+  const [expandedCashReturnIds, setExpandedCashReturnIds] = useState<Set<number>>(new Set());
+
+  const toggleCashReturnExpand = (id: number) => {
+    setExpandedCashReturnIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   /* ─────────────────── COMMON state ─────────────────── */
   const [error, setError] = useState('');
@@ -238,12 +264,13 @@ export default function Collections() {
     } else if (activeTab === 'cash-on-bank') {
       loadCashOnBank();
     } else if (activeTab === 'cash-return') {
-      loadCashReturn();
+      loadCashReturn(cashReturnPage, cashReturnFilterDate, cashReturnFilterMonth, cashReturnSearchDebounceText);
     }
   }, [
     activeTab, schoolYear,
     page, filterDate, filterStatus, filterMonth, searchDebounceText,
-    expensePage, expenseFilterDate, expenseFilterMonth, expenseSearchDebounceText
+    expensePage, expenseFilterDate, expenseFilterMonth, expenseSearchDebounceText,
+    cashReturnPage, cashReturnFilterDate, cashReturnFilterMonth, cashReturnSearchDebounceText
   ]);
 
   async function loadCashOnBank() {
@@ -305,58 +332,88 @@ export default function Collections() {
   }
 
   /* ─────────────────── CASH RETURN helpers ─────────────────── */
-  async function loadCashReturn() {
+  async function loadCashReturn(p = 1, date?: string, month?: string, search?: string) {
     setLoadingCashReturn(true);
-    setCashReturnError('');
     try {
-      const res = await cashReturnApi.list(schoolYear);
+      const res = await cashReturnApi.list({ schoolYear, page: p, date, month, search });
       setCashReturnDeposits(res.results || []);
     } catch (e: any) {
-      setCashReturnError(e.message || 'Failed to load cash return.');
+      setError(e.message || 'Failed to load cash return.');
     } finally {
       setLoadingCashReturn(false);
     }
   }
 
+  function applyCashReturnFilters(date: string, month: string = '') {
+    setCashReturnPage(1);
+    loadCashReturn(1, date, month, cashReturnSearchDebounceText);
+  }
+
   async function handleSaveCashReturn() {
-    const amount = parseFloat(cashReturnInput) || 0;
-    if (amount <= 0) return;
-    setSavingCashReturn(true);
-    setCashReturnError('');
+    const amount = parseFloat(cashReturnForm.amount) || 0;
+    if (amount <= 0 || !cashReturnForm.returned_by.trim()) {
+      setError('Please provide a valid amount and returned by name.');
+      return;
+    }
+    setSaving(true);
+    setError('');
+    
+    const data = {
+      school_year: schoolYear,
+      returned_by: cashReturnForm.returned_by.trim(),
+      type: cashReturnModalTab,
+      amount: amount,
+      date: cashReturnForm.date,
+      reason: cashReturnForm.reason?.trim() || undefined,
+    };
+
     try {
       if (editingCashReturnId !== null) {
-        await cashReturnApi.update(editingCashReturnId, { school_year: schoolYear, amount, date: cashReturnDate });
+        await cashReturnApi.update(editingCashReturnId, data);
       } else {
-        await cashReturnApi.create({ school_year: schoolYear, amount, date: cashReturnDate });
+        await cashReturnApi.create(data);
       }
-      setCashReturnInput('');
-      setCashReturnDate(TODAY);
+      setShowCashReturnModal(false);
       setEditingCashReturnId(null);
-      setCashReturnSaved(true);
-      loadCashReturn();
-      setTimeout(() => setCashReturnSaved(false), 2500);
+      setCashReturnForm(EMPTY_CASH_RETURN_FORM);
+      loadCashReturn(cashReturnPage, cashReturnFilterDate, cashReturnFilterMonth, cashReturnSearchDebounceText);
     } catch (e: any) {
-      setCashReturnError(e.message || 'Failed to save.');
+      setError(e.message || 'Failed to save cash return.');
     } finally {
-      setSavingCashReturn(false);
+      setSaving(false);
     }
   }
 
   async function handleDeleteCashReturn(id: number) {
-    if (!confirm('Are you sure you want to delete this cash return entry?')) return;
+    setIsDeleting(true);
     try {
       await cashReturnApi.delete(id);
-      loadCashReturn();
+      loadCashReturn(cashReturnPage, cashReturnFilterDate, cashReturnFilterMonth, cashReturnSearchDebounceText);
+      setDeleteModalOpen(false);
     } catch (e: any) {
-      setCashReturnError(e.message || 'Failed to delete cash return entry.');
+      setError(e.message || 'Failed to delete cash return entry.');
+    } finally {
+      setIsDeleting(false);
     }
   }
 
   function handleEditCashReturn(dep: CashReturnDeposit) {
     setEditingCashReturnId(dep.id);
-    setCashReturnInput(String(dep.amount));
-    setCashReturnDate(dep.date);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setCashReturnModalTab(dep.type as 'Canteen' | 'Coconut');
+    setCashReturnForm({
+      returned_by: dep.returned_by,
+      amount: String(dep.amount),
+      date: dep.date,
+      reason: dep.reason || '',
+    });
+    setShowCashReturnModal(true);
+  }
+
+  function openCreateCashReturnModal() {
+    setEditingCashReturnId(null);
+    setCashReturnForm(EMPTY_CASH_RETURN_FORM);
+    setCashReturnModalTab('Canteen');
+    setShowCashReturnModal(true);
   }
 
   useEffect(() => {
@@ -653,7 +710,7 @@ export default function Collections() {
                       <Plus className="h-3.5 w-3.5" />
                       <span>Record New Payment</span>
                     </button>
-                  ) : (
+                  ) : activeTab === 'expenses' ? (
                     <button
                       onClick={openCreateExpenseModal}
                       className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition-colors"
@@ -661,7 +718,15 @@ export default function Collections() {
                       <Plus className="h-3.5 w-3.5" />
                       <span>Record New Expense</span>
                     </button>
-                  )}
+                  ) : activeTab === 'cash-return' ? (
+                    <button
+                      onClick={openCreateCashReturnModal}
+                      className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg transition-colors"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      <span>Record New Cash Return</span>
+                    </button>
+                  ) : null}
                 </>
               )}
             </div>
@@ -1426,178 +1491,218 @@ export default function Collections() {
 
           {/* ================= CASH RETURN VIEW ================= */}
           {activeTab === 'cash-return' && (
-            <div className="space-y-6">
-              {cashReturnError && (
-                <div className="bg-red-50 border border-red-200 text-red-700 text-xs font-semibold px-4 py-3 rounded-lg">{cashReturnError}</div>
-              )}
-
-              {/* Info cards row */}
+            <div className="space-y-5">
+              {/* Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Cash Return card */}
-                <div className="bg-white p-5 rounded-xl border-2 border-amber-200 shadow-sm flex flex-col justify-between">
+                <div className="bg-white p-5 rounded-xl border border-amber-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="bg-amber-50 p-2 rounded-lg text-amber-600">
-                      <Coins className="h-5 w-5" />
-                    </div>
-                    <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Coconut</span>
+                    <div className="bg-amber-50 p-2 rounded-lg text-amber-600"><Coins className="h-5 w-5" /></div>
+                    <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Canteen</span>
                   </div>
                   <div className="mt-4">
-                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Cash Return</span>
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Cash Return - CANTEEN</span>
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
-                      {loadingCashReturn ? '...' : formatCurrency(cashReturnAmount)}
+                      {loadingCashReturn ? '...' : formatCurrency(dashboardStats?.canteen_cash_return ?? 0)}
                     </p>
-                    <p className="text-[10px] text-gray-400 mt-1">for {schoolYear}</p>
                   </div>
                 </div>
 
-                {/* Coconut Balance card */}
-                <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
+                <div className="bg-white p-5 rounded-xl border border-amber-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                    </div>
-                    <span className="text-[9px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Coconut</span>
+                    <div className="bg-amber-50 p-2 rounded-lg text-amber-600"><Coins className="h-5 w-5" /></div>
+                    <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Coconut</span>
                   </div>
                   <div className="mt-4">
-                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Cash Return added here contribute to Total Balance - Coconut on dashboard</span>
-                    <p className="text-[10px] text-gray-500 mt-1">Total Balance - Coconut = Coconut Collections − Expenses + Cash Return</p>
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Cash Return - COCONUT</span>
+                    <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
+                      {loadingCashReturn ? '...' : formatCurrency(dashboardStats?.coconut_cash_return ?? 0)}
+                    </p>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Input section */}
-                <div className="lg:col-span-1">
-                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sticky top-6">
-                    <h3 className="text-sm font-bold text-gray-900 mb-1">
-                      {editingCashReturnId !== null ? 'Edit Cash Return Entry' : 'Add Cash Return'}
-                    </h3>
-                    <p className="text-xs text-gray-500 mb-5">
-                      {editingCashReturnId !== null ? 'Update the selected cash return entry.' : 'Record a new cash return for the coconut fund.'}
-                    </p>
+              {/* Cash Return table */}
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col min-h-[240px]">
+                <div className="px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100/40 rounded-t-xl bg-white">
+                  <div className="flex items-center space-x-3">
+                    <h3 className="text-sm font-bold text-gray-900">All Cash Returns</h3>
+                    <span className="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full hidden sm:inline-block">
+                      {cashReturnDeposits.length} entries
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-3 flex-wrap gap-y-2">
+                    {/* Search Input */}
+                    <div className="relative">
+                      <Search className="absolute left-2.5 top-1.5 h-3.5 w-3.5 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="Search returns..."
+                        value={cashReturnSearchQuery}
+                        onChange={(e) => setCashReturnSearchQuery(e.target.value)}
+                        className="pl-8 pr-3 py-1.5 bg-white border border-slate-200/60 text-xs text-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 w-32 sm:w-48"
+                      />
+                    </div>
 
-                    <div className="space-y-4">
-                      <div>
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Amount (PHP)</label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">₱</span>
+                    {/* Date dropdown */}
+                    <div className="relative" ref={cashReturnDatePickerRef}>
+                      <button
+                        onClick={() => { setShowCashReturnDatePicker(v => !v); setShowCashReturnMonthPicker(false); }}
+                        className={`flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${cashReturnFilterDate ? 'bg-amber-500 text-white border-amber-500' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-150'
+                          }`}
+                      >
+                        <Calendar className="h-3.5 w-3.5" />
+                        <span>{cashReturnFilterDate
+                          ? new Date(cashReturnFilterDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                          : 'All Dates'}
+                        </span>
+                        <ChevronDown className="h-3 w-3" />
+                      </button>
+                      {showCashReturnDatePicker && (
+                        <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-30 p-4 w-64">
+                          <div className="flex justify-between items-center mb-3">
+                            <span className="text-xs font-bold text-gray-700">Select Date</span>
+                            {cashReturnFilterDate && (
+                              <button
+                                onClick={() => { setCashReturnFilterDate(''); setShowCashReturnDatePicker(false); applyCashReturnFilters(''); }}
+                                className="text-[10px] text-red-500 hover:text-red-700 font-semibold"
+                              >Clear</button>
+                            )}
+                          </div>
                           <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={cashReturnInput}
-                            onChange={e => setCashReturnInput(e.target.value)}
-                            onKeyDown={e => e.key === 'Enter' && handleSaveCashReturn()}
-                            placeholder="0.00"
-                            className="w-full pl-8 pr-4 py-2.5 border border-gray-200 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors"
+                            type="date"
+                            value={cashReturnFilterDate}
+                            onChange={e => { setCashReturnFilterDate(e.target.value); setShowCashReturnDatePicker(false); applyCashReturnFilters(e.target.value); }}
+                            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-amber-500"
                           />
                         </div>
-                      </div>
+                      )}
+                    </div>
 
-                      <div>
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Date</label>
-                        <input
-                          type="date"
-                          value={cashReturnDate}
-                          onChange={e => setCashReturnDate(e.target.value)}
-                          className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors"
-                        />
-                      </div>
-
-                      <div className="flex items-center space-x-3 pt-2">
-                        {editingCashReturnId !== null && (
-                          <button
-                            onClick={() => {
-                              setEditingCashReturnId(null);
-                              setCashReturnInput('');
-                              setCashReturnDate(TODAY);
+                    {/* Month dropdown */}
+                    <div className="relative" ref={cashReturnMonthPickerRef}>
+                      <button
+                        onClick={() => { setShowCashReturnMonthPicker(v => !v); setShowCashReturnDatePicker(false); }}
+                        className={`flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${cashReturnFilterMonth ? 'bg-amber-500 text-white border-amber-500' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-150'
+                          }`}
+                      >
+                        <Calendar className="h-3.5 w-3.5" />
+                        <span>{cashReturnFilterMonth
+                          ? new Date(cashReturnFilterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                          : 'All Months'}
+                        </span>
+                        <ChevronDown className="h-3 w-3" />
+                      </button>
+                      {showCashReturnMonthPicker && (
+                        <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-30 p-4 w-64">
+                          <div className="flex justify-between items-center mb-3">
+                            <span className="text-xs font-bold text-gray-700">Select Month</span>
+                            {cashReturnFilterMonth && (
+                              <button
+                                onClick={() => { setCashReturnFilterMonth(''); setShowCashReturnMonthPicker(false); applyCashReturnFilters(cashReturnFilterDate, ''); }}
+                                className="text-[10px] text-red-500 hover:text-red-700 font-semibold"
+                              >Clear</button>
+                            )}
+                          </div>
+                          <input
+                            type="month"
+                            value={cashReturnFilterMonth}
+                            onChange={e => {
+                              setCashReturnFilterMonth(e.target.value);
+                              setCashReturnFilterDate('');
+                              setShowCashReturnMonthPicker(false);
+                              applyCashReturnFilters('', e.target.value);
                             }}
-                            className="px-4 py-2.5 border border-gray-200 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50 transition-colors"
-                          >
-                            Cancel
-                          </button>
-                        )}
-                        <button
-                          onClick={handleSaveCashReturn}
-                          disabled={savingCashReturn || !cashReturnInput}
-                          className="flex-1 flex items-center space-x-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors justify-center"
-                        >
-                          {savingCashReturn ? (
-                            <Loader2 className="animate-spin h-3.5 w-3.5" />
-                          ) : editingCashReturnId !== null ? (
-                            <Pencil className="h-3.5 w-3.5" />
-                          ) : (
-                            <Plus className="h-3.5 w-3.5" />
-                          )}
-                          <span>{savingCashReturn ? 'Saving...' : editingCashReturnId !== null ? 'Save Changes' : 'Add Entry'}</span>
-                        </button>
-                      </div>
-
-                      {cashReturnSaved && (
-                        <div className="flex items-center justify-center space-x-1 text-emerald-600 text-xs font-semibold animate-pulse">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                          <span>Saved successfully!</span>
+                            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                          />
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
 
-                {/* Table section */}
-                <div className="lg:col-span-2">
-                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                    <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                      <h3 className="text-sm font-bold text-gray-800">Cash Return History</h3>
-                    </div>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse">
+                <div className="overflow-x-auto w-full">
+                  <div className="min-w-[800px]">
+                    {/* Fixed header */}
+                    <div className="bg-gray-50 border-b border-gray-200 rounded-t-xl overflow-hidden">
+                      <table className="w-full table-fixed text-left border-collapse">
+                        <colgroup>
+                          <col style={{ width: '25%' }} />
+                          <col style={{ width: '20%' }} />
+                          <col style={{ width: '15%' }} />
+                          <col style={{ width: '15%' }} />
+                          <col style={{ width: '10%' }} />
+                          <col style={{ width: '15%' }} />
+                        </colgroup>
                         <thead>
-                          <tr className="bg-gray-50/80 border-b border-gray-200">
-                            <th className="px-5 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider w-1/3">Date</th>
-                            <th className="px-5 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider w-1/2 text-right">Amount</th>
-                            <th className="px-5 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider text-center w-1/6">Actions</th>
+                          <tr className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                            <th className="pl-8 pr-4 py-3 text-left">Returned By</th>
+                            <th className="px-4 py-3 text-left">Reason</th>
+                            <th className="px-4 py-3 text-center">Type</th>
+                            <th className="px-4 py-3 text-center">Date</th>
+                            <th className="px-4 py-3 text-right">Amount</th>
+                            <th className="px-4 py-3 text-center">Actions</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                      </table>
+                    </div>
+
+                    {/* Scrollable body */}
+                    <div className="overflow-y-auto max-h-[400px]">
+                      <table className="w-full table-fixed text-left border-collapse">
+                        <colgroup>
+                          <col style={{ width: '25%' }} />
+                          <col style={{ width: '20%' }} />
+                          <col style={{ width: '15%' }} />
+                          <col style={{ width: '15%' }} />
+                          <col style={{ width: '10%' }} />
+                          <col style={{ width: '15%' }} />
+                        </colgroup>
+                        <tbody className={`divide-y divide-slate-200 text-xs ${loadingCashReturn && cashReturnDeposits.length > 0 ? 'opacity-50 pointer-events-none transition-opacity' : ''}`}>
                           {loadingCashReturn && cashReturnDeposits.length === 0 ? (
-                            <tr>
-                              <td colSpan={3} className="px-5 py-10 text-center"><Loader2 className="w-5 h-5 animate-spin mx-auto text-gray-400" /></td>
-                            </tr>
+                            <tr><td colSpan={6} className="px-4 py-10 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" /></td></tr>
                           ) : cashReturnDeposits.length === 0 ? (
                             <tr>
-                              <td colSpan={3} className="px-5 py-10 text-center text-gray-400 text-xs">No cash return entries found for this school year.</td>
+                              <td colSpan={6} className="px-4 py-12 text-center h-28">
+                                <div className="min-h-28 flex flex-col items-center justify-center space-y-2 text-gray-400">
+                                  <Coins className="h-7 w-7 opacity-30" />
+                                  <p className="text-xs font-semibold">No cash returns recorded</p>
+                                </div>
+                              </td>
                             </tr>
                           ) : (
-                            cashReturnDeposits.map((dep) => (
-                              <tr key={dep.id} className="hover:bg-amber-50/30 transition-colors">
-                                <td className="px-5 py-3 text-sm text-gray-600 font-medium">
-                                  {new Date(dep.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                            cashReturnDeposits.map(dep => {
+                              const isExpanded = expandedCashReturnIds.has(dep.id);
+                              return (
+                              <tr key={dep.id} onClick={() => toggleCashReturnExpand(dep.id)} className="hover:bg-amber-50/30 transition-colors cursor-pointer">
+                                <td className="pl-8 pr-4 py-3 w-[25%]">
+                                  <span className={`font-bold text-gray-800 ${isExpanded ? 'whitespace-normal break-words block' : 'truncate block'}`}>{dep.returned_by}</span>
                                 </td>
-                                <td className="px-5 py-3 text-sm font-bold text-gray-900 text-right">
-                                  {formatCurrency(dep.amount)}
+                                <td className="px-4 py-3 w-[20%]">
+                                  <span className={`text-gray-600 ${isExpanded ? 'whitespace-normal break-words block' : 'truncate block'}`} title={dep.reason || ''}>{dep.reason || '-'}</span>
                                 </td>
-                                <td className="px-5 py-3 text-center">
+                                <td className="px-4 py-3 w-[15%] text-center">
+                                  <span className={`inline-block px-2 py-1 text-[10px] font-bold rounded-full ${dep.type === 'Canteen' ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700'}`}>
+                                    {dep.type}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-3 w-[15%] text-center text-gray-500 font-medium text-[11px]">
+                                  {new Date(dep.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                </td>
+                                <td className="px-4 py-3 w-[10%] text-right font-bold text-amber-600 whitespace-nowrap">{formatCurrency(dep.amount)}</td>
+                                <td className="px-4 py-3 w-[15%] text-center" onClick={(e) => e.stopPropagation()}>
                                   {!isViewMode && (
                                     <div className="flex items-center justify-center space-x-1">
-                                      <button
-                                        onClick={() => handleEditCashReturn(dep)}
-                                        className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-md transition-colors"
-                                        title="Edit entry"
-                                      >
+                                      <button onClick={() => handleEditCashReturn(dep)} title="Edit" className="p-1 rounded-md text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors">
                                         <Pencil className="h-3.5 w-3.5" />
                                       </button>
-                                      <button
-                                        onClick={() => handleDeleteCashReturn(dep.id)}
-                                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                                        title="Delete entry"
-                                      >
+                                      <button onClick={() => openDeleteModal(dep.id, dep.returned_by, 'cash-return')} title="Delete" className="p-1 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
                                         <Trash2 className="h-3.5 w-3.5" />
                                       </button>
                                     </div>
                                   )}
                                 </td>
                               </tr>
-                            ))
+                            )})
                           )}
                         </tbody>
                       </table>
@@ -1829,8 +1934,94 @@ export default function Collections() {
                 </div>
               </div>
             </div>
+            </div>
           )}
 
+          {/* ══════════════ CASH RETURN MODAL ══════════════ */}
+          {showCashReturnModal && (
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-5">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-sm font-bold text-gray-900">{editingCashReturnId !== null ? 'Edit Cash Return' : 'Record New Cash Return'}</h2>
+                  <button onClick={() => setShowCashReturnModal(false)} className="text-gray-400 hover:text-gray-600"><X className="h-4 w-4" /></button>
+                </div>
+
+                {modalError && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 text-xs font-semibold px-4 py-3 rounded-lg flex items-center space-x-2">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>{modalError}</span>
+                  </div>
+                )}
+
+                {/* Modal Tabs */}
+                {!editingCashReturnId && (
+                  <div className="flex border-b border-gray-200 mb-4">
+                    <button
+                      onClick={() => {
+                        setCashReturnModalTab('Canteen');
+                        setCashReturnForm(EMPTY_CASH_RETURN_FORM);
+                      }}
+                      className={`flex-1 pb-2 text-xs font-bold tracking-tight transition-colors border-b-2 ${cashReturnModalTab === 'Canteen' ? 'border-amber-500 text-amber-500' : 'border-transparent text-gray-500 hover:text-gray-700'
+                        }`}
+                    >
+                      Canteen Cash Return
+                    </button>
+                    <button
+                      onClick={() => {
+                        setCashReturnModalTab('Coconut');
+                        setCashReturnForm(EMPTY_CASH_RETURN_FORM);
+                      }}
+                      className={`flex-1 pb-2 text-xs font-bold tracking-tight transition-colors border-b-2 ${cashReturnModalTab === 'Coconut' ? 'border-amber-500 text-amber-500' : 'border-transparent text-gray-500 hover:text-gray-700'
+                        }`}
+                    >
+                      Coconut Cash Return
+                    </button>
+                  </div>
+                )}
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Returned By</label>
+                    <input
+                      type="text"
+                      value={cashReturnForm.returned_by}
+                      onChange={e => setCashReturnForm(prev => ({ ...prev, returned_by: e.target.value }))}
+                      placeholder="e.g. John Doe, PTA..."
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Reason (Optional)</label>
+                    <input
+                      type="text"
+                      value={cashReturnForm.reason}
+                      onChange={e => setCashReturnForm(prev => ({ ...prev, reason: e.target.value }))}
+                      placeholder="Additional details..."
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Amount</label>
+                    <input type="number" value={cashReturnForm.amount} onChange={e => setCashReturnForm(prev => ({ ...prev, amount: e.target.value }))} placeholder="0.00" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-amber-500" />
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Date</label>
+                    <input type="date" value={cashReturnForm.date} onChange={e => setCashReturnForm(prev => ({ ...prev, date: e.target.value }))} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-amber-500" />
+                  </div>
+                </div>
+
+                <div className="flex space-x-3 pt-2">
+                  <button onClick={() => setShowCashReturnModal(false)} className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50">Cancel</button>
+                  <button onClick={handleSaveCashReturn} disabled={saving || !cashReturnForm.returned_by || !cashReturnForm.amount} className="flex-1 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg disabled:opacity-50 transition-colors">
+                    {saving ? 'Saving...' : editingCashReturnId !== null ? 'Save Changes' : 'Record Return'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <IncomePDFExport
             isOpen={showIncomePDFModal}

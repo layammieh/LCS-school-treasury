@@ -186,12 +186,21 @@ class CashOnBank(models.Model):
 
 
 class CashReturn(models.Model):
-    """Stores the user-entered 'Cash Return' (coconut) amount per school year.
-    Cash returns are added on top of the coconut balance."""
+    """Stores the user-entered 'Cash Return' (coconut/canteen) amount per school year.
+    Cash returns are added on top of the respective balance."""
+    
+    TYPE_CHOICES = [
+        ('Canteen', 'Canteen'),
+        ('Coconut', 'Coconut'),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cash_return', null=True, blank=True)
     school_year = models.CharField(max_length=20, default='2026-2027', db_index=True)
+    returned_by = models.CharField(max_length=200, default='Unknown')
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='Coconut')
     amount = models.DecimalField(max_digits=14, decimal_places=2, default=0)
     date = models.DateField(default=django.utils.timezone.now)
+    reason = models.TextField(blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

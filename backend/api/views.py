@@ -327,8 +327,12 @@ def dashboard_stats(request):
     
     coconut_balance = total_coconut_collections - total_coconut_expenses
 
-    cash_return_total = CashReturn.objects.filter(
-        user=request.user, school_year=school_year
+    canteen_cash_return = CashReturn.objects.filter(
+        user=request.user, school_year=school_year, type='Canteen'
+    ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
+
+    coconut_cash_return = CashReturn.objects.filter(
+        user=request.user, school_year=school_year, type='Coconut'
     ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
 
     return Response({
@@ -339,7 +343,8 @@ def dashboard_stats(request):
         'total_coconut_collections': float(total_coconut_collections),
         'total_coconut_expenses': float(total_coconut_expenses),
         'coconut_balance': float(coconut_balance),
-        'cash_return_total': float(cash_return_total),
+        'canteen_cash_return': float(canteen_cash_return),
+        'coconut_cash_return': float(coconut_cash_return),
         'monthly_chart': months_data,
         'recent_transactions': recent_data,
     })
@@ -768,6 +773,18 @@ class CashReturnViewSet(viewsets.ModelViewSet):
         school_year = self.request.query_params.get('school_year')
         if school_year:
             qs = qs.filter(school_year=school_year)
+        date_filter = self.request.query_params.get('date')
+        if date_filter:
+            qs = qs.filter(date=date_filter)
+        month_filter = self.request.query_params.get('month')
+        if month_filter:
+            parts = month_filter.split('-')
+            if len(parts) == 2:
+                qs = qs.filter(date__year=parts[0], date__month=parts[1])
+        search = self.request.query_params.get('search')
+        if search:
+            from django.db.models import Q
+            qs = qs.filter(Q(returned_by__icontains=search) | Q(reason__icontains=search))
         return qs.order_by('-date', '-updated_at')
 
     def perform_create(self, serializer):

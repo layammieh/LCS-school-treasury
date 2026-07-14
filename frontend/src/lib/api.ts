@@ -103,7 +103,8 @@ export interface DashboardStats {
   total_coconut_collections: number;
   total_coconut_expenses: number;
   coconut_balance: number;
-  cash_return_total: number;
+  canteen_cash_return: number;
+  coconut_cash_return: number;
   monthly_chart: MonthlyData[];
   recent_transactions: Transaction[];
 }
@@ -437,25 +438,32 @@ export const cashOnBankApi = {
 export interface CashReturnDeposit {
   id: number;
   school_year: string;
+  returned_by: string;
+  type: string;
   amount: number;
   date: string;
+  reason: string | null;
   updated_at: string;
 }
 
 export const cashReturnApi = {
-  list: (schoolYear: string) => {
+  list: (params?: { schoolYear?: string; page?: number; date?: string; month?: string; search?: string }) => {
     const qs = new URLSearchParams();
-    if (schoolYear) qs.set('school_year', schoolYear);
+    if (params?.schoolYear) qs.set('school_year', params.schoolYear);
+    if (params?.page) qs.set('page', String(params.page));
+    if (params?.date) qs.set('date', params.date);
+    if (params?.month) qs.set('month', params.month);
+    if (params?.search) qs.set('search', params.search);
     return request<PaginatedResponse<CashReturnDeposit>>(`/cash-return/?${qs}`);
   },
 
-  create: (data: { school_year: string; amount: number; date: string }) =>
+  create: (data: { school_year: string; returned_by: string; type: string; amount: number; date: string; reason?: string }) =>
     request<CashReturnDeposit>('/cash-return/', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
-  update: (id: number, data: { school_year: string; amount: number; date: string }) =>
+  update: (id: number, data: { school_year: string; returned_by: string; type: string; amount: number; date: string; reason?: string }) =>
     request<CashReturnDeposit>(`/cash-return/${id}/`, {
       method: 'PUT',
       body: JSON.stringify(data),

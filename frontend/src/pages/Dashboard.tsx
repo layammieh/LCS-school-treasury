@@ -16,7 +16,7 @@ import {
   Activity,
   Landmark
 } from 'lucide-react';
-import { dashboardApi, cashOnBankApi, cashReturnApi } from '../lib/api';
+import { dashboardApi, cashOnBankApi } from '../lib/api';
 import type { DashboardStats, Transaction } from '../lib/api';
 
 function formatCurrency(n: any) {
@@ -69,13 +69,6 @@ export default function Dashboard() {
     cashOnBankApi.list(schoolYear)
       .then(res => setCashOnBank(res.results.reduce((acc, d) => acc + Number(d.amount || 0), 0)))
       .catch(() => setCashOnBank(0));
-  }, [schoolYear]);
-
-  const [cashReturn, setCashReturn] = useState(0);
-  useEffect(() => {
-    cashReturnApi.list(schoolYear)
-      .then(res => setCashReturn(res.results.reduce((acc, d) => acc + Number(d.amount || 0), 0)))
-      .catch(() => setCashReturn(0));
   }, [schoolYear]);
 
   // Build SVG chart path from monthly data
@@ -223,13 +216,13 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
-                    Total Balance{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
-                  </span>
-                  <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                    {loading ? '...' : formatCurrency(Number(stats?.total_collections || 0) - Number(stats?.total_expenses || 0))}
-                  </p>
-                </div>
+                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
+                  Total Balance - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                </span>
+                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                  {loading ? '...' : formatCurrency((Number(stats?.total_collections || 0) - Number(stats?.total_expenses || 0)) + Number(stats?.canteen_cash_return || 0))}
+                </p>
+              </div>
               </div>
 
               {/* Cash on Bank sub-card */}
@@ -337,7 +330,7 @@ export default function Dashboard() {
                   Total Balance - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                 </span>
                 <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                  {loading ? '...' : formatCurrency((stats?.coconut_balance ?? 0) + cashReturn)}
+                  {loading ? '...' : formatCurrency((stats?.coconut_balance ?? 0) + (stats?.coconut_cash_return ?? 0))}
                 </p>
               </div>
             </div>
@@ -357,7 +350,7 @@ export default function Dashboard() {
                   Cash Return
                 </span>
                 <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                  {loading ? '...' : formatCurrency(cashReturn)}
+                  {loading ? '...' : formatCurrency(stats?.coconut_cash_return ?? 0)}
                 </p>
               </div>
             </div>
