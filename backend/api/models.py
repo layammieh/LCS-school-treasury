@@ -184,4 +184,20 @@ class CashOnBank(models.Model):
     def __str__(self):
         return f"CashOnBank {self.school_year}: {self.amount}"
 
+
+class CashReturn(models.Model):
+    """Stores the user-entered 'Cash Return' (coconut) amount per school year.
+    Cash returns are added on top of the coconut balance."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cash_return', null=True, blank=True)
+    school_year = models.CharField(max_length=20, default='2026-2027', db_index=True)
+    amount = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    date = models.DateField(default=django.utils.timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-date', '-updated_at']
+
+    def __str__(self):
+        return f"CashReturn {self.school_year}: {self.amount}"
+
 # trigger github desktop

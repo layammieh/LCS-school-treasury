@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Consignee, Transaction, Expense, RevenueRecipient, Liquidation, CashOnBank
+from .models import Consignee, Transaction, Expense, RevenueRecipient, Liquidation, CashOnBank, CashReturn
 
 
 class ConsigneeSerializer(serializers.ModelSerializer):
@@ -95,3 +95,13 @@ class CashOnBankSerializer(serializers.ModelSerializer):
         self.fields['user'].required = False
         self.fields['school_year'].required = False
 
+
+class CashReturnSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CashReturn
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['user'].required = False
+        self.fields['school_year'].required = False

@@ -9,6 +9,7 @@ router.register(r'expenses', views.ExpenseViewSet, basename='expense')
 router.register(r'revenue-recipients', views.RevenueRecipientViewSet, basename='revenue-recipient')
 router.register(r'liquidations', views.LiquidationViewSet, basename='liquidation')
 router.register(r'cash-on-bank', views.CashOnBankViewSet, basename='cash-on-bank')
+router.register(r'cash-return', views.CashReturnViewSet, basename='cash-return')
 
 urlpatterns = [
     path('', include(router.urls)),

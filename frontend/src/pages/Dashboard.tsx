@@ -16,7 +16,7 @@ import {
   Activity,
   Landmark
 } from 'lucide-react';
-import { dashboardApi, cashOnBankApi } from '../lib/api';
+import { dashboardApi, cashOnBankApi, cashReturnApi } from '../lib/api';
 import type { DashboardStats, Transaction } from '../lib/api';
 
 function formatCurrency(n: any) {
@@ -69,6 +69,13 @@ export default function Dashboard() {
     cashOnBankApi.list(schoolYear)
       .then(res => setCashOnBank(res.results.reduce((acc, d) => acc + Number(d.amount || 0), 0)))
       .catch(() => setCashOnBank(0));
+  }, [schoolYear]);
+
+  const [cashReturn, setCashReturn] = useState(0);
+  useEffect(() => {
+    cashReturnApi.list(schoolYear)
+      .then(res => setCashReturn(res.results.reduce((acc, d) => acc + Number(d.amount || 0), 0)))
+      .catch(() => setCashReturn(0));
   }, [schoolYear]);
 
   // Build SVG chart path from monthly data
@@ -207,7 +214,7 @@ export default function Dashboard() {
             </div>
 
             {/* Balances - split into 3 columns */}
-            <div className="grid grid-cols-3 gap-5 md:col-span-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 md:col-span-3">
               {/* Total Balance sub-card */}
               <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between group hover:bg-[#006B4D] transition-colors">
                 <div className="flex justify-between items-start">
@@ -274,7 +281,7 @@ export default function Dashboard() {
               <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Coconut</h3>
               <div className="flex-1 h-px bg-gray-200"></div>
             </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
             {/* Total Collected - COCONUT */}
             <div 
               onClick={() => navigate('/collections', { state: { tab: 'income' } })}
@@ -330,7 +337,27 @@ export default function Dashboard() {
                   Total Balance - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                 </span>
                 <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                  {loading ? '...' : formatCurrency(stats?.coconut_balance ?? 0)}
+                  {loading ? '...' : formatCurrency((stats?.coconut_balance ?? 0) + cashReturn)}
+                </p>
+              </div>
+            </div>
+
+            {/* Cash Return - COCONUT */}
+            <div
+              onClick={() => navigate('/collections', { state: { tab: 'cash-return' } })}
+              className="bg-white p-5 rounded-xl border border-amber-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
+            >
+              <div className="flex justify-between items-start">
+                <div className="bg-amber-50 p-2 rounded-lg text-amber-600 group-hover:bg-amber-500/30 group-hover:text-amber-100 transition-colors">
+                  <Coins className="h-5 w-5" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
+                  Cash Return
+                </span>
+                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                  {loading ? '...' : formatCurrency(cashReturn)}
                 </p>
               </div>
             </div>

@@ -10,8 +10,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 
-from .models import Consignee, Transaction, Expense, RevenueRecipient, Liquidation, CashOnBank
-from .serializers import ConsigneeSerializer, TransactionSerializer, ExpenseSerializer, RevenueRecipientSerializer, LiquidationSerializer, CashOnBankSerializer
+from .models import Consignee, Transaction, Expense, RevenueRecipient, Liquidation, CashOnBank, CashReturn
+from .serializers import ConsigneeSerializer, TransactionSerializer, ExpenseSerializer, RevenueRecipientSerializer, LiquidationSerializer, CashOnBankSerializer, CashReturnSerializer
 
 
 # ---------------------------------------------------------------------------
@@ -327,6 +327,10 @@ def dashboard_stats(request):
     
     coconut_balance = total_coconut_collections - total_coconut_expenses
 
+    cash_return_total = CashReturn.objects.filter(
+        user=request.user, school_year=school_year
+    ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
+
     return Response({
         'total_collections': float(total_collected),
         'outstanding_fees': float(outstanding),
@@ -335,6 +339,7 @@ def dashboard_stats(request):
         'total_coconut_collections': float(total_coconut_collections),
         'total_coconut_expenses': float(total_coconut_expenses),
         'coconut_balance': float(coconut_balance),
+        'cash_return_total': float(cash_return_total),
         'monthly_chart': months_data,
         'recent_transactions': recent_data,
     })
@@ -741,6 +746,25 @@ class CashOnBankViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = CashOnBank.objects.filter(user=self.request.user)
+        school_year = self.request.query_params.get('school_year')
+        if school_year:
+            qs = qs.filter(school_year=school_year)
+        return qs.order_by('-date', '-updated_at')
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+# ---------------------------------------------------------------------------
+# Cash Return (Coconut)
+# ---------------------------------------------------------------------------
+
+class CashReturnViewSet(viewsets.ModelViewSet):
+    serializer_class = CashReturnSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = CashReturn.objects.filter(user=self.request.user)
         school_year = self.request.query_params.get('school_year')
         if school_year:
             qs = qs.filter(school_year=school_year)

@@ -103,6 +103,7 @@ export interface DashboardStats {
   total_coconut_collections: number;
   total_coconut_expenses: number;
   coconut_balance: number;
+  cash_return_total: number;
   monthly_chart: MonthlyData[];
   recent_transactions: Transaction[];
 }
@@ -430,3 +431,36 @@ export const cashOnBankApi = {
     request<void>(`/cash-on-bank/${id}/`, { method: 'DELETE' }),
 };
 
+// ---------------------------------------------------------------------------
+// Cash Return (Coconut)
+// ---------------------------------------------------------------------------
+export interface CashReturnDeposit {
+  id: number;
+  school_year: string;
+  amount: number;
+  date: string;
+  updated_at: string;
+}
+
+export const cashReturnApi = {
+  list: (schoolYear: string) => {
+    const qs = new URLSearchParams();
+    if (schoolYear) qs.set('school_year', schoolYear);
+    return request<PaginatedResponse<CashReturnDeposit>>(`/cash-return/?${qs}`);
+  },
+
+  create: (data: { school_year: string; amount: number; date: string }) =>
+    request<CashReturnDeposit>('/cash-return/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  update: (id: number, data: { school_year: string; amount: number; date: string }) =>
+    request<CashReturnDeposit>(`/cash-return/${id}/`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: number) =>
+    request<void>(`/cash-return/${id}/`, { method: 'DELETE' }),
+};
