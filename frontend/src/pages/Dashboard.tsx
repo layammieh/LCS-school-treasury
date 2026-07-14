@@ -165,50 +165,49 @@ export default function Dashboard() {
               <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Canteen</h3>
               <div className="flex-1 h-px bg-gray-200"></div>
             </div>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-5">
-            {/* Total Income */}
-            <div 
-              onClick={() => navigate('/collections', { state: { tab: 'income' } })}
-              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
-            >
-              <div className="flex justify-between items-start">
-                <div className="bg-[#4ade80]/10 p-2 rounded-lg text-[#006B4D] group-hover:bg-[#4ade80]/20 group-hover:text-[#4ade80] transition-colors">
-                  <Coins className="h-5 w-5" />
+          <div className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {/* Total Income */}
+              <div 
+                onClick={() => navigate('/collections', { state: { tab: 'income' } })}
+                className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="bg-[#4ade80]/10 p-2 rounded-lg text-[#006B4D] group-hover:bg-[#4ade80]/20 group-hover:text-[#4ade80] transition-colors">
+                    <Coins className="h-5 w-5" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
+                    Total Income - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                  </span>
+                  <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                    {loading ? '...' : formatCurrency(stats?.total_collections ?? 0)}
+                  </p>
                 </div>
               </div>
-              <div className="mt-4">
-                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
-                  Total Income - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
-                </span>
-                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                  {loading ? '...' : formatCurrency(stats?.total_collections ?? 0)}
-                </p>
-              </div>
-            </div>
 
-            {/* Total Expenses */}
-            <div 
-              onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
-              className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
-            >
-              <div className="flex justify-between items-start">
-                <div className="bg-red-50 p-2 rounded-lg text-red-600 group-hover:bg-red-500/20 group-hover:text-red-400 transition-colors">
-                  <CreditCard className="h-5 w-5" />
+              {/* Total Expenses */}
+              <div 
+                onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
+                className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="bg-red-50 p-2 rounded-lg text-red-600 group-hover:bg-red-500/20 group-hover:text-red-400 transition-colors">
+                    <CreditCard className="h-5 w-5" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
+                    Total Expenses - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                  </span>
+                  <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                    {loading ? '...' : formatCurrency(stats?.total_expenses ?? 0)}
+                  </p>
                 </div>
               </div>
-              <div className="mt-4">
-                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
-                  Total Expenses - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
-                </span>
-                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                  {loading ? '...' : formatCurrency(stats?.total_expenses ?? 0)}
-                </p>
-              </div>
-            </div>
 
-            {/* Balances - split into 3 columns */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 md:col-span-3">
-              {/* Total Balance sub-card */}
+              {/* Total Balance */}
               <div className="bg-white p-5 rounded-xl border border-gray-200/80 shadow-sm flex flex-col justify-between group hover:bg-[#006B4D] transition-colors">
                 <div className="flex justify-between items-start">
                   <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">
@@ -216,16 +215,18 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="mt-4">
-                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
-                  Total Balance - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
-                </span>
-                <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                  {loading ? '...' : formatCurrency((Number(stats?.total_collections || 0) - Number(stats?.total_expenses || 0)) + Number(stats?.canteen_cash_return || 0))}
-                </p>
+                  <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
+                    Total Balance - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                  </span>
+                  <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                    {loading ? '...' : formatCurrency((Number(stats?.total_collections || 0) - Number(stats?.total_expenses || 0)) + Number(stats?.canteen_cash_return || 0))}
+                  </p>
+                </div>
               </div>
-              </div>
+            </div>
 
-              {/* Cash on Bank sub-card */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {/* Cash on Bank */}
               <div
                 onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
                 className="bg-white p-5 rounded-xl border border-blue-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
@@ -245,7 +246,27 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Cash on Hand sub-card */}
+              {/* Cash Return */}
+              <div
+                onClick={() => navigate('/collections', { state: { tab: 'cash-return' } })}
+                className="bg-white p-5 rounded-xl border border-amber-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="bg-amber-50 p-2 rounded-lg text-amber-600 group-hover:bg-amber-500/30 group-hover:text-amber-100 transition-colors">
+                    <Activity className="h-5 w-5" />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
+                    Cash Return - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                  </span>
+                  <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                    {loading ? '...' : formatCurrency(stats?.canteen_cash_return ?? 0)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Cash on Hand */}
               <div
                 onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
                 className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
@@ -260,7 +281,7 @@ export default function Dashboard() {
                     Cash on Hand
                   </span>
                   <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                    {loading ? '...' : formatCurrency((Number(stats?.total_collections || 0) - Number(stats?.total_expenses || 0)) - Number(cashOnBank))}
+                    {loading ? '...' : formatCurrency((Number(stats?.total_collections || 0) - Number(stats?.total_expenses || 0) + Number(stats?.canteen_cash_return || 0)) - Number(cashOnBank))}
                   </p>
                 </div>
               </div>
