@@ -1458,7 +1458,7 @@ export default function Collections() {
             <div className="space-y-5">
               {/* Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-white p-5 rounded-xl border border-amber-200 shadow-sm flex flex-col justify-between">
+                <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
                     <div className="bg-amber-50 p-2 rounded-lg text-amber-600"><Coins className="h-5 w-5" /></div>
                     <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Canteen</span>
@@ -1471,7 +1471,7 @@ export default function Collections() {
                   </div>
                 </div>
 
-                <div className="bg-white p-5 rounded-xl border border-amber-200 shadow-sm flex flex-col justify-between">
+                <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
                     <div className="bg-amber-50 p-2 rounded-lg text-amber-600"><Coins className="h-5 w-5" /></div>
                     <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Coconut</span>
@@ -1637,7 +1637,7 @@ export default function Collections() {
                             cashReturnDeposits.map(dep => {
                               const isExpanded = expandedCashReturnIds.has(dep.id);
                               return (
-                              <tr key={dep.id} onClick={() => toggleCashReturnExpand(dep.id)} className="hover:bg-amber-50/30 transition-colors cursor-pointer">
+                              <tr key={dep.id} onClick={() => toggleCashReturnExpand(dep.id)} className="transition-colors cursor-pointer">
                                 <td className="pl-8 pr-4 py-3 w-[25%]">
                                   <span className={`font-bold text-gray-800 ${isExpanded ? 'whitespace-normal break-words block' : 'truncate block'}`}>{dep.returned_by}</span>
                                 </td>

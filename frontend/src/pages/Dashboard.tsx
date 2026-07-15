@@ -455,63 +455,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Recent Transactions */}
-          <div className="bg-white rounded-xl border border-slate-100/60 shadow-md shadow-slate-200/60 overflow-hidden">
-            <div className="px-6 py-4 flex justify-between items-center border-b border-slate-100/40">
-              <h3 className="text-sm font-bold text-gray-900">Recent Transactions</h3>
-              <div className="flex space-x-3 text-gray-400">
-                <button className="hover:text-gray-600"><Settings className="h-4.5 w-4.5" /></button>
-                <button className="hover:text-gray-600"><ExternalLink className="h-4.5 w-4.5" /></button>
-              </div>
-            </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-gray-50 border-b border-slate-100/60 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                    <th className="px-6 py-3.5">Vendor</th>
-                    <th className="px-6 py-3.5">Date</th>
-                    <th className="px-6 py-3.5">Category</th>
-                    <th className="px-6 py-3.5 text-right">Amount</th>
-                    <th className="px-6 py-3.5 text-center">Status</th>
-                    <th className="px-6 py-3.5 text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className={`divide-y divide-slate-200 text-xs ${loading && stats ? 'opacity-50 pointer-events-none transition-opacity' : ''}`}>
-                  {loading && !stats ? (
-                    <tr><td colSpan={6} className="px-6 py-8 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" /></td></tr>
-                  ) : (stats?.recent_transactions ?? []).map((txn: Transaction) => (
-                    <tr key={txn.id} className="hover:bg-gray-50/50">
-                      <td className="px-6 py-3.5 font-bold text-gray-800">{txn.student_name}</td>
-                      <td className="px-6 py-3.5 text-gray-500 font-medium">
-                        {new Date(txn.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                      </td>
-                      <td className="px-6 py-3.5">
-                        <span className="px-2 py-0.5 text-[10px] font-semibold bg-blue-50 text-blue-700 rounded-md">{txn.category}</span>
-                      </td>
-                      <td className="px-6 py-3.5 text-right font-bold text-gray-800">{formatCurrency(txn.amount)}</td>
-                      <td className="px-6 py-3.5 text-center">
-                        <span className={`px-2.5 py-0.5 text-[9px] font-extrabold rounded-full uppercase tracking-wide ${getStatusBadge(txn.status)}`}>
-                          {txn.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-3.5 text-center">
-                        <a href="#view" className="text-gray-400 hover:text-gray-600 font-semibold text-[11px] underline">View</a>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="px-6 py-4 flex justify-between items-center bg-gray-50 border-t border-slate-100/40 text-[11px] text-gray-500">
-              <span>Showing {stats?.recent_transactions?.length ?? 0} recent transactions</span>
-              <div className="flex space-x-2">
-                <button className="px-3 py-1 bg-white border border-gray-200 rounded-md font-semibold text-gray-700 hover:bg-gray-50">Previous</button>
-                <button className="px-3 py-1 bg-white border border-gray-200 rounded-md font-semibold text-gray-700 hover:bg-gray-50">Next</button>
-              </div>
-            </div>
-          </div>
 
         </main>
       </div>
