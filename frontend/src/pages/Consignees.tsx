@@ -182,7 +182,6 @@ export default function Consignees() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div className="bg-white p-5 rounded-xl border border-slate-200/60 shadow-sm shadow-slate-300/50 flex flex-col justify-between">
               <div className="flex justify-between items-start">
-                <div className="bg-[#4ade80]/10 p-2 rounded-lg text-[#006B4D]"><Users className="h-5 w-5" /></div>
                 <span className="text-[10px] font-bold text-[#006B4D] bg-[#4ade80]/15 px-2 py-0.5 rounded-full">Live</span>
               </div>
               <div className="mt-4">
@@ -193,7 +192,6 @@ export default function Consignees() {
 
             <div className="bg-white p-5 rounded-xl border border-slate-200/60 shadow-sm shadow-slate-300/50 flex flex-col justify-between">
               <div className="flex justify-between items-start">
-                <div className="bg-[#4ade80]/10 p-2 rounded-lg text-[#006B4D]"><FileCheck className="h-5 w-5" /></div>
                 <span className="text-[10px] font-bold text-[#006B4D] bg-[#4ade80]/15 px-2 py-0.5 rounded-full">Active</span>
               </div>
               <div className="mt-4">
@@ -204,7 +202,6 @@ export default function Consignees() {
 
             <div className="bg-white p-5 rounded-xl border border-slate-200/60 shadow-sm shadow-slate-300/50 flex flex-col justify-between">
               <div className="flex justify-between items-start">
-                <div className="bg-red-50 p-2 rounded-lg text-red-400"><XCircle className="h-5 w-5" /></div>
                 <span className="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full">Inactive</span>
               </div>
               <div className="mt-4">

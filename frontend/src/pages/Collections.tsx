@@ -747,7 +747,7 @@ export default function Collections() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="bg-[#4ade80]/10 p-2 rounded-lg text-[#006B4D]"><Coins className="h-5 w-5" /></div>
+
                     <span className="text-[9px] font-bold text-[#006B4D] bg-[#4ade80]/15 px-2 py-0.5 rounded-full">CANTEEN</span>
                   </div>
                   <div className="mt-4">
@@ -760,7 +760,7 @@ export default function Collections() {
 
                 <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="bg-blue-50 p-2 rounded-lg text-blue-600"><Layers className="h-5 w-5" /></div>
+
                     <span className="text-[9px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">Outstanding</span>
                   </div>
                   <div className="mt-4">
@@ -773,7 +773,7 @@ export default function Collections() {
 
                 <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="bg-green-50 p-2 rounded-lg text-green-600"><Coins className="h-5 w-5" /></div>
+
                     <span className="text-[9px] font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Coconut</span>
                   </div>
                   <div className="mt-4">
@@ -1013,7 +1013,7 @@ export default function Collections() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="bg-red-50 p-2 rounded-lg text-red-600"><CreditCard className="h-5 w-5" /></div>
+
                     <span className="text-[9px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Canteen</span>
                   </div>
                   <div className="mt-4">
@@ -1026,7 +1026,7 @@ export default function Collections() {
 
                 <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="bg-orange-50 p-2 rounded-lg text-orange-600"><CreditCard className="h-5 w-5" /></div>
+
                     <span className="text-[9px] font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Coconut</span>
                   </div>
                   <div className="mt-4">
@@ -1260,9 +1260,7 @@ export default function Collections() {
                 {/* Cash on Bank card */}
                 <div className="bg-white p-5 rounded-xl border-2 border-blue-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="bg-blue-50 p-2 rounded-lg text-blue-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
-                    </div>
+
                     <span className="text-[9px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Bank</span>
                   </div>
                   <div className="mt-4">
@@ -1277,9 +1275,6 @@ export default function Collections() {
                 {/* Total Balance card */}
                 <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                    </div>
                     <span className="text-[9px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Canteen</span>
                   </div>
                   <div className="mt-4">
@@ -1293,9 +1288,7 @@ export default function Collections() {
                 {/* Cash on Hand card */}
                 <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="bg-emerald-50 p-2 rounded-lg text-emerald-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    </div>
+
                     <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-wider">On Hand</span>
                   </div>
                   <div className="mt-4">
@@ -1460,7 +1453,7 @@ export default function Collections() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="bg-amber-50 p-2 rounded-lg text-amber-600"><Coins className="h-5 w-5" /></div>
+
                     <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Canteen</span>
                   </div>
                   <div className="mt-4">
@@ -1473,7 +1466,7 @@ export default function Collections() {
 
                 <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="bg-amber-50 p-2 rounded-lg text-amber-600"><Coins className="h-5 w-5" /></div>
+
                     <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Coconut</span>
                   </div>
                   <div className="mt-4">
