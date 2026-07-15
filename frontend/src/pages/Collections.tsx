@@ -99,23 +99,15 @@ export default function Collections() {
 
   /* ─────────────────── CASH ON BANK state ─────────────────── */
   const [cashOnBankDeposits, setCashOnBankDeposits] = useState<CashOnBankDeposit[]>([]);
-  const cashOnBankAmount = cashOnBankDeposits.reduce((acc, d) => acc + Number(d.amount || 0), 0);
   const [cashOnBankInput, setCashOnBankInput] = useState('');
   const [cashOnBankDate, setCashOnBankDate] = useState(TODAY);
   const [loadingCashOnBank, setLoadingCashOnBank] = useState(false);
   const [savingCashOnBank, setSavingCashOnBank] = useState(false);
-  const [cashOnBankSaved, setCashOnBankSaved] = useState(false);
   const [cashOnBankError, setCashOnBankError] = useState('');
   const [editingCashOnBankId, setEditingCashOnBankId] = useState<number | null>(null);
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
   const [showCashOnBankModal, setShowCashOnBankModal] = useState(false);
   const [cashOnBankModalTab, setCashOnBankModalTab] = useState<'Canteen' | 'Coconut'>('Canteen');
-  const [cashOnBankFilterDate, setCashOnBankFilterDate] = useState('');
-  const [showCashOnBankDatePicker, setShowCashOnBankDatePicker] = useState(false);
-  const [cashOnBankFilterMonth, setCashOnBankFilterMonth] = useState('');
-  const [showCashOnBankMonthPicker, setShowCashOnBankMonthPicker] = useState(false);
-  const cashOnBankDatePickerRef = useRef<HTMLDivElement>(null);
-  const cashOnBankMonthPickerRef = useRef<HTMLDivElement>(null);
 
   /* ─────────────────── CASH RETURN state ─────────────────── */
   const [cashReturnDeposits, setCashReturnDeposits] = useState<CashReturnDeposit[]>([]);
@@ -310,10 +302,8 @@ export default function Collections() {
       setCashOnBankInput('');
       setCashOnBankDate(TODAY);
       setEditingCashOnBankId(null);
-      setCashOnBankSaved(true);
       setShowCashOnBankModal(false);
       loadCashOnBank();
-      setTimeout(() => setCashOnBankSaved(false), 2500);
     } catch (e: any) {
       setCashOnBankError(e.message || 'Failed to save.');
     } finally {

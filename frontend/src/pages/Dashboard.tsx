@@ -7,7 +7,7 @@ import {
   Calendar,
   ChevronDown
 } from 'lucide-react';
-import { dashboardApi, cashOnBankApi } from '../lib/api';
+import { dashboardApi } from '../lib/api';
 import type { DashboardStats } from '../lib/api';
 
 function formatCurrency(n: any) {
