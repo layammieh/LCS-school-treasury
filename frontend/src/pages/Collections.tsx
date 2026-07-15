@@ -4,7 +4,7 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import { useSchoolYearStore } from '../store/schoolYearStore';
 import {
-  Plus, ChevronDown, Calendar, Layers, Coins, X,
+  Plus, ChevronDown, Calendar, Coins, X,
   Pencil, Trash2, AlertCircle, Search, CreditCard, Loader2, Download
 } from 'lucide-react';
 import { transactionsApi, consigneesApi, expensesApi, cashOnBankApi, cashReturnApi, dashboardApi } from '../lib/api';

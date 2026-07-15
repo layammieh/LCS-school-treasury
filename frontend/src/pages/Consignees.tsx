@@ -2,11 +2,8 @@ import { useEffect, useState, useRef } from 'react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import {
-  Users,
   Plus,
   Filter,
-  FileCheck,
-  XCircle,
   X,
   Edit2,
   Trash2,
