@@ -656,7 +656,7 @@ export default function Collections() {
             </div>
             <div className="flex space-x-2.5 items-center">
               {/* Export PDF buttons */}
-              {activeTab === 'income' && (
+              {!isViewMode && activeTab === 'income' && (
                 <button
                   onClick={() => setShowIncomePDFModal(true)}
                   className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-white hover:bg-green-50 text-[#006B4D] text-xs font-semibold rounded-lg border border-green-200 transition-colors"
@@ -665,7 +665,7 @@ export default function Collections() {
                   <span>Export PDF</span>
                 </button>
               )}
-              {activeTab === 'expenses' && (
+              {!isViewMode && activeTab === 'expenses' && (
                 <button
                   onClick={() => setShowExpensePDFModal(true)}
                   className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-white hover:bg-red-50 text-red-600 text-xs font-semibold rounded-lg border border-red-200 transition-colors"
