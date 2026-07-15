@@ -161,6 +161,7 @@ export default function Collections() {
 
   const [showModal, setShowModal] = useState(false);
   const [incomeModalTab, setIncomeModalTab] = useState<'consignee' | 'external'>('consignee');
+  const [externalSubTab, setExternalSubTab] = useState<'canteen' | 'coconut'>('canteen');
   const [form, setForm] = useState(EMPTY_INCOME_FORM);
   const [saving, setSaving] = useState(false);
   const [modalError, setModalError] = useState('');
@@ -183,8 +184,6 @@ export default function Collections() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedConsignee, setSelectedConsignee] = useState<Consignee | null>(null);
   const suggestRef = useRef<HTMLDivElement>(null);
-  const [showExternalSuggestions, setShowExternalSuggestions] = useState(false);
-  const externalSuggestRef = useRef<HTMLDivElement>(null);
   const searchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 
@@ -458,7 +457,6 @@ export default function Collections() {
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (suggestRef.current && !suggestRef.current.contains(e.target as Node)) setShowSuggestions(false);
-      if (externalSuggestRef.current && !externalSuggestRef.current.contains(e.target as Node)) setShowExternalSuggestions(false);
       if (datePickerRef.current && !datePickerRef.current.contains(e.target as Node)) setShowDatePicker(false);
       if (monthPickerRef.current && !monthPickerRef.current.contains(e.target as Node)) setShowMonthPicker(false);
       if (statusMenuRef.current && !statusMenuRef.current.contains(e.target as Node)) setShowStatusMenu(false);
@@ -504,15 +502,29 @@ export default function Collections() {
         setModalError('Please select a consignee from the list so the payment is filed under the correct canteen.');
         return;
       }
+      // Determine category based on tab selection
+      let cat: string;
       if (editingId) {
-        const cat = name.toLowerCase() === 'coconut' ? 'Coconut' : 'General';
+        // When editing, preserve the original category logic based on current tab state
+        if (incomeModalTab === 'external') {
+          cat = externalSubTab === 'coconut' ? 'Coconut' : 'General';
+        } else {
+          cat = name.toLowerCase() === 'coconut' ? 'Coconut' : 'General';
+        }
+      } else {
+        if (incomeModalTab === 'external') {
+          cat = externalSubTab === 'coconut' ? 'Coconut' : 'General';
+        } else {
+          cat = 'General';
+        }
+      }
+      if (editingId) {
         await transactionsApi.update(editingId, {
           student_name: name, student_initials: initials,
           amount: parseFloat(form.amount), status: form.status, date: form.date, canteen,
           category: cat,
         });
       } else {
-        const cat = name.toLowerCase() === 'coconut' ? 'Coconut' : 'General';
         await transactionsApi.create({
           transaction_type: 'collection', student_name: name, student_initials: initials,
           grade_section: '', id_number: '', amount: parseFloat(form.amount),
@@ -535,7 +547,10 @@ export default function Collections() {
   function openCreateModal() {
     setForm({ ...EMPTY_INCOME_FORM, date: filterDate || TODAY });
     setConsigneeQuery(''); setSelectedConsignee(null);
-    setModalError(''); setEditingId(null); setIncomeModalTab('consignee'); setShowModal(true);
+    setModalError(''); setEditingId(null);
+    setIncomeModalTab('consignee');
+    setExternalSubTab('canteen');
+    setShowModal(true);
     consigneesApi.list({ schoolYear }).then(res => {
       setSuggestions(res.results);
       setShowSuggestions(res.results.length > 0);
@@ -553,7 +568,14 @@ export default function Collections() {
       status: txn.status, date: txn.date, canteen: txn.canteen || '',
     });
     setConsigneeQuery(txn.student_name || '');
-    setIncomeModalTab(txn.canteen === 'External' ? 'external' : 'consignee');
+    if (txn.canteen === 'External') {
+      setIncomeModalTab('external');
+      // Restore sub-tab based on category
+      setExternalSubTab((txn as any).category === 'Coconut' ? 'coconut' : 'canteen');
+    } else {
+      setIncomeModalTab('consignee');
+      setExternalSubTab('canteen');
+    }
     setSelectedConsignee(null); setSuggestions([]); setModalError(''); setShowModal(true);
   }
 
@@ -1783,34 +1805,49 @@ export default function Collections() {
                       </div>
                     </div>
                   ) : (
-                    <div>
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Source Name</label>
-                      <div className="relative" ref={externalSuggestRef}>
+                    <div className="space-y-3">
+                      {/* External Source Sub-tabs */}
+                      {!editingId && (
+                        <div className="flex bg-gray-100 rounded-lg p-0.5">
+                          <button
+                            onClick={() => { setExternalSubTab('canteen'); setForm(EMPTY_INCOME_FORM); }}
+                            className={`flex-1 py-1.5 text-[11px] font-bold rounded-md transition-all ${
+                              externalSubTab === 'canteen'
+                                ? 'bg-white text-[#006B4D] shadow-sm'
+                                : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                          >
+                            Canteen Income
+                          </button>
+                          <button
+                            onClick={() => { setExternalSubTab('coconut'); setForm(EMPTY_INCOME_FORM); }}
+                            className={`flex-1 py-1.5 text-[11px] font-bold rounded-md transition-all ${
+                              externalSubTab === 'coconut'
+                                ? 'bg-white text-orange-600 shadow-sm'
+                                : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                          >
+                            Coconut Income
+                          </button>
+                        </div>
+                      )}
+                      {/* Sub-tab indicator when editing */}
+                      {editingId && (
+                        <div className={`text-[10px] font-bold px-2 py-1 rounded-full w-fit ${
+                          externalSubTab === 'coconut' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-[#006B4D]'
+                        }`}>
+                          {externalSubTab === 'coconut' ? 'Coconut Income' : 'Canteen Income'}
+                        </div>
+                      )}
+                      <div>
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Source Name</label>
                         <input
                           type="text"
                           value={form.consignee_name}
-                          onChange={e => {
-                            setForm(prev => ({ ...prev, consignee_name: e.target.value }));
-                            setShowExternalSuggestions(true);
-                          }}
-                          onFocus={() => setShowExternalSuggestions(true)}
-                          placeholder="Enter external source name..."
+                          onChange={e => setForm(prev => ({ ...prev, consignee_name: e.target.value }))}
+                          placeholder={externalSubTab === 'coconut' ? 'e.g. Coconut Sales, Vendor...' : 'e.g. Donation, Rental...'}
                           className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#006B4D]"
                         />
-                        {showExternalSuggestions && 'Coconut'.toLowerCase().includes(form.consignee_name.toLowerCase()) && (
-                          <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-30 max-h-48 overflow-y-auto">
-                            <button
-                              onClick={() => {
-                                setForm(prev => ({ ...prev, consignee_name: 'Coconut' }));
-                                setShowExternalSuggestions(false);
-                              }}
-                              className="w-full text-left px-4 py-2 text-xs font-semibold hover:bg-gray-50 transition-colors flex items-center justify-between"
-                            >
-                              <span>Coconut</span>
-                              <span className="text-[10px] text-gray-400">External Category</span>
-                            </button>
-                          </div>
-                        )}
                       </div>
                     </div>
                   )}
