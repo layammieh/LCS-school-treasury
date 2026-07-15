@@ -283,7 +283,7 @@ export default function Dashboard() {
                       Total Balance - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                     </span>
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                      {loading ? '...' : formatCurrency((Number(stats?.total_coconut_collections || 0) - Number(stats?.total_coconut_expenses || 0)) + Number(stats?.coconut_cash_return || 0))}
+                      {loading ? '...' : formatCurrency(Number(stats?.total_coconut_collections || 0) - Number(stats?.total_coconut_expenses || 0))}
                     </p>
                   </div>
                 </div>
