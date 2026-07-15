@@ -781,11 +781,18 @@ class CashOnBankViewSet(viewsets.ModelViewSet):
         school_year = self.request.query_params.get('school_year')
         if school_year:
             qs = qs.filter(school_year=school_year)
+        date_filter = self.request.query_params.get('date')
+        if date_filter:
+            qs = qs.filter(date=date_filter)
         month_filter = self.request.query_params.get('month')
         if month_filter:
             parts = month_filter.split('-')
             if len(parts) == 2:
                 qs = qs.filter(date__year=parts[0], date__month=parts[1])
+        search = self.request.query_params.get('search')
+        if search:
+            from django.db.models import Q
+            qs = qs.filter(Q(type__icontains=search))
         return qs.order_by('-date', '-updated_at')
 
     def perform_create(self, serializer):

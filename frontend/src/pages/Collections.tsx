@@ -108,6 +108,13 @@ export default function Collections() {
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
   const [showCashOnBankModal, setShowCashOnBankModal] = useState(false);
   const [cashOnBankModalTab, setCashOnBankModalTab] = useState<'Canteen' | 'Coconut'>('Canteen');
+  const [cashOnBankFilterDate, setCashOnBankFilterDate] = useState('');
+  const [showCashOnBankDatePicker, setShowCashOnBankDatePicker] = useState(false);
+  const [cashOnBankFilterMonth, setCashOnBankFilterMonth] = useState('');
+  const [showCashOnBankMonthPicker, setShowCashOnBankMonthPicker] = useState(false);
+  const [cashOnBankSearchQuery, setCashOnBankSearchQuery] = useState('');
+  const cashOnBankDatePickerRef = useRef<HTMLDivElement>(null);
+  const cashOnBankMonthPickerRef = useRef<HTMLDivElement>(null);
 
   /* ─────────────────── CASH RETURN state ─────────────────── */
   const [cashReturnDeposits, setCashReturnDeposits] = useState<CashReturnDeposit[]>([]);
@@ -271,12 +278,16 @@ export default function Collections() {
     cashReturnPage, cashReturnFilterDate, cashReturnFilterMonth, cashReturnSearchDebounceText
   ]);
 
-  async function loadCashOnBank() {
+  async function loadCashOnBank(date?: string, month?: string, search?: string) {
     setLoadingCashOnBank(true);
     setCashOnBankError('');
     try {
+      const params: any = { school_year: schoolYear };
+      if (date) params.date = date;
+      if (month) params.month = month;
+      if (search) params.search = search;
       const [res, stats] = await Promise.all([
-        cashOnBankApi.list(schoolYear),
+        cashOnBankApi.list(schoolYear, params),
         dashboardApi.getStats(schoolYear, '')
       ]);
       setCashOnBankDeposits(res.results || []);
@@ -286,6 +297,10 @@ export default function Collections() {
     } finally {
       setLoadingCashOnBank(false);
     }
+  }
+
+  function applyCashOnBankFilters(date: string, month: string = '') {
+    loadCashOnBank(date, month, cashOnBankSearchQuery);
   }
 
   async function handleSaveCashOnBank() {
@@ -1296,8 +1311,106 @@ export default function Collections() {
 
               {/* Table section */}
               <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
-                <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                  <h3 className="text-sm font-bold text-gray-800">Deposit History</h3>
+                <div className="px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100/40 rounded-t-xl bg-white">
+                  <div className="flex items-center space-x-3">
+                    <h3 className="text-sm font-bold text-gray-900">Deposit History</h3>
+                    <span className="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full hidden sm:inline-block">
+                      {cashOnBankDeposits.length} entries
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-3 flex-wrap gap-y-2">
+                    {/* Search Input */}
+                    <div className="relative">
+                      <Search className="absolute left-2.5 top-1.5 h-3.5 w-3.5 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="Search deposits..."
+                        value={cashOnBankSearchQuery}
+                        onChange={(e) => {
+                          setCashOnBankSearchQuery(e.target.value);
+                          loadCashOnBank(cashOnBankFilterDate, cashOnBankFilterMonth, e.target.value);
+                        }}
+                        className="pl-8 pr-3 py-1.5 bg-white border border-slate-200/60 text-xs text-gray-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 w-32 sm:w-48"
+                      />
+                    </div>
+
+                    {/* Date dropdown */}
+                    <div className="relative" ref={cashOnBankDatePickerRef}>
+                      <button
+                        onClick={() => { setShowCashOnBankDatePicker(v => !v); setShowCashOnBankMonthPicker(false); }}
+                        className={`flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
+                          cashOnBankFilterDate ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-150'
+                        }`}
+                      >
+                        <Calendar className="h-3.5 w-3.5" />
+                        <span>{cashOnBankFilterDate
+                          ? new Date(cashOnBankFilterDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                          : 'All Dates'}
+                        </span>
+                        <ChevronDown className="h-3 w-3" />
+                      </button>
+                      {showCashOnBankDatePicker && (
+                        <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-30 p-4 w-64">
+                          <div className="flex justify-between items-center mb-3">
+                            <span className="text-xs font-bold text-gray-700">Select Date</span>
+                            {cashOnBankFilterDate && (
+                              <button
+                                onClick={() => { setCashOnBankFilterDate(''); setShowCashOnBankDatePicker(false); applyCashOnBankFilters(''); }}
+                                className="text-[10px] text-red-500 hover:text-red-700 font-semibold"
+                              >Clear</button>
+                            )}
+                          </div>
+                          <input
+                            type="date"
+                            value={cashOnBankFilterDate}
+                            onChange={e => { setCashOnBankFilterDate(e.target.value); setShowCashOnBankDatePicker(false); applyCashOnBankFilters(e.target.value); }}
+                            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Month dropdown */}
+                    <div className="relative" ref={cashOnBankMonthPickerRef}>
+                      <button
+                        onClick={() => { setShowCashOnBankMonthPicker(v => !v); setShowCashOnBankDatePicker(false); }}
+                        className={`flex items-center space-x-2 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors ${
+                          cashOnBankFilterMonth ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-150'
+                        }`}
+                      >
+                        <Calendar className="h-3.5 w-3.5" />
+                        <span>{cashOnBankFilterMonth
+                          ? new Date(cashOnBankFilterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                          : 'All Months'}
+                        </span>
+                        <ChevronDown className="h-3 w-3" />
+                      </button>
+                      {showCashOnBankMonthPicker && (
+                        <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-30 p-4 w-64">
+                          <div className="flex justify-between items-center mb-3">
+                            <span className="text-xs font-bold text-gray-700">Select Month</span>
+                            {cashOnBankFilterMonth && (
+                              <button
+                                onClick={() => { setCashOnBankFilterMonth(''); setShowCashOnBankMonthPicker(false); applyCashOnBankFilters(cashOnBankFilterDate, ''); }}
+                                className="text-[10px] text-red-500 hover:text-red-700 font-semibold"
+                              >Clear</button>
+                            )}
+                          </div>
+                          <input
+                            type="month"
+                            value={cashOnBankFilterMonth}
+                            onChange={e => {
+                              setCashOnBankFilterMonth(e.target.value);
+                              setCashOnBankFilterDate('');
+                              setShowCashOnBankMonthPicker(false);
+                              applyCashOnBankFilters('', e.target.value);
+                            }}
+                            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto w-full">
@@ -1305,15 +1418,15 @@ export default function Collections() {
                     <div className="bg-gray-50 border-b border-gray-200 rounded-t-xl overflow-hidden">
                       <table className="w-full table-fixed text-left border-collapse">
                         <colgroup>
-                          <col style={{ width: '25%' }} />
                           <col style={{ width: '30%' }} />
+                          <col style={{ width: '25%' }} />
                           <col style={{ width: '25%' }} />
                           <col style={{ width: '20%' }} />
                         </colgroup>
                         <thead>
                           <tr className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                            <th className="pl-8 pr-4 py-3 text-center">Type</th>
-                            <th className="px-4 py-3 text-center">Date Deposited</th>
+                            <th className="pl-8 pr-4 py-3 text-center">Date Deposited</th>
+                            <th className="px-4 py-3 text-center">Type</th>
                             <th className="px-4 py-3 text-right">Amount</th>
                             <th className="px-4 py-3 text-center">Actions</th>
                           </tr>
@@ -1324,8 +1437,8 @@ export default function Collections() {
                     <div className="overflow-y-auto max-h-[400px]">
                       <table className="w-full table-fixed text-left border-collapse">
                         <colgroup>
-                          <col style={{ width: '25%' }} />
                           <col style={{ width: '30%' }} />
+                          <col style={{ width: '25%' }} />
                           <col style={{ width: '25%' }} />
                           <col style={{ width: '20%' }} />
                         </colgroup>
@@ -1344,13 +1457,13 @@ export default function Collections() {
                           ) : (
                             cashOnBankDeposits.map(dep => (
                               <tr key={dep.id} className="transition-colors hover:bg-blue-50/30">
+                                <td className="px-4 py-3 w-[30%] text-center text-gray-500 font-medium text-[11px]">
+                                  {new Date(dep.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                </td>
                                 <td className="px-4 py-3 w-[25%] text-center">
                                   <span className={`inline-block px-2 py-1 text-[10px] font-bold rounded-full ${dep.type === 'Canteen' ? 'bg-blue-100 text-blue-700' : 'bg-indigo-100 text-indigo-700'}`}>
                                     {dep.type}
                                   </span>
-                                </td>
-                                <td className="px-4 py-3 w-[30%] text-center text-gray-500 font-medium text-[11px]">
-                                  {new Date(dep.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                 </td>
                                 <td className="px-4 py-3 w-[25%] text-right font-bold text-blue-600 whitespace-nowrap">{formatCurrency(dep.amount)}</td>
                                 <td className="px-4 py-3 w-[20%] text-center">
