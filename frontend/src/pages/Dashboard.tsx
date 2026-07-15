@@ -250,7 +250,7 @@ export default function Dashboard() {
                 onClick={() => navigate('/collections', { state: { tab: 'income' } })}
                 className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
               >
-                <div className="mt-2">
+                <div className="flex flex-col justify-between h-full">
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                     Total Collected - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                   </span>
@@ -265,7 +265,7 @@ export default function Dashboard() {
                 onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
                 className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
               >
-                <div className="mt-2">
+                <div className="flex flex-col justify-between h-full">
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                     Total Expenses - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                   </span>
@@ -280,7 +280,7 @@ export default function Dashboard() {
                 onClick={() => navigate('/collections', { state: { tab: 'balance' } })}
                 className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
               >
-                <div className="mt-2">
+                <div className="flex flex-col justify-between h-full">
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                     Total Balance - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                   </span>
@@ -295,7 +295,7 @@ export default function Dashboard() {
                 onClick={() => navigate('/collections', { state: { tab: 'cash-return' } })}
                 className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
               >
-                <div className="mt-2">
+                <div className="flex flex-col justify-between h-full">
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                     Cash Return - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                   </span>
