@@ -342,6 +342,24 @@ def dashboard_stats(request):
             coconut_cash_return_qs = coconut_cash_return_qs.filter(date__year=parts[0], date__month=parts[1])
     coconut_cash_return = coconut_cash_return_qs.aggregate(total=Sum('amount'))['total'] or Decimal('0')
 
+    canteen_cash_on_bank_qs = CashOnBank.objects.filter(
+        user=request.user, school_year=school_year, type='Canteen'
+    )
+    if month_filter:
+        parts = month_filter.split('-')
+        if len(parts) == 2:
+            canteen_cash_on_bank_qs = canteen_cash_on_bank_qs.filter(date__year=parts[0], date__month=parts[1])
+    canteen_cash_on_bank = canteen_cash_on_bank_qs.aggregate(total=Sum('amount'))['total'] or Decimal('0')
+
+    coconut_cash_on_bank_qs = CashOnBank.objects.filter(
+        user=request.user, school_year=school_year, type='Coconut'
+    )
+    if month_filter:
+        parts = month_filter.split('-')
+        if len(parts) == 2:
+            coconut_cash_on_bank_qs = coconut_cash_on_bank_qs.filter(date__year=parts[0], date__month=parts[1])
+    coconut_cash_on_bank = coconut_cash_on_bank_qs.aggregate(total=Sum('amount'))['total'] or Decimal('0')
+
     return Response({
         'total_collections': float(total_collected),
         'outstanding_fees': float(outstanding),
@@ -352,6 +370,8 @@ def dashboard_stats(request):
         'coconut_balance': float(coconut_balance),
         'canteen_cash_return': float(canteen_cash_return),
         'coconut_cash_return': float(coconut_cash_return),
+        'canteen_cash_on_bank': float(canteen_cash_on_bank),
+        'coconut_cash_on_bank': float(coconut_cash_on_bank),
         'monthly_chart': months_data,
         'recent_transactions': recent_data,
     })

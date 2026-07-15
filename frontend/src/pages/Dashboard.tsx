@@ -25,7 +25,6 @@ export default function Dashboard() {
   const [filterMonth, setFilterMonth] = useState('');
   const [showMonthPicker, setShowMonthPicker] = useState(false);
   const monthPickerRef = useRef<HTMLDivElement>(null);
-  const [cashOnBank, setCashOnBank] = useState(0);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -40,12 +39,10 @@ export default function Dashboard() {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      dashboardApi.getStats(schoolYear, filterMonth),
-      cashOnBankApi.list(schoolYear, filterMonth)
+      dashboardApi.getStats(schoolYear, filterMonth)
     ])
-      .then(([statsRes, cobRes]) => {
+      .then(([statsRes]) => {
         setStats(statsRes);
-        setCashOnBank(cobRes.results.reduce((acc, d) => acc + Number(d.amount || 0), 0));
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -197,10 +194,10 @@ export default function Dashboard() {
                 >
                   <div className="flex flex-col justify-between h-full">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
-                      Cash on Bank{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                      Cash on Bank - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                     </span>
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                      {loading ? '...' : formatCurrency(cashOnBank)}
+                      {loading ? '...' : formatCurrency(stats?.canteen_cash_on_bank ?? 0)}
                     </p>
                   </div>
                 </div>
@@ -230,7 +227,7 @@ export default function Dashboard() {
                       Cash on Hand - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                     </span>
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                      {loading ? '...' : formatCurrency((Number(stats?.total_collections || 0) - Number(stats?.total_expenses || 0) + Number(stats?.canteen_cash_return || 0)) - Number(cashOnBank))}
+                      {loading ? '...' : formatCurrency((Number(stats?.total_collections || 0) - Number(stats?.total_expenses || 0) + Number(stats?.canteen_cash_return || 0)) - Number(stats?.canteen_cash_on_bank || 0))}
                     </p>
                   </div>
                 </div>
@@ -244,64 +241,98 @@ export default function Dashboard() {
               <h3 className="text-xs font-bold text-orange-800 bg-orange-100 px-3 py-1.5 rounded-full uppercase tracking-widest whitespace-nowrap border border-orange-200/60 shadow-sm">Coconut</h3>
               <div className="flex-1 h-px bg-orange-200/50"></div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
-              {/* Total Collected - COCONUT */}
-              <div
-                onClick={() => navigate('/collections', { state: { tab: 'income' } })}
-                className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
-              >
-                <div className="flex flex-col justify-between h-full">
-                  <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
-                    Total Collected - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
-                  </span>
-                  <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                    {loading ? '...' : formatCurrency(stats?.total_coconut_collections ?? 0)}
-                  </p>
+            <div className="space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {/* Total Income - COCONUT */}
+                <div
+                  onClick={() => navigate('/collections', { state: { tab: 'income' } })}
+                  className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
+                >
+                  <div className="flex flex-col justify-between h-full">
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
+                      Total Income - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                    </span>
+                    <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                      {loading ? '...' : formatCurrency(stats?.total_coconut_collections ?? 0)}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Total Expenses - COCONUT */}
+                <div
+                  onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
+                  className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
+                >
+                  <div className="flex flex-col justify-between h-full">
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
+                      Total Expenses - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                    </span>
+                    <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                      {loading ? '...' : formatCurrency(stats?.total_coconut_expenses ?? 0)}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Total Balance - COCONUT */}
+                <div
+                  onClick={() => navigate('/collections', { state: { tab: 'balance' } })}
+                  className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
+                >
+                  <div className="flex flex-col justify-between h-full">
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
+                      Total Balance - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                    </span>
+                    <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                      {loading ? '...' : formatCurrency((Number(stats?.total_coconut_collections || 0) - Number(stats?.total_coconut_expenses || 0)) + Number(stats?.coconut_cash_return || 0))}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {/* Total Expenses - COCONUT */}
-              <div
-                onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
-                className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
-              >
-                <div className="flex flex-col justify-between h-full">
-                  <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
-                    Total Expenses - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
-                  </span>
-                  <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                    {loading ? '...' : formatCurrency(stats?.total_coconut_expenses ?? 0)}
-                  </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {/* Cash on Bank - COCONUT */}
+                <div
+                  onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
+                  className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
+                >
+                  <div className="flex flex-col justify-between h-full">
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
+                      Cash on Bank - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                    </span>
+                    <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                      {loading ? '...' : formatCurrency(stats?.coconut_cash_on_bank ?? 0)}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              {/* Total Balance - COCONUT */}
-              <div
-                onClick={() => navigate('/collections', { state: { tab: 'balance' } })}
-                className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
-              >
-                <div className="flex flex-col justify-between h-full">
-                  <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
-                    Total Balance - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
-                  </span>
-                  <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                    {loading ? '...' : formatCurrency((stats?.coconut_balance ?? 0) + (stats?.coconut_cash_return ?? 0))}
-                  </p>
+                {/* Cash Return - COCONUT */}
+                <div
+                  onClick={() => navigate('/collections', { state: { tab: 'cash-return' } })}
+                  className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
+                >
+                  <div className="flex flex-col justify-between h-full">
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
+                      Cash Return - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                    </span>
+                    <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                      {loading ? '...' : formatCurrency(stats?.coconut_cash_return ?? 0)}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              {/* Cash Return - COCONUT */}
-              <div
-                onClick={() => navigate('/collections', { state: { tab: 'cash-return' } })}
-                className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
-              >
-                <div className="flex flex-col justify-between h-full">
-                  <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
-                    Cash Return - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
-                  </span>
-                  <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
-                    {loading ? '...' : formatCurrency(stats?.coconut_cash_return ?? 0)}
-                  </p>
+                {/* Cash on Hand - COCONUT */}
+                <div
+                  onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
+                  className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
+                >
+                  <div className="flex flex-col justify-between h-full">
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
+                      Cash on Hand - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
+                    </span>
+                    <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5 group-hover:text-white transition-colors">
+                      {loading ? '...' : formatCurrency((Number(stats?.total_coconut_collections || 0) - Number(stats?.total_coconut_expenses || 0) + Number(stats?.coconut_cash_return || 0)) - Number(stats?.coconut_cash_on_bank || 0))}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

@@ -108,6 +108,14 @@ export default function Collections() {
   const [cashOnBankError, setCashOnBankError] = useState('');
   const [editingCashOnBankId, setEditingCashOnBankId] = useState<number | null>(null);
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
+  const [showCashOnBankModal, setShowCashOnBankModal] = useState(false);
+  const [cashOnBankModalTab, setCashOnBankModalTab] = useState<'Canteen' | 'Coconut'>('Canteen');
+  const [cashOnBankFilterDate, setCashOnBankFilterDate] = useState('');
+  const [showCashOnBankDatePicker, setShowCashOnBankDatePicker] = useState(false);
+  const [cashOnBankFilterMonth, setCashOnBankFilterMonth] = useState('');
+  const [showCashOnBankMonthPicker, setShowCashOnBankMonthPicker] = useState(false);
+  const cashOnBankDatePickerRef = useRef<HTMLDivElement>(null);
+  const cashOnBankMonthPickerRef = useRef<HTMLDivElement>(null);
 
   /* ─────────────────── CASH RETURN state ─────────────────── */
   const [cashReturnDeposits, setCashReturnDeposits] = useState<CashReturnDeposit[]>([]);
@@ -295,14 +303,15 @@ export default function Collections() {
     setCashOnBankError('');
     try {
       if (editingCashOnBankId !== null) {
-        await cashOnBankApi.update(editingCashOnBankId, { school_year: schoolYear, amount, date: cashOnBankDate });
+        await cashOnBankApi.update(editingCashOnBankId, { school_year: schoolYear, type: cashOnBankModalTab, amount, date: cashOnBankDate });
       } else {
-        await cashOnBankApi.create({ school_year: schoolYear, amount, date: cashOnBankDate });
+        await cashOnBankApi.create({ school_year: schoolYear, type: cashOnBankModalTab, amount, date: cashOnBankDate });
       }
       setCashOnBankInput('');
       setCashOnBankDate(TODAY);
       setEditingCashOnBankId(null);
       setCashOnBankSaved(true);
+      setShowCashOnBankModal(false);
       loadCashOnBank();
       setTimeout(() => setCashOnBankSaved(false), 2500);
     } catch (e: any) {
@@ -324,9 +333,10 @@ export default function Collections() {
 
   function handleEditCashOnBank(dep: CashOnBankDeposit) {
     setEditingCashOnBankId(dep.id);
+    setCashOnBankModalTab(dep.type as 'Canteen' | 'Coconut');
     setCashOnBankInput(String(dep.amount));
     setCashOnBankDate(dep.date);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setShowCashOnBankModal(true);
   }
 
   /* ─────────────────── CASH RETURN helpers ─────────────────── */
@@ -405,6 +415,14 @@ export default function Collections() {
     setCashReturnForm(EMPTY_CASH_RETURN_FORM);
     setCashReturnModalTab('Canteen');
     setShowCashReturnModal(true);
+  }
+
+  function openCreateCashOnBankModal() {
+    setEditingCashOnBankId(null);
+    setCashOnBankInput('');
+    setCashOnBankDate(TODAY);
+    setCashOnBankModalTab('Canteen');
+    setShowCashOnBankModal(true);
   }
 
   useEffect(() => {
@@ -674,7 +692,7 @@ export default function Collections() {
                   <span>Export PDF</span>
                 </button>
               )}
-              {!isViewMode && activeTab !== 'cash-on-bank' && (
+              {!isViewMode && (
                 <>
                   {activeTab === 'income' ? (
                     <button
@@ -699,6 +717,14 @@ export default function Collections() {
                     >
                       <Plus className="h-3.5 w-3.5" />
                       <span>Record New Cash Return</span>
+                    </button>
+                  ) : activeTab === 'cash-on-bank' ? (
+                    <button
+                      onClick={openCreateCashOnBankModal}
+                      className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      <span>Record New Cash on Bank</span>
                     </button>
                   ) : null}
                 </>
@@ -1250,185 +1276,100 @@ export default function Collections() {
 
           {/* ================= CASH ON BANK VIEW ================= */}
           {activeTab === 'cash-on-bank' && (
-            <div className="space-y-6">
-              {cashOnBankError && (
-                <div className="bg-red-50 border border-red-200 text-red-700 text-xs font-semibold px-4 py-3 rounded-lg">{cashOnBankError}</div>
-              )}
-
-              {/* Info cards row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Cash on Bank card */}
-                <div className="bg-white p-5 rounded-xl border-2 border-blue-200 shadow-sm flex flex-col justify-between">
-                  <div className="flex justify-between items-start">
-
-                    <span className="text-[9px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Bank</span>
-                  </div>
-                  <div className="mt-4">
-                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Current Cash on Bank</span>
-                    <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
-                      {loadingCashOnBank ? '...' : formatCurrency(cashOnBankAmount)}
-                    </p>
-                    <p className="text-[10px] text-gray-400 mt-1">for {schoolYear}</p>
-                  </div>
-                </div>
-
-                {/* Total Balance card */}
+            <div className="space-y-5">
+              {/* Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <span className="text-[9px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Canteen</span>
+                    <span className="text-[9px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Canteen</span>
                   </div>
                   <div className="mt-4">
-                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Total Balance (Canteen)</span>
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Cash on Bank - CANTEEN</span>
                     <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
-                      {loadingCashOnBank ? '...' : formatCurrency(Number(dashboardStats?.total_collections || 0) - Number(dashboardStats?.total_expenses || 0))}
+                      {loadingCashOnBank ? '...' : formatCurrency(dashboardStats?.canteen_cash_on_bank || 0)}
                     </p>
                   </div>
                 </div>
 
-                {/* Cash on Hand card */}
                 <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-
-                    <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-wider">On Hand</span>
+                    <span className="text-[9px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-wider">Coconut</span>
                   </div>
                   <div className="mt-4">
-                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Cash on Hand</span>
-                    <p className={`text-2xl font-bold tracking-tight mt-0.5 ${
-                      (Number(dashboardStats?.total_collections || 0) - Number(dashboardStats?.total_expenses || 0)) - Number(cashOnBankAmount) >= 0 ? 'text-gray-900' : 'text-red-600'
-                    }`}>
-                      {loadingCashOnBank ? '...' : formatCurrency((Number(dashboardStats?.total_collections || 0) - Number(dashboardStats?.total_expenses || 0)) - Number(cashOnBankAmount))}
+                    <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Cash on Bank - COCONUT</span>
+                    <p className="text-2xl font-bold text-gray-900 tracking-tight mt-0.5">
+                      {loadingCashOnBank ? '...' : formatCurrency(dashboardStats?.coconut_cash_on_bank || 0)}
                     </p>
-                    <p className="text-[10px] text-gray-400 mt-1">Total Balance − Cash on Bank</p>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Input section */}
-                <div className="lg:col-span-1">
-                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sticky top-6">
-                    <h3 className="text-sm font-bold text-gray-900 mb-1">
-                      {editingCashOnBankId !== null ? 'Edit Bank Deposit' : 'Add Bank Deposit'}
-                    </h3>
-                    <p className="text-xs text-gray-500 mb-5">
-                      {editingCashOnBankId !== null ? 'Update the details of the selected deposit.' : 'Record a new bank deposit.'}
-                    </p>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Amount (PHP)</label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">₱</span>
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={cashOnBankInput}
-                            onChange={e => setCashOnBankInput(e.target.value)}
-                            onKeyDown={e => e.key === 'Enter' && handleSaveCashOnBank()}
-                            placeholder="0.00"
-                            className="w-full pl-8 pr-4 py-2.5 border border-gray-200 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">Date Deposited</label>
-                        <input
-                          type="date"
-                          value={cashOnBankDate}
-                          onChange={e => setCashOnBankDate(e.target.value)}
-                          className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                        />
-                      </div>
-
-                      <div className="flex items-center space-x-3 pt-2">
-                        {editingCashOnBankId !== null && (
-                          <button
-                            onClick={() => {
-                              setEditingCashOnBankId(null);
-                              setCashOnBankInput('');
-                              setCashOnBankDate(TODAY);
-                            }}
-                            className="px-4 py-2.5 border border-gray-200 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50 transition-colors"
-                          >
-                            Cancel
-                          </button>
-                        )}
-                        <button
-                          onClick={handleSaveCashOnBank}
-                          disabled={savingCashOnBank || !cashOnBankInput}
-                          className="flex-1 flex items-center space-x-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors justify-center"
-                        >
-                          {savingCashOnBank ? (
-                            <Loader2 className="animate-spin h-3.5 w-3.5" />
-                          ) : editingCashOnBankId !== null ? (
-                            <Pencil className="h-3.5 w-3.5" />
-                          ) : (
-                            <Plus className="h-3.5 w-3.5" />
-                          )}
-                          <span>{savingCashOnBank ? 'Saving...' : editingCashOnBankId !== null ? 'Save Changes' : 'Add Deposit'}</span>
-                        </button>
-                      </div>
-
-                      {cashOnBankSaved && (
-                        <div className="flex items-center justify-center space-x-1 text-emerald-600 text-xs font-semibold animate-pulse">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                          <span>Saved successfully!</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+              {/* Table section */}
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+                <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                  <h3 className="text-sm font-bold text-gray-800">Deposit History</h3>
                 </div>
 
-                {/* Table section */}
-                <div className="lg:col-span-2">
-                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                    <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                      <h3 className="text-sm font-bold text-gray-800">Deposit History</h3>
-                    </div>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse">
+                <div className="overflow-x-auto w-full">
+                  <div className="min-w-[600px]">
+                    <div className="bg-gray-50 border-b border-gray-200 rounded-t-xl overflow-hidden">
+                      <table className="w-full table-fixed text-left border-collapse">
+                        <colgroup>
+                          <col style={{ width: '25%' }} />
+                          <col style={{ width: '30%' }} />
+                          <col style={{ width: '25%' }} />
+                          <col style={{ width: '20%' }} />
+                        </colgroup>
                         <thead>
-                          <tr className="bg-gray-50/80 border-b border-gray-200">
-                            <th className="px-5 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider w-1/3">Date Deposited</th>
-                            <th className="px-5 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider w-1/2 text-right">Amount</th>
-                            <th className="px-5 py-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider text-center w-1/6">Actions</th>
+                          <tr className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                            <th className="pl-8 pr-4 py-3 text-center">Type</th>
+                            <th className="px-4 py-3 text-center">Date Deposited</th>
+                            <th className="px-4 py-3 text-right">Amount</th>
+                            <th className="px-4 py-3 text-center">Actions</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                      </table>
+                    </div>
+
+                    <div className="overflow-y-auto max-h-[400px]">
+                      <table className="w-full table-fixed text-left border-collapse">
+                        <colgroup>
+                          <col style={{ width: '25%' }} />
+                          <col style={{ width: '30%' }} />
+                          <col style={{ width: '25%' }} />
+                          <col style={{ width: '20%' }} />
+                        </colgroup>
+                        <tbody className={`divide-y divide-slate-200 text-xs ${loadingCashOnBank && cashOnBankDeposits.length > 0 ? 'opacity-50 pointer-events-none transition-opacity' : ''}`}>
                           {loadingCashOnBank && cashOnBankDeposits.length === 0 ? (
-                            <tr>
-                              <td colSpan={3} className="px-5 py-10 text-center"><Loader2 className="w-5 h-5 animate-spin mx-auto text-gray-400" /></td>
-                            </tr>
+                            <tr><td colSpan={4} className="px-4 py-10 text-center"><Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" /></td></tr>
                           ) : cashOnBankDeposits.length === 0 ? (
                             <tr>
-                              <td colSpan={3} className="px-5 py-10 text-center text-gray-400 text-xs">No bank deposits found for this school year.</td>
+                              <td colSpan={4} className="px-4 py-12 text-center h-28">
+                                <div className="min-h-28 flex flex-col items-center justify-center space-y-2 text-gray-400">
+                                  <Coins className="h-7 w-7 opacity-30" />
+                                  <p className="text-xs font-semibold">No bank deposits found</p>
+                                </div>
+                              </td>
                             </tr>
                           ) : (
-                            cashOnBankDeposits.map((dep) => (
-                              <tr key={dep.id} className="hover:bg-blue-50/30 transition-colors">
-                                <td className="px-5 py-3 text-sm text-gray-600 font-medium">
-                                  {new Date(dep.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                            cashOnBankDeposits.map(dep => (
+                              <tr key={dep.id} className="transition-colors hover:bg-blue-50/30">
+                                <td className="px-4 py-3 w-[25%] text-center">
+                                  <span className={`inline-block px-2 py-1 text-[10px] font-bold rounded-full ${dep.type === 'Canteen' ? 'bg-blue-100 text-blue-700' : 'bg-indigo-100 text-indigo-700'}`}>
+                                    {dep.type}
+                                  </span>
                                 </td>
-                                <td className="px-5 py-3 text-sm font-bold text-gray-900 text-right">
-                                  {formatCurrency(dep.amount)}
+                                <td className="px-4 py-3 w-[30%] text-center text-gray-500 font-medium text-[11px]">
+                                  {new Date(dep.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                 </td>
-                                <td className="px-5 py-3 text-center">
+                                <td className="px-4 py-3 w-[25%] text-right font-bold text-blue-600 whitespace-nowrap">{formatCurrency(dep.amount)}</td>
+                                <td className="px-4 py-3 w-[20%] text-center">
                                   {!isViewMode && (
                                     <div className="flex items-center justify-center space-x-1">
-                                      <button 
-                                        onClick={() => handleEditCashOnBank(dep)}
-                                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                                        title="Edit deposit"
-                                      >
+                                      <button onClick={(e) => { e.stopPropagation(); handleEditCashOnBank(dep); }} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors" title="Edit deposit">
                                         <Pencil className="h-3.5 w-3.5" />
                                       </button>
-                                      <button 
-                                        onClick={() => handleDeleteCashOnBank(dep.id)}
-                                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                                        title="Delete deposit"
-                                      >
+                                      <button onClick={(e) => { e.stopPropagation(); handleDeleteCashOnBank(dep.id); }} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors" title="Delete deposit">
                                         <Trash2 className="h-3.5 w-3.5" />
                                       </button>
                                     </div>
@@ -1973,6 +1914,62 @@ export default function Collections() {
                   <button onClick={() => setShowCashReturnModal(false)} className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50">Cancel</button>
                   <button onClick={handleSaveCashReturn} disabled={saving || !cashReturnForm.returned_by || !cashReturnForm.amount} className="flex-1 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg disabled:opacity-50 transition-colors">
                     {saving ? 'Saving...' : editingCashReturnId !== null ? 'Save Changes' : 'Record Return'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════ CASH ON BANK MODAL ══════════════ */}
+          {showCashOnBankModal && (
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-5">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-sm font-bold text-gray-900">{editingCashOnBankId !== null ? 'Edit Bank Deposit' : 'Record New Bank Deposit'}</h2>
+                  <button onClick={() => setShowCashOnBankModal(false)} className="text-gray-400 hover:text-gray-600"><X className="h-4 w-4" /></button>
+                </div>
+
+                {cashOnBankError && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 text-xs font-semibold px-4 py-3 rounded-lg flex items-center space-x-2">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>{cashOnBankError}</span>
+                  </div>
+                )}
+
+                {/* Modal Tabs */}
+                {!editingCashOnBankId && (
+                  <div className="flex border-b border-gray-200 mb-4">
+                    <button
+                      onClick={() => setCashOnBankModalTab('Canteen')}
+                      className={`flex-1 pb-2 text-xs font-bold tracking-tight transition-colors border-b-2 ${cashOnBankModalTab === 'Canteen' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                    >
+                      Canteen Deposit
+                    </button>
+                    <button
+                      onClick={() => setCashOnBankModalTab('Coconut')}
+                      className={`flex-1 pb-2 text-xs font-bold tracking-tight transition-colors border-b-2 ${cashOnBankModalTab === 'Coconut' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                    >
+                      Coconut Deposit
+                    </button>
+                  </div>
+                )}
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Amount</label>
+                    <input type="number" min="0" step="0.01" value={cashOnBankInput} onChange={e => setCashOnBankInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSaveCashOnBank()} placeholder="0.00" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-600" />
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Date Deposited</label>
+                    <input type="date" value={cashOnBankDate} onChange={e => setCashOnBankDate(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-600" />
+                  </div>
+                </div>
+
+                <div className="flex space-x-3 pt-2">
+                  <button onClick={() => setShowCashOnBankModal(false)} className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50">Cancel</button>
+                  <button onClick={handleSaveCashOnBank} disabled={savingCashOnBank || !cashOnBankInput} className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg disabled:opacity-50 transition-colors">
+                    {savingCashOnBank ? 'Saving...' : editingCashOnBankId !== null ? 'Save Changes' : 'Record Deposit'}
                   </button>
                 </div>
               </div>

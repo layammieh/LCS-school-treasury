@@ -175,14 +175,22 @@ class Liquidation(models.Model):
 
 class CashOnBank(models.Model):
     """Stores the user-entered 'Cash on Bank' amount per school year."""
+    TYPE_CHOICES = [
+        ('Canteen', 'Canteen'),
+        ('Coconut', 'Coconut'),
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cash_on_bank', null=True, blank=True)
     school_year = models.CharField(max_length=20, default='2026-2027', db_index=True)
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='Canteen')
     amount = models.DecimalField(max_digits=14, decimal_places=2, default=0)
     date = models.DateField(default=django.utils.timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ['-date', '-updated_at']
+
     def __str__(self):
-        return f"CashOnBank {self.school_year}: {self.amount}"
+        return f"CashOnBank {self.type} {self.school_year}: {self.amount}"
 
 
 class CashReturn(models.Model):

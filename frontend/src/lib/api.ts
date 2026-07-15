@@ -105,6 +105,8 @@ export interface DashboardStats {
   coconut_balance: number;
   canteen_cash_return: number;
   coconut_cash_return: number;
+  canteen_cash_on_bank: number;
+  coconut_cash_on_bank: number;
   monthly_chart: MonthlyData[];
   recent_transactions: Transaction[];
 }
@@ -404,6 +406,7 @@ export const liquidationApi = {
 export interface CashOnBankDeposit {
   id: number;
   school_year: string;
+  type: string;
   amount: number;
   date: string;
   updated_at: string;
@@ -417,13 +420,13 @@ export const cashOnBankApi = {
     return request<PaginatedResponse<CashOnBankDeposit>>(`/cash-on-bank/?${qs}`);
   },
 
-  create: (data: { school_year: string; amount: number; date: string }) =>
+  create: (data: { school_year: string; type: string; amount: number; date: string }) =>
     request<CashOnBankDeposit>('/cash-on-bank/', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
-  update: (id: number, data: { school_year: string; amount: number; date: string }) =>
+  update: (id: number, data: { school_year: string; type: string; amount: number; date: string }) =>
     request<CashOnBankDeposit>(`/cash-on-bank/${id}/`, {
       method: 'PUT',
       body: JSON.stringify(data),
