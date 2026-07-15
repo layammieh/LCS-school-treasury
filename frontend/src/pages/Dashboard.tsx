@@ -151,7 +151,7 @@ export default function Dashboard() {
                   onClick={() => navigate('/collections', { state: { tab: 'income' } })}
                   className="bg-white p-5 min-h-[120px] rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
                 >
-                  <div className="mt-2">
+                  <div className="flex flex-col justify-between h-full">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                       Total Income - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                     </span>
@@ -166,7 +166,7 @@ export default function Dashboard() {
                   onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
                   className="bg-white p-5 min-h-[120px] rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
                 >
-                  <div className="mt-2">
+                  <div className="flex flex-col justify-between h-full">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                       Total Expenses - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                     </span>
@@ -178,7 +178,7 @@ export default function Dashboard() {
 
                 {/* Total Balance */}
                 <div className="bg-white p-5 min-h-[120px] rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between group hover:bg-[#006B4D] transition-colors">
-                  <div className="mt-2">
+                  <div className="flex flex-col justify-between h-full">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                       Total Balance - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                     </span>
@@ -195,7 +195,7 @@ export default function Dashboard() {
                   onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
                   className="bg-white p-5 min-h-[120px] rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
                 >
-                  <div className="mt-2">
+                  <div className="flex flex-col justify-between h-full">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                       Cash on Bank{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                     </span>
@@ -210,7 +210,7 @@ export default function Dashboard() {
                   onClick={() => navigate('/collections', { state: { tab: 'cash-return' } })}
                   className="bg-white p-5 min-h-[120px] rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
                 >
-                  <div className="mt-2">
+                  <div className="flex flex-col justify-between h-full">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                       Cash Return - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                     </span>
@@ -225,7 +225,7 @@ export default function Dashboard() {
                   onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
                   className="bg-white p-5 min-h-[120px] rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
                 >
-                  <div className="mt-2">
+                  <div className="flex flex-col justify-between h-full">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                       Cash on Hand - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                     </span>
