@@ -149,7 +149,7 @@ export default function Dashboard() {
                 {/* Total Income */}
                 <div
                   onClick={() => navigate('/collections', { state: { tab: 'income' } })}
-                  className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
+                  className="bg-white p-5 min-h-[120px] rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
                 >
                   <div className="mt-2">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
@@ -164,7 +164,7 @@ export default function Dashboard() {
                 {/* Total Expenses */}
                 <div
                   onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
-                  className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
+                  className="bg-white p-5 min-h-[120px] rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
                 >
                   <div className="mt-2">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
@@ -177,7 +177,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Total Balance */}
-                <div className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between group hover:bg-[#006B4D] transition-colors">
+                <div className="bg-white p-5 min-h-[120px] rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between group hover:bg-[#006B4D] transition-colors">
                   <div className="mt-2">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                       Total Balance - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
@@ -193,7 +193,7 @@ export default function Dashboard() {
                 {/* Cash on Bank */}
                 <div
                   onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
-                  className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
+                  className="bg-white p-5 min-h-[120px] rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
                 >
                   <div className="mt-2">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
@@ -208,7 +208,7 @@ export default function Dashboard() {
                 {/* Cash Return */}
                 <div
                   onClick={() => navigate('/collections', { state: { tab: 'cash-return' } })}
-                  className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
+                  className="bg-white p-5 min-h-[120px] rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
                 >
                   <div className="mt-2">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
@@ -223,7 +223,7 @@ export default function Dashboard() {
                 {/* Cash on Hand */}
                 <div
                   onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
-                  className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
+                  className="bg-white p-5 min-h-[120px] rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
                 >
                   <div className="mt-2">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
@@ -248,7 +248,7 @@ export default function Dashboard() {
               {/* Total Collected - COCONUT */}
               <div
                 onClick={() => navigate('/collections', { state: { tab: 'income' } })}
-                className="bg-white p-5 rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
+                className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
               >
                 <div className="mt-2">
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
@@ -263,7 +263,7 @@ export default function Dashboard() {
               {/* Total Expenses - COCONUT */}
               <div
                 onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
-                className="bg-white p-5 rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
+                className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
               >
                 <div className="mt-2">
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
@@ -278,7 +278,7 @@ export default function Dashboard() {
               {/* Total Balance - COCONUT */}
               <div
                 onClick={() => navigate('/collections', { state: { tab: 'balance' } })}
-                className="bg-white p-5 rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
+                className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
               >
                 <div className="mt-2">
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
@@ -293,7 +293,7 @@ export default function Dashboard() {
               {/* Cash Return - COCONUT */}
               <div
                 onClick={() => navigate('/collections', { state: { tab: 'cash-return' } })}
-                className="bg-white p-5 rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
+                className="bg-white p-5 min-h-[120px] rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
               >
                 <div className="mt-2">
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
