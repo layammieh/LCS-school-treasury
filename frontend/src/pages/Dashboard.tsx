@@ -155,7 +155,7 @@ export default function Dashboard() {
                 {/* Total Income */}
                 <div
                   onClick={() => navigate('/collections', { state: { tab: 'income' } })}
-                  className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
+                  className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-emerald-400 active:bg-emerald-500 transition-colors"
                 >
                   <div className="flex justify-between items-start">
                     <div className="bg-[#4ade80]/10 p-2 rounded-lg text-[#006B4D] group-hover:bg-[#4ade80]/20 group-hover:text-[#4ade80] transition-colors">
@@ -175,7 +175,7 @@ export default function Dashboard() {
                 {/* Total Expenses */}
                 <div
                   onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
-                  className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
+                  className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-emerald-400 active:bg-emerald-500 transition-colors"
                 >
                   <div className="flex justify-between items-start">
                     <div className="bg-red-50 p-2 rounded-lg text-red-600 group-hover:bg-red-500/20 group-hover:text-red-400 transition-colors">
@@ -193,7 +193,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Total Balance */}
-                <div className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between group hover:bg-[#006B4D] transition-colors">
+                <div className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between group hover:bg-emerald-400 transition-colors">
                   <div className="flex justify-between items-start">
                     <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">
                       <Wallet className="h-5 w-5" />
@@ -214,7 +214,7 @@ export default function Dashboard() {
                 {/* Cash on Bank */}
                 <div
                   onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
-                  className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
+                  className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-emerald-400 active:bg-emerald-500 transition-colors"
                 >
                   <div className="flex justify-between items-start">
                     <div className="bg-blue-50 p-2 rounded-lg text-blue-600 group-hover:bg-blue-500/30 group-hover:text-blue-100 transition-colors">
@@ -234,7 +234,7 @@ export default function Dashboard() {
                 {/* Cash Return */}
                 <div
                   onClick={() => navigate('/collections', { state: { tab: 'cash-return' } })}
-                  className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
+                  className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-emerald-400 active:bg-emerald-500 transition-colors"
                 >
                   <div className="flex justify-between items-start">
                     <div className="bg-amber-50 p-2 rounded-lg text-amber-600 group-hover:bg-amber-500/30 group-hover:text-amber-100 transition-colors">
@@ -254,7 +254,7 @@ export default function Dashboard() {
                 {/* Cash on Hand */}
                 <div
                   onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
-                  className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
+                  className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-emerald-400 active:bg-emerald-500 transition-colors"
                 >
                   <div className="flex justify-between items-start">
                     <div className="bg-emerald-50 p-2 rounded-lg text-emerald-600 group-hover:bg-emerald-500/30 group-hover:text-emerald-100 transition-colors">
@@ -284,7 +284,7 @@ export default function Dashboard() {
               {/* Total Collected - COCONUT */}
               <div
                 onClick={() => navigate('/collections', { state: { tab: 'income' } })}
-                className="bg-white p-5 rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
+                className="bg-white p-5 rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-orange-400 active:bg-orange-500 transition-colors"
               >
                 <div className="flex justify-between items-start">
                   <div className="bg-[#4ade80]/15 p-2 rounded-lg text-[#006B4D] group-hover:bg-[#4ade80]/20 group-hover:text-[#4ade80] transition-colors">
@@ -304,7 +304,7 @@ export default function Dashboard() {
               {/* Total Expenses - COCONUT */}
               <div
                 onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
-                className="bg-white p-5 rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
+                className="bg-white p-5 rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-orange-400 active:bg-orange-500 transition-colors"
               >
                 <div className="flex justify-between items-start">
                   <div className="bg-red-50 p-2 rounded-lg text-red-600 group-hover:bg-red-500/20 group-hover:text-red-400 transition-colors">
@@ -324,7 +324,7 @@ export default function Dashboard() {
               {/* Total Balance - COCONUT */}
               <div
                 onClick={() => navigate('/collections', { state: { tab: 'balance' } })}
-                className="bg-white p-5 rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
+                className="bg-white p-5 rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-orange-400 active:bg-orange-500 transition-colors"
               >
                 <div className="flex justify-between items-start">
                   <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">
@@ -344,7 +344,7 @@ export default function Dashboard() {
               {/* Cash Return - COCONUT */}
               <div
                 onClick={() => navigate('/collections', { state: { tab: 'cash-return' } })}
-                className="bg-white p-5 rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
+                className="bg-white p-5 rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-orange-400 active:bg-orange-500 transition-colors"
               >
                 <div className="flex justify-between items-start">
                   <div className="bg-amber-50 p-2 rounded-lg text-amber-600 group-hover:bg-amber-500/30 group-hover:text-amber-100 transition-colors">
