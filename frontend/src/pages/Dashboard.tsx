@@ -4,8 +4,6 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import { useSchoolYearStore } from '../store/schoolYearStore';
 import {
-  Settings,
-  ExternalLink,
   Coins,
   CreditCard,
   Wallet,
@@ -72,32 +70,7 @@ export default function Dashboard() {
       .finally(() => setLoading(false));
   }, [schoolYear, filterMonth]);
 
-  // Build SVG chart path from monthly data
-  const buildChartPath = (data: { revenue: number; expenses: number }[], key: 'revenue' | 'expenses') => {
-    if (!data.length) return '';
-    const maxVal = Math.max(...data.map(d => Math.max(d.revenue, d.expenses)), 1);
-    const w = 600;
-    const h = 180;
-    const points = data.map((d, i) => {
-      const x = (i / (data.length - 1)) * w;
-      const y = h - (d[key] / maxVal) * (h - 20);
-      return `${x},${y}`;
-    });
-    return `M ${points.join(' L ')}`;
-  };
 
-  const buildAreaPath = (data: { revenue: number }[]) => {
-    if (!data.length) return '';
-    const maxVal = Math.max(...data.map(d => d.revenue), 1);
-    const w = 600;
-    const h = 180;
-    const pts = data.map((d, i) => {
-      const x = (i / (data.length - 1)) * w;
-      const y = h - (d.revenue / maxVal) * (h - 20);
-      return `${x},${y}`;
-    });
-    return `M ${pts[0]} ${pts.slice(1).map(p => `L ${p}`).join(' ')} L 600,${h} L 0,${h} Z`;
-  };
 
   return (
     <div className="min-h-screen bg-slate-50 flex font-sans text-slate-800">
