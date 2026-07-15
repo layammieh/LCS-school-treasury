@@ -4,14 +4,8 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import { useSchoolYearStore } from '../store/schoolYearStore';
 import {
-  Coins,
-  CreditCard,
-  Wallet,
   Calendar,
-  ChevronDown,
-  TrendingUp,
-  Activity,
-  Landmark
+  ChevronDown
 } from 'lucide-react';
 import { dashboardApi, cashOnBankApi } from '../lib/api';
 import type { DashboardStats } from '../lib/api';
@@ -157,12 +151,7 @@ export default function Dashboard() {
                   onClick={() => navigate('/collections', { state: { tab: 'income' } })}
                   className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
                 >
-                  <div className="flex justify-between items-start">
-                    <div className="bg-[#4ade80]/10 p-2 rounded-lg text-[#006B4D] group-hover:bg-[#4ade80]/20 group-hover:text-[#4ade80] transition-colors">
-                      <Coins className="h-5 w-5" />
-                    </div>
-                  </div>
-                  <div className="mt-4">
+                  <div className="mt-2">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                       Total Income - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                     </span>
@@ -177,12 +166,7 @@ export default function Dashboard() {
                   onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
                   className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
                 >
-                  <div className="flex justify-between items-start">
-                    <div className="bg-red-50 p-2 rounded-lg text-red-600 group-hover:bg-red-500/20 group-hover:text-red-400 transition-colors">
-                      <CreditCard className="h-5 w-5" />
-                    </div>
-                  </div>
-                  <div className="mt-4">
+                  <div className="mt-2">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                       Total Expenses - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                     </span>
@@ -194,12 +178,7 @@ export default function Dashboard() {
 
                 {/* Total Balance */}
                 <div className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between group hover:bg-[#006B4D] transition-colors">
-                  <div className="flex justify-between items-start">
-                    <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">
-                      <Wallet className="h-5 w-5" />
-                    </div>
-                  </div>
-                  <div className="mt-4">
+                  <div className="mt-2">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                       Total Balance - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                     </span>
@@ -216,12 +195,7 @@ export default function Dashboard() {
                   onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
                   className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
                 >
-                  <div className="flex justify-between items-start">
-                    <div className="bg-blue-50 p-2 rounded-lg text-blue-600 group-hover:bg-blue-500/30 group-hover:text-blue-100 transition-colors">
-                      <Landmark className="h-5 w-5" />
-                    </div>
-                  </div>
-                  <div className="mt-4">
+                  <div className="mt-2">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                       Cash on Bank{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                     </span>
@@ -236,12 +210,7 @@ export default function Dashboard() {
                   onClick={() => navigate('/collections', { state: { tab: 'cash-return' } })}
                   className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
                 >
-                  <div className="flex justify-between items-start">
-                    <div className="bg-amber-50 p-2 rounded-lg text-amber-600 group-hover:bg-amber-500/30 group-hover:text-amber-100 transition-colors">
-                      <Activity className="h-5 w-5" />
-                    </div>
-                  </div>
-                  <div className="mt-4">
+                  <div className="mt-2">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                       Cash Return - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                     </span>
@@ -256,12 +225,7 @@ export default function Dashboard() {
                   onClick={() => navigate('/collections', { state: { tab: 'cash-on-bank' } })}
                   className="bg-white p-5 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#006B4D] active:bg-[#00523b] transition-colors"
                 >
-                  <div className="flex justify-between items-start">
-                    <div className="bg-emerald-50 p-2 rounded-lg text-emerald-600 group-hover:bg-emerald-500/30 group-hover:text-emerald-100 transition-colors">
-                      <Coins className="h-5 w-5" />
-                    </div>
-                  </div>
-                  <div className="mt-4">
+                  <div className="mt-2">
                     <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                       Cash on Hand - CANTEEN{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                     </span>
@@ -286,12 +250,7 @@ export default function Dashboard() {
                 onClick={() => navigate('/collections', { state: { tab: 'income' } })}
                 className="bg-white p-5 rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
               >
-                <div className="flex justify-between items-start">
-                  <div className="bg-[#4ade80]/15 p-2 rounded-lg text-[#006B4D] group-hover:bg-[#4ade80]/20 group-hover:text-[#4ade80] transition-colors">
-                    <TrendingUp className="h-5 w-5" />
-                  </div>
-                </div>
-                <div className="mt-4">
+                <div className="mt-2">
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                     Total Collected - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                   </span>
@@ -306,12 +265,7 @@ export default function Dashboard() {
                 onClick={() => navigate('/collections', { state: { tab: 'expenses' } })}
                 className="bg-white p-5 rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
               >
-                <div className="flex justify-between items-start">
-                  <div className="bg-red-50 p-2 rounded-lg text-red-600 group-hover:bg-red-500/20 group-hover:text-red-400 transition-colors">
-                    <Activity className="h-5 w-5" />
-                  </div>
-                </div>
-                <div className="mt-4">
+                <div className="mt-2">
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                     Total Expenses - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                   </span>
@@ -326,12 +280,7 @@ export default function Dashboard() {
                 onClick={() => navigate('/collections', { state: { tab: 'balance' } })}
                 className="bg-white p-5 rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
               >
-                <div className="flex justify-between items-start">
-                  <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">
-                    <Wallet className="h-5 w-5" />
-                  </div>
-                </div>
-                <div className="mt-4">
+                <div className="mt-2">
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                     Total Balance - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                   </span>
@@ -346,12 +295,7 @@ export default function Dashboard() {
                 onClick={() => navigate('/collections', { state: { tab: 'cash-return' } })}
                 className="bg-white p-5 rounded-xl border border-orange-200/80 shadow-sm flex flex-col justify-between cursor-pointer group hover:bg-[#ea580c] active:bg-[#c2410c] transition-colors"
               >
-                <div className="flex justify-between items-start">
-                  <div className="bg-amber-50 p-2 rounded-lg text-amber-600 group-hover:bg-amber-500/30 group-hover:text-amber-100 transition-colors">
-                    <Coins className="h-5 w-5" />
-                  </div>
-                </div>
-                <div className="mt-4">
+                <div className="mt-2">
                   <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-300 transition-colors">
                     Cash Return - COCONUT{filterMonth ? ` · ${new Date(filterMonth + '-01T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : ''}
                   </span>
