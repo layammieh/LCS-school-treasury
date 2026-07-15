@@ -4,36 +4,22 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import { useSchoolYearStore } from '../store/schoolYearStore';
 import {
-  Settings,
-  ExternalLink,
   Coins,
   CreditCard,
   Wallet,
   Calendar,
   ChevronDown,
-  Loader2,
   TrendingUp,
   Activity,
   Landmark
 } from 'lucide-react';
 import { dashboardApi, cashOnBankApi } from '../lib/api';
-import type { DashboardStats, Transaction } from '../lib/api';
+import type { DashboardStats } from '../lib/api';
 
 function formatCurrency(n: any) {
   const num = Number(n);
   if (isNaN(num)) return '₱0.00';
   return num.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' });
-}
-
-function getStatusBadge(status: string) {
-  const map: Record<string, string> = {
-    paid: 'bg-green-50 text-green-700',
-    pending: 'bg-amber-50 text-amber-700',
-    overdue: 'bg-red-50 text-red-700',
-    unpaid: 'bg-red-50 text-red-700',
-    partial: 'bg-gray-100 text-gray-700',
-  };
-  return map[status] ?? 'bg-gray-100 text-gray-700';
 }
 
 export default function Dashboard() {
